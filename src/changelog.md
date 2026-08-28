@@ -3,9 +3,9 @@
 <!--
 @marss
 title: Regular Labs
-link: https://gavmor.github.io/regular-labs/
+link: https://www.gavmor.com/regular-labs/
 description: GPU/generative-render experiment write-ups — ComfyUI, H3, Concourse.
-htmlUrl: https://gavmor.github.io/regular-labs/changelog
+htmlUrl: https://www.gavmor.com/regular-labs/changelog
 language: en-us
 -->
 
