@@ -1,0 +1,224 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Light is the default/fallback (no prefers-color-scheme support = light).
+   Warm parchment rather than stark white — keeps the old-style-serif mood
+   cohesive instead of reading as "dark mode, inverted." */
+:root {
+  --serif: 'EB Garamond', Georgia, "Noto Serif", serif;
+  --bg: #f6f1e4;
+  --bg-nav: #ece4d0;
+  --border: #d9cead;
+  --text: #2b2620;
+  --text-dim: #5c5546;
+  --text-faint: #8a8271;
+  --accent: #9c2318;
+}
+
+/* Dark variant: the film's own mood, deferred to when the OS asks for it. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111012;
+    --bg-nav: #17161a;
+    --border: #2c2b30;
+    --text: #e6e1d3;
+    --text-dim: #a29c8d;
+    --text-faint: #736d62;
+    --accent: #b33025;
+  }
+}
+
+/* Chonky em dash: the plain-weight body dash swaps to bold-weight glyph
+   outlines via unicode-range so it reads as a deliberate beat, not a
+   hairline — Goudy's titles carried weight through case, not stroke, but
+   the crawl still needed dashes with visual mass. */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ebgaramond/v33/SlGUmQSNjdsmc35JDF1K5GR1SDk.woff2) format('woff2');
+  unicode-range: U+2014;
+}
+
+body {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+  font-kerning: auto;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+nav {
+  background: var(--bg-nav);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.25rem;
+  font-family: var(--serif);
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+nav a {
+  display: block;
+  padding: 0.2rem 0;
+  color: var(--text-dim);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+nav a:hover { color: var(--text); }
+nav .breadcrumb {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+nav .breadcrumb a { display: inline; padding: 0; }
+nav .mdsite-current-file > a { color: var(--text); }
+.nav-footer {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  font-size: 0.62rem;
+}
+.nav-footer a { display: inline; padding: 0; color: var(--text-faint); }
+.nav-footer a:hover { color: var(--text-dim); }
+main {
+  padding: 3rem 4rem 4rem;
+  max-width: 68ch;
+}
+h1 {
+  font-size: 2.15rem;
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 1.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--text);
+}
+h2 {
+  font-size: 1.05rem;
+  line-height: 1.3;
+  margin-top: 2.75rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+h3 {
+  font-size: 0.82rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--text-dim);
+}
+p {
+  margin: 0 0 1rem;
+  word-spacing: 0.06em;
+  text-indent: 1.6em;
+}
+h1 + p, h2 + p, h3 + p { text-indent: 0; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.5rem; }
+li { margin-bottom: 0.35rem; word-spacing: 0.06em; }
+table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 0.9rem; }
+th, td { border: 1px solid var(--border); padding: 0.4rem 0.75rem; text-align: left; }
+th {
+  background: var(--bg-nav);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78em;
+}
+pre { background: var(--bg-nav); border: 1px solid var(--border); border-radius: 3px; padding: 1rem; overflow-x: auto; margin: 1.5rem 0; }
+code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.85em; }
+p code, li code { background: var(--bg-nav); padding: 0.1em 0.35em; border-radius: 2px; }
+a { color: var(--text); text-decoration-color: var(--text-faint); }
+a:hover { color: var(--text); text-decoration-color: var(--text); }
+
+/* The one recurring, semantically loaded word gets the one accent color —
+   "recommended" plays the role Blade Runner's titles gave "Replicant." */
+em.verdict {
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* Mobile drawer nav (CSS-only checkbox hack). Desktop is untouched:
+   every element below is display:none outside the media query. */
+.nav-toggle, .nav-toggle-label, .nav-overlay { display: none; }
+@media (max-width: 720px) {
+  .layout { display: block; }
+  nav {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(260px, 85vw);
+    padding-top: 3.75rem;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 20;
+  }
+  .nav-toggle:checked ~ nav { transform: translateX(0); box-shadow: 2px 0 8px rgba(0,0,0,0.45); }
+  .nav-toggle {
+    display: block;
+    position: fixed;
+    top: 0.75rem; left: 0.75rem;
+    width: 2.25rem; height: 2.25rem;
+    margin: 0;
+    opacity: 0;
+    z-index: 31;
+    cursor: pointer;
+  }
+  .nav-toggle-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    position: fixed;
+    top: 0.75rem; left: 0.75rem;
+    width: 2.25rem; height: 2.25rem;
+    background: var(--bg-nav);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    z-index: 30;
+    cursor: pointer;
+  }
+  .nav-toggle-label span {
+    display: block;
+    width: 18px; height: 2px;
+    background: var(--text-dim);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .nav-toggle:checked ~ .nav-toggle-label span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle:checked ~ .nav-toggle-label span:nth-child(2) { opacity: 0; }
+  .nav-toggle:checked ~ .nav-toggle-label span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .nav-toggle:focus-visible ~ .nav-toggle-label { outline: 2px solid var(--text); outline-offset: 2px; }
+  .nav-overlay {
+    display: block;
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: rgba(0,0,0,0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 10;
+  }
+  .nav-toggle:checked ~ .nav-overlay { opacity: 1; pointer-events: auto; }
+  main { padding: 4rem 1.25rem 3rem; max-width: none; }
+  table { display: block; overflow-x: auto; }
+  main code { overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) {
+    nav, .nav-overlay, .nav-toggle-label span { transition: none; }
+  }
+}

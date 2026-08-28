@@ -1,0 +1,16 @@
+{
+  "name": "regular-labs",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "description": "Regular Labs — GPU/generative-render experiment write-ups (ComfyUI, Concourse, H3 and friends)",
+  "scripts": {
+    "build": "pnpm run build:site && pnpm run build:feed",
+    "build:site": "mdsite -i src -o site -t template.html",
+    "build:feed": "marss src/changelog.md site/feed.xml"
+  },
+  "devDependencies": {
+    "@benchristel/mdsite": "0.9.0",
+    "marss": "0.0.1"
+  }
+}

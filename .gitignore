@@ -1,0 +1,4 @@
+node_modules/
+# Build output (mdsite + marss). src/ is the only source of truth;
+# CI builds and deploys site/ — never commit it.
+site/
