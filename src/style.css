@@ -90,6 +90,32 @@ nav .mdsite-current-file > a { color: var(--text); }
 }
 .nav-footer a { display: inline; padding: 0; color: var(--text-faint); }
 .nav-footer a:hover { color: var(--text-dim); }
+
+/* Site motto (Flaubert) -- lives in the shared nav footer, so it shows on
+   every page. Scaled down and untinted-by-nav-uppercase to read as a quiet
+   aside, not another nav link. */
+blockquote.site-motto {
+  margin: 1.25rem 0 0;
+  padding: 0.75rem 0 0 0.6rem;
+  border-left: 1px solid var(--border);
+  font-size: 0.92em;
+  line-height: 1.5;
+  text-transform: none;
+  letter-spacing: normal;
+}
+blockquote.site-motto p {
+  margin: 0 0 0.4rem;
+  text-indent: 0;
+  font-style: italic;
+  color: var(--text-faint);
+  word-spacing: normal;
+}
+blockquote.site-motto p:last-child { margin-bottom: 0; }
+blockquote.site-motto cite {
+  font-style: normal;
+  color: var(--text-faint);
+  opacity: 0.85;
+}
 main {
   padding: 3rem 4rem 4rem;
   max-width: 68ch;
