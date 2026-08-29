@@ -7,7 +7,7 @@ final image," and got back a plausible reverse-engineered construction
 video. Inspiration and full credit:
 [the original post](https://reddit.com/r/StableDiffusion/s/np0U2umKtw).
 
-I run [T2VA](https://github.com/gavmor/T2VA), an existing pipeline of mine
+I run [charref-gen](https://github.com/gavmor/charref-gen), an existing pipeline of mine
 (ported from an earlier `blades68-lora` character-reference-sheet job) that
 generates video+audio character reference sheets for a game roster using
 MiniMax H3. It seemed like a natural fit for the same trick: instead of a
@@ -24,7 +24,7 @@ prompt that explicitly names each classical Loomis/Reilly construction
 primitive — sphere skull, box ribcage, box pelvis, cylinder limbs — so the
 model blocks in visibly three-dimensional shapes before refining into line
 art, color, and final rendering. Same seed, same 8-step turbo LoRA config,
-124 frames, as every other T2VA render. Eight evenly-spaced frames are then
+124 frames, as every other charref-gen render. Eight evenly-spaced frames are then
 extracted and labeled: Blank Canvas, Primitive Shapes, Rough Structure,
 Detail Pass, Line Refinement, Base Color, Rendering, Final Render.
 
