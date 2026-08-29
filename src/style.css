@@ -146,6 +146,25 @@ p code, li code { background: var(--bg-nav); padding: 0.1em 0.35em; border-radiu
 a { color: var(--text); text-decoration-color: var(--text-faint); }
 a:hover { color: var(--text); text-decoration-color: var(--text); }
 
+blockquote {
+  margin: 0 0 2rem;
+  padding: 0.1rem 0 0.1rem 1.25rem;
+  border-left: 2px solid var(--border);
+}
+blockquote p {
+  text-indent: 0;
+  font-style: italic;
+  color: var(--text-dim);
+}
+blockquote p:last-child { margin-bottom: 0; }
+blockquote cite {
+  display: block;
+  font-style: normal;
+  font-size: 0.85em;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
 /* The one recurring, semantically loaded word gets the one accent color —
    "recommended" plays the role Blade Runner's titles gave "Replicant." */
 em.verdict {
