@@ -10,10 +10,15 @@ video. Inspiration and full credit:
 I run [charref-gen](https://github.com/gavmor/charref-gen), an existing pipeline of mine
 (ported from an earlier `blades68-lora` character-reference-sheet job) that
 generates video+audio character reference sheets for a game roster using
-MiniMax H3. It seemed like a natural fit for the same trick: instead of a
-video, render a static multi-panel *construction sheet* — the kind you'd
-find in a figure-drawing instruction book — for one of the roster
-characters.
+MiniMax H3. That pipeline's own 4-shot technique (head closeup / front /
+back / side, neutral A-pose) traces back to a separate real source:
+[u/bstr3k's "Using H3 as a Character Reference Sheet Generator"](https://www.reddit.com/r/StableDiffusion/comments/1vr5nvc/using_h3_as_a_character_reference_sheet_generator/)
+(r/StableDiffusion) — multi-image reference generating a static 360°
+character sheet, with the same "neutral A pose" fixed prompt and a 4-panel/
+6-panel workflow choice. It seemed like a natural fit for the drawing-
+tutorial trick too: instead of a video, render a static multi-panel
+*construction sheet* — the kind you'd find in a figure-drawing instruction
+book — for one of the roster characters.
 
 ## What actually worked
 
