@@ -28,17 +28,16 @@ art, color, and final rendering. Same seed, same 8-step turbo LoRA config,
 extracted and labeled: Blank Canvas, Primitive Shapes, Rough Structure,
 Detail Pass, Line Refinement, Base Color, Rendering, Final Render.
 
-Two of those eight panels came out completely clean:
+Here's the full 8-panel sheet, unedited:
 
 <figure>
-  <img src="images/2026-08-28-drawing-tutorial-sheet/raven_blank_canvas.png" alt="Blank parchment canvas with a single faint construction circle sketched in" width="320">
-  <figcaption>Blank Canvas</figcaption>
+  <img src="images/2026-08-28-drawing-tutorial-sheet/raven_tutorial_sheet_full.png" alt="Full 8-panel construction sheet: Blank Canvas, Primitive Shapes, Rough Structure, Detail Pass, Line Refinement, Base Color, Rendering, Final Render — a drawing hand is visible in the six middle panels" width="640">
+  <figcaption>Blank Canvas → Primitive Shapes → Rough Structure → Detail Pass → Line Refinement → Base Color → Rendering → Final Render</figcaption>
 </figure>
 
-<figure>
-  <img src="images/2026-08-28-drawing-tutorial-sheet/raven_final_render.png" alt="Finished rendered character illustration on parchment background" width="320">
-  <figcaption>Final Render</figcaption>
-</figure>
+Only the first and last panels — Blank Canvas and Final Render — came out
+completely clean. The six in between have a problem, covered honestly
+below rather than cropped out of the picture.
 
 ## What didn't
 
@@ -64,6 +63,7 @@ override it. The untested next move would be dropping the "tutorial video"
 framing entirely for something like "an animated technical diagram" — no
 implied camera, no implied operator. That's a future post if it works.
 
-For now: the two clean endpoints above are genuinely representative of
-what the pipeline produces, and the middle-panel hand problem is a known,
-open issue rather than something quietly cropped out of view.
+For now: the sheet above is exactly what the pipeline produces, hand
+problem and all. The Blank Canvas and Final Render panels are genuinely
+clean; the middle-panel hand issue is a known, open problem, not
+something quietly cropped out of view.
