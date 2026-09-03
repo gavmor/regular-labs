@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-03
+
+- Index page: added an at-a-glance Sankey of the 26 active genops experiments (up from 25 on 2026-09-02, adding the H3-World reproduction attempt — blocked immediately on MiniMax-H3's community license excluding the US). Compact view lives on the index; the full breakdown and caveats stay in the 2026-09-02 write-up.
+
 ## 2026-09-02
 
 - New entry: [25 GPU experiments, one diagram](2026-09-02-experiments-sankey.html) — a Sankey view of the genops experiment register as of 2026-09-02: 25 items, seven work domains, five terminal states. Read alongside the per-experiment database for the audit trail; the diagram is the shape, not the confound check.
