@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-02
+
+- New entry: [25 GPU experiments, one diagram](2026-09-02-experiments-sankey.html) — a Sankey view of the genops experiment register as of 2026-09-02: 25 items, seven work domains, five terminal states. Read alongside the per-experiment database for the audit trail; the diagram is the shape, not the confound check.
+
 ## 2026-08-29
 
 - New entry: [Reproducing "50 tok/s at 100k context on 16GB" — and what it doesn't tell you](2026-08-29-qwen38-27b-100k-context-reproduction.html) — a LocalLLaMA benchmark claim (Qwen3.8-27B, beellama.cpp, kvarn KV-cache quant) reproduced on our RTX 3090, tok/s verified, quality caveat reported honestly.
