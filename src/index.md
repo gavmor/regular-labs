@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — 2026-09-04
 - [The H3-World reproduction that never reached the GPU](2026-09-06-h3-world-license-block.html) — 2026-09-06
 - [The full resolution sweep, and where the safe ceiling actually sits](2026-09-06-h3-resolution-array-sweep.html) — 2026-09-06
 - [We wrote down what we'd test. We can't confirm we ever ran it.](2026-09-06-prompt-builder-seed-consistency-unverified.html) — 2026-09-06

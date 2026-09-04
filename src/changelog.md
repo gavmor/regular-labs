@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-04 (cycle update)
+
+- New entry: [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — a register-level update against the 2026-09-02 Sankey: `krea2-4step-chk14000-distill-test` landed a Mixed verdict (step count, not the LoRA, drives the quality loss), `krea2-pixelart-gamelevel-test` landed Refuted (no pixel grid, no dithered palette, no tiling), and `sopro-tts-experiment` resolved to "never started" (zero unique commits vs `main`). Fresh Sankey, three flows re-routed, rest of the register unchanged since 2026-09-02.
+
 ## 2026-09-06
 
 - New entry: [The H3-World reproduction that never reached the GPU](2026-09-06-h3-world-license-block.html) — a third-party keyboard-controlled H3 fork never reached this rig at all: MiniMax H3's own Community License excludes the US territorially (Section V.4), with no personal-use exception, and separately the fork's own inference script turns out to pick one motion preset up front per render rather than accept live keystrokes.
