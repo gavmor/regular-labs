@@ -30,13 +30,21 @@ pipeline's default), and internal prompt-refinement explicitly turned off
 so the posted prompt reaches CLIP unmodified rather than getting rewritten
 by this project's own refiner first.
 
-That's the entire branch. No second commit, nothing in the repo's own lab
-notebook past the initial commit, no note about a build being queued or
-blocked in this lab's own tracked archive. What this retrofit pass found is
-that the workflow was, in fact, run at some point (the file is dated the
-same day as the commit): the output just never made it into this lab's
-archive or notebook, and sat unindexed in the render container's output
-volume instead.
+That's the entire branch for a while: no second commit, nothing in the
+repo's own lab notebook past the initial commit, no note about a build
+being queued or blocked in this lab's own tracked archive. The workflow was,
+in fact, run the same day as the commit; the output just never made it into
+this lab's archive or notebook, and sat unindexed in the render container's
+output volume instead.
+
+Since then, the branch was rebased onto `main` to pick up two pipeline
+features that didn't exist back on 2026-08-20: the render-labeling step and
+Immich egress. The same workflow file, same seed, was re-run through the
+branch's own Concourse pipeline (`run-changed-workflows` build #3) to
+confirm the result through the current pipeline end to end, not just from
+an unarchived file on disk. The render is uploaded to a dedicated
+`krea2_pixelart_gamelevel_test` Immich album; the analysis below holds for
+both the original and the reconfirmed render (same seed, same output).
 
 ## What the render actually shows
 
