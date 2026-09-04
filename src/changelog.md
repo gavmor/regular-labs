@@ -13,7 +13,9 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-03
 
-- Index page: added an at-a-glance Sankey of the 26 active genops experiments (up from 25 on 2026-09-02, adding the H3-World reproduction attempt — blocked immediately on MiniMax-H3's community license excluding the US). Compact view lives on the index; the full breakdown and caveats stay in the 2026-09-02 write-up.
+- Both Sankeys revised to include the 12 branches merged since the August 26 survey (verified against `origin/main`'s actual PR-merge commits), routed to a new "Merged / shipped" terminal state under `Pipeline / infra`. An earlier version of the 2026-09-02 write-up deliberately left merged work out; that framing was reconsidered — shipped infrastructure is part of the same body of work, and it turns out to be the single largest band in the diagram.
+- Both diagrams recolored to match the site's own parchment/ink palette instead of a stock library palette; "Blocked" now reuses the site's `--accent` red.
+- Index page: added an at-a-glance Sankey of the active genops experiments (26 open, up from 25 on 2026-09-02 — adds the H3-World reproduction attempt, blocked immediately on MiniMax-H3's community license excluding the US — plus the same 12 merged branches as the full write-up). Compact view lives on the index; the full breakdown and caveats stay in the 2026-09-02 write-up.
 
 ## 2026-09-02
 
