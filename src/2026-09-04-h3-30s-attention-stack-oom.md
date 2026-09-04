@@ -1,10 +1,14 @@
 # A 30-second H3 render that took down the host
 
-This is the sibling to the [LongMedia native 30s write-up](2026-09-04-h3-30s-longmedia-native.html): same goal (a coherent single-shot 30-second MiniMax H3 render on a 3090), different route. This branch (`feature/h3-30s-attention-stack-test`) tried getting there with a bespoke attention stack instead of shipped segmentation machinery, and it is the one that didn't make it.
+This is the sibling to the [LongMedia native 30s write-up](2026-09-04-h3-30s-longmedia-native.html): same goal (a coherent single-shot 30-second [MiniMax H3](https://huggingface.co/MiniMaxAI) render on a 3090), different route. This branch (`feature/h3-30s-attention-stack-test`) tried getting there with a bespoke attention stack instead of shipped segmentation machinery, and it is the one that didn't make it.
+
+<video src="images/2026-09-04-h3-30s-attention-stack-oom/h3-spectrum-stack-5s-control.mp4" controls width="640"></video>
+
+*The 5s control clip that succeeded: 864x480, h264+aac, 5.167s, 336,894 bytes, confirmed via ffprobe. The 30s arm never produced a file (it OOM'd the host during decode, twice), so there's nothing to embed for that arm; that absence is itself part of this write-up's result.*
 
 ## The hypothesis
 
-The idea came from a r/StableDiffusion post claiming 570 seconds for a single-prompt 30s/0.4MP H3 render, using a native ComfyUI node (`ModelAttentionBacked`) to route into a custom attention module (SolAttn) plus a `spectrum` step-skipping node, on top of the turbo LoRA now bundled in ComfyUI's own H3 template. That exact node doesn't exist on this box's pinned ComfyUI core (v0.31.1), confirmed by grepping `comfy/model_management.py` inside the container and by a public code search that turned up nothing. Rather than substitute Sage in its place (already tried and a wash on a prior branch), this test isolated the genuinely new part: SolAttn + Spectrum + the turbo LoRA, at two durations, everything else pinned identical.
+The idea came from a r/StableDiffusion post claiming 570 seconds for a single-prompt 30s/0.4MP H3 render, using a native ComfyUI node (`ModelAttentionBacked`) to route into a custom attention module ([SolAttn](https://github.com/kijai/ComfyUI-SolAttn_triton)) plus a [Spectrum](https://github.com/xmarre/ComfyUI-Spectrum-MiniMax-H3) step-skipping node, on top of [the turbo LoRA now bundled in ComfyUI's own H3 template](https://huggingface.co/lightx2v/Minimax-h3-Turbo/blob/main/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors). That exact node doesn't exist on this box's pinned ComfyUI core (v0.31.1), confirmed by grepping `comfy/model_management.py` inside the container and by a public code search that turned up nothing. Rather than substitute Sage in its place (already tried and a wash on a prior branch), this test isolated the genuinely new part: SolAttn + Spectrum + the turbo LoRA, at two durations, everything else pinned identical.
 
 ## What happened
 

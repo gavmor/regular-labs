@@ -10,14 +10,21 @@ place: no render, no verdict.
 ## The hypothesis
 
 A community report (referenced in this branch's Concourse dispatch log)
-claimed that a third-party H3 Sparse Attention library's default 30% video
-KV budget is quality-neutral for simple, single-subject scenes but
-measurably hurts prompt adherence, elements popping in and out of
+claimed that [H3-Optimizations](https://github.com/Zironic/H3-Optimizations)'s
+default 30% video KV budget is quality-neutral for simple, single-subject
+scenes but measurably hurts prompt adherence, elements popping in and out of
 existence, in complex multi-element scenes, per one commenter's own
-seed-controlled A/B testing. This branch tests only that sparse-attention
-claim, not the library's separate memory-optimization mode, across two
+seed-controlled A/B testing. This branch tests only that library's sparse-attention
+node, not its separate memory-optimization mode, across two
 scene types: a simple dual-reference scene and a five-person crew-group
-scene.
+scene. [MiniMax H3](https://huggingface.co/MiniMaxAI) is the video model both
+variants render against.
+
+*Output: not retrievable.* No build log, Immich album, or output file under
+this branch's name turned up in the `comfyui-local` container's output
+volume (searched for `sparse`, `h3opt`, and `validation` keywords) or
+anywhere in the branch worktree itself. This matches the article's own
+account: the render that would have produced media never ran.
 
 ## What was actually built
 

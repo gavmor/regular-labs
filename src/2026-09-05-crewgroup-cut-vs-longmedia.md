@@ -2,11 +2,15 @@
 
 Fourth deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-crewgroup-longmedia-vs-cut-comparison`. It picks up where the [30-second LongMedia render](2026-09-04-h3-30s-longmedia-native.html) left off, on a harder, more honest test subject.
 
+<video src="images/2026-09-05-crewgroup-cut-vs-longmedia/crewgroup-cut-based-assembly.mp4" controls width="640"></video>
+
+*The cut-based arm's assembled output, `crewgroup_militants_cut_based.mp4` from `output/h3_crewgroup_comparison/` on the branch worktree: 372 of 372 frames, 15.533s, 864x480, h264+aac, matching the "372 of 372 frames exact" claim below. This is the wide/medium/closeup shots concatenated via OTIO and ffmpeg, not the individual per-shot clips; the LongMedia side never produced a video at all, so there is no counterpart to show.*
+
 ## The hypothesis
 
-That earlier LongMedia render succeeded technically, but a human review of the clip flagged a real weakness: the internal segment-continuation boundaries read as jarring hard cuts with no camera change to justify them. This branch asks whether an alternative architecture avoids that problem: render independent short takes with genuinely different camera framing, then assemble them with hard cuts via OTIO and ffmpeg concat. The prediction was that a real camera change at a cut reads as intentional editing, while LongMedia's same-angle internal seam never can.
+That earlier LongMedia render succeeded technically, but a human review of the clip flagged a real weakness: the internal segment-continuation boundaries read as jarring hard cuts with no camera change to justify them. This branch asks whether an alternative architecture avoids that problem: render independent short takes with genuinely different camera framing, then assemble them with hard cuts via [OTIO](https://opentimeline.io) and [ffmpeg](https://ffmpeg.org) concat. The prediction was that a real camera change at a cut reads as intentional editing, while LongMedia's same-angle internal seam never can.
 
-Both arms ran against the same real production asset this time, an 11-person crew-portrait scene (not the synthetic test images earlier branches used), same seed (`919880931791466`), same MiniMax H3 checkpoint stack.
+Both arms ran against the same real production asset this time, an 11-person crew-portrait scene (not the synthetic test images earlier branches used), same seed (`919880931791466`), same [MiniMax H3](https://huggingface.co/MiniMaxAI) checkpoint stack.
 
 ## Build: both arms submitted together, one came back
 

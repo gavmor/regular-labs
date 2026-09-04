@@ -1,6 +1,18 @@
 # The full resolution sweep, and where the safe ceiling actually sits
 
-Third write-up out of the [experiment register](2026-09-02-experiments-sankey.html), and the cleanest confirmed result of the three covered here: `feature/h3-resolution-array-sweep` ran a full 8-point resolution sweep from 0.3 to 0.98 megapixels on the Graves H3 workflow, and none of the eight arms came close to an out-of-memory failure.
+Third write-up out of the [experiment register](2026-09-02-experiments-sankey.html), and the cleanest confirmed result of the three covered here: `feature/h3-resolution-array-sweep` ran a full 8-point resolution sweep from 0.3 to 0.98 megapixels on the Graves [MiniMax H3](https://huggingface.co/MiniMaxAI) workflow, and none of the eight arms came close to an out-of-memory failure.
+
+<video src="images/2026-09-06-h3-resolution-array-sweep/sweep-030mp-736x416.mp4" controls width="400"></video>
+
+*Low end of the sweep: 0.3MP arm, `h3_resolution_sweep_030mp.mp4` from the `feature/h3-resolution-array-sweep` worktree's `.scratch/` output. Confirmed via ffprobe: 736x416, 5.167s, h264+aac (736x416 is 306,176px, consistent with the 0.3MP label).*
+
+<video src="images/2026-09-06-h3-resolution-array-sweep/sweep-050mp-960x544.mp4" controls width="400"></video>
+
+*Production midpoint: 0.5MP arm, `h3_resolution_sweep_050mp.mp4`. Confirmed via ffprobe: 960x544, 5.167s, h264+aac (522,240px).*
+
+<video src="images/2026-09-06-h3-resolution-array-sweep/sweep-098mp-1344x768.mp4" controls width="400"></video>
+
+*Top of the tested range: 0.98MP arm, `h3_resolution_sweep_098mp.mp4`. Confirmed via ffprobe: 1344x768, 5.167s, h264+aac (1,032,192px), the same resolution the prior two-point test used and the one that came in at one of the lowest VRAM peaks in this sweep despite being the largest frame.*
 
 ## Why this needed a sweep, not another A/B
 

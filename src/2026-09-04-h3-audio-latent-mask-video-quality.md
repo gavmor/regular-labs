@@ -2,9 +2,14 @@
 
 A branch on this register set out to measure a video-quality side effect of a technique that had already merged to `main`. It found the side effect. It also found that the technique wasn't the cause of it, and that nobody had actually checked before.
 
+<video src="images/2026-09-04-h3-audio-latent-mask-video-quality/h3-av-quality-baseline.mp4" controls width="480"></video>
+<video src="images/2026-09-04-h3-audio-latent-mask-video-quality/h3-av-quality-masked.mp4" controls width="480"></video>
+
+*Build 1's real output, in order: unmodified [MiniMax H3](https://huggingface.co/MiniMaxAI) native audio+video (1056x608, 5.167s, 517,328 bytes) and the audio-latent-masked arm (1056x608, 5.167s, 505,569 bytes). Both hold on the reference still frame through roughly the first third of the clip before cross-fading, the artifact this write-up traces to something other than the audio mask.*
+
 ## The hypothesis
 
-An earlier, already-merged branch reproduced a r/StableDiffusion technique for putting a custom soundtrack into an H3 render: split the joint audio+video latent H3 generates, discard the audio half, encode an external WAV in its place, protect it with a full noise mask for the whole 25-step trajectory, and rejoin it with the still-denoising video latent. That branch measured exactly one thing, whether the custom audio survived (verified by Whisper transcription), and shipped. There was no video-quality check anywhere in its graph, its CI job, or its commits.
+An earlier, already-merged branch reproduced a r/StableDiffusion technique for putting a custom soundtrack into an H3 render: split the joint audio+video latent H3 generates, discard the audio half, encode an external WAV in its place, protect it with a full noise mask for the whole 25-step trajectory, and rejoin it with the still-denoising video latent. That branch measured exactly one thing, whether the custom audio survived (verified by [Whisper](https://github.com/openai/whisper) transcription), and shipped. There was no video-quality check anywhere in its graph, its CI job, or its commits.
 
 Gavin's review of the actual output caught what that missed: the audio was there, but the video "fades from a still frame to a speaking face" and reads warped. This branch's hypothesis was a plausible mechanism for that: protecting the audio latent for the entire trajectory conditions the video latent's cross-attention on an audio embedding that's fully clean from step 1, out of distribution with how joint audio/video diffusion normally denoises both together in lockstep, a plausible cause of a held-frame-then-jump artifact.
 

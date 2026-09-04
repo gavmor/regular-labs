@@ -2,13 +2,17 @@
 
 Sixth deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/otio-ffmpeg-cut-based-editing-test`, the tooling spike that both the [cut-versus-continuation comparison](2026-09-05-crewgroup-cut-vs-longmedia.html) and the [quality pass](2026-09-05-crewgroup-quality-pass.html) went on to build directly on top of.
 
+<video src="images/2026-09-05-otio-ffmpeg-cut-assembly/cut_test_assembly.mp4" controls width="480"></video>
+
+*The assembled `cut_test.mp4` from `workflows/otio_cut_test/output/` on the `feature/otio-ffmpeg-cut-based-editing-test` worktree: 864x480, 24fps, h264+aac. `ffprobe -count_frames` confirms exactly 964 frames and a 40.199s reported duration, matching the article's own claims below to the frame.*
+
 ## The hypothesis
 
-This one is narrower than the render experiments around it: not a comparative generative test, a mechanics validation. Cut-based editing had been proposed as an alternative to single long continuous takes, on the reasoning that a continuation-based render is architecturally fragile (the sibling LongMedia branch had already hit a real host-RAM risk from that class of approach). The claim under test: can a small Python script drive real OpenTimelineIO (OTIO) objects and a real `ffmpeg concat` invocation to produce a frame-accurate hard-cut assembly, with no manual timestamp math and no re-encoding?
+This one is narrower than the render experiments around it: not a comparative generative test, a mechanics validation. Cut-based editing had been proposed as an alternative to single long continuous takes, on the reasoning that a continuation-based render is architecturally fragile (the sibling LongMedia branch had already hit a real host-RAM risk from that class of approach). The claim under test: can a small Python script drive real [OpenTimelineIO](https://github.com/AcademySoftwareFoundation/OpenTimelineIO) (OTIO) objects and a real [`ffmpeg`](https://ffmpeg.org/) `concat` invocation to produce a frame-accurate hard-cut assembly, with no manual timestamp math and no re-encoding?
 
 ## What was built
 
-Two scripts under `workflows/otio_cut_test/`. `build_timeline.py` opens each input clip with PyAV, reads the real stream frame count and frame rate (not the container's float duration field), and builds an OTIO `Timeline` to `Stack` to `Track` to one whole-clip `Clip` per shot. `render_cut.py` reads that file back, walks the clips in track order, writes an ffmpeg concat-demuxer manifest, and shells out to `ffmpeg -f concat -safe 0 -c copy`.
+Two scripts under `workflows/otio_cut_test/`. `build_timeline.py` opens each input clip with [PyAV](https://github.com/PyAV-Org/PyAV) (the [`av`](https://pypi.org/project/av/) package on PyPI), reads the real stream frame count and frame rate (not the container's float duration field), and builds an OTIO `Timeline` to `Stack` to `Track` to one whole-clip `Clip` per shot. `render_cut.py` reads that file back, walks the clips in track order, writes an ffmpeg concat-demuxer manifest, and shells out to `ffmpeg -f concat -safe 0 -c copy`.
 
 No new GPU render was needed for this pass. Three already-rendered clips from sibling branches were reused as three independent "shots": a 5-second control clip, a 5-second diagnostic clip, and the 30-second continuation render, all h264/864x480/24fps/AAC by coincidence of sharing the same pipeline, not by any codec-compatibility check the scripts themselves enforce.
 

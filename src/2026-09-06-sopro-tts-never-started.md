@@ -8,6 +8,8 @@ Its tip commit, `fab77c3`, is identical to a merge-pull-request commit that land
 
 There's no file anywhere in the repository, and no line in `docs/lab-notebook.md`, that mentions "sopro" at all. Whatever this branch was meant to test left no design doc, no workflow file, no README entry, nothing to reconstruct even a hypothesis from. The name is the entire artifact.
 
+**No media for this one, checked rather than assumed.** The `feature/sopro-tts-experiment` worktree on disk (`blades68-lora.sopro-tts-experiment`) is, as expected given the above, just a checkout of the same commit as `main`, with nothing "sopro"-named in it. A search across every running and exited container on this rig's `comfyui-local` host, including the exited `tts-bench-*` containers built for the [voice-clone benchmark](2026-09-06-tts-voice-clone-benchmark-progress.html), also turns up nothing matching "sopro". There is no output to embed because, per the git evidence above, nothing was ever run.
+
 ## Why this is worth writing down anyway
 
 The [TTS voice-clone benchmark](2026-09-06-tts-voice-clone-benchmark-progress.html) covered above is the other TTS-tagged item in this lab's register, and it's a real, if partial, build-out: four models wired, validated, and benchmarked, ten still to go. This branch is its opposite case: a name reserved for TTS work that, as far as any commit history shows, was never started at all.

@@ -1,20 +1,30 @@
-# A fully-specified H3 LoRA test that never actually rendered
+# A fully-specified H3 LoRA test that rendered without anyone following up
 
 Item #12 on the [experiment register](2026-09-02-experiments-sankey.html):
 `feature/h3-bf16-turbo-lora-quality-test`. This one has no build-by-build
-story, because there was only ever one commit and no render. That's a
-legitimate ending, not a gap in the research: the branch got as far as a
-fully specified, ready-to-submit comparison, and then nothing happened.
+story in its own commit history, because there was only ever one commit and
+its design doc's "Results" section was never filled in. That looked, from
+the branch alone, like a legitimate stop at the design-and-stage step. It
+wasn't quite that: real render output for both arms turns out to exist on
+the shared render host, dated minutes after that single commit, matching
+this branch's two workflow files exactly. Nobody ever came back to look at
+it or write it up. See "What's missing, and why" below for how that was
+confirmed.
+
+<video src="images/2026-09-04-h3-bf16-turbo-lora-never-run/h3-bf16lora-baseline-int8.mp4" controls width="480"></video>
+<video src="images/2026-09-04-h3-bf16-turbo-lora-never-run/h3-bf16lora-rank20-bf16.mp4" controls width="480"></video>
+
+*In order: the baseline arm (int8-pruned Turbo LoRA, 960x544, 5.167s, 1,048,111 bytes) and the BF16 rank-20 arm (960x544, 5.167s, 880,365 bytes), pulled from `comfyui-local`'s output directory. Each file's embedded ComfyUI prompt metadata was checked directly: the baseline's `lora_name` reads `minimax_h3_turbo_v4_step600_ema.safetensors`, the other reads `MiniMax-H3/minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors`, exactly the two LoRA files this branch's design doc specifies. No frame-by-frame quality comparison has been done on these; that's still not done, see below.*
 
 ## The hypothesis
 
 Production's H3 render pipeline uses an int8-pruned Turbo LoRA
-(`minimax_h3_turbo_v4_step600_ema.safetensors`) as a deliberate speed/VRAM
-optimization. Two r/StableDiffusion threads speculated that a BF16-precision
+([`minimax_h3_turbo_v4_step600_ema.safetensors`](https://huggingface.co/larryvrh/MiniMax-H3-Turbo-Lora/blob/main/minimax_h3_turbo_v4_step600_ema.safetensors))
+as a deliberate speed/VRAM optimization. Two r/StableDiffusion threads speculated that a BF16-precision
 LoRA, at more steps, might close a perceived quality gap between cloud H3
 renders and this rig's quantized local setup. Kijai's personal HuggingFace
-repo, `Kijai/MiniMax-H3_comfy`, hosts rank-resized BF16 Turbo LoRAs; its
-`ref2v` rank-20 resize (`minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors`,
+repo, [`Kijai/MiniMax-H3_comfy`](https://huggingface.co/Kijai/MiniMax-H3_comfy), hosts rank-resized BF16 Turbo LoRAs; its
+`ref2v` rank-20 resize ([`minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors`](https://huggingface.co/Kijai/MiniMax-H3_comfy/blob/main/loras/minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors),
 307MB) pairs with production's `ref2va` checkpoint, unlike the repo's other
 four `fl2v`-prefixed files. The hypothesis: swapping only that LoRA file,
 with everything else held identical, will measurably change wall-clock time,
@@ -46,18 +56,39 @@ to re-run the comparison automatically whenever the file set changes.
 
 The doc's own "Results" section, as committed, reads only: "(To be filled
 in after the Concourse `comfyui-branch` / `run-changed-workflows` build for
-this branch completes both arms.)" No later commit exists on this branch.
-Nothing in the commit history or the doc explains why the build was never
-triggered or never completed; the branch simply stops at the design-and-stage
-step. There's no crash log, no blocker note, no abandoned-in-favor-of note,
-the kind of honest dead ends this register usually documents when a branch
-gets refuted or blocked. This one just never got run.
+this branch completes both arms.)" No later commit exists on this branch,
+and nothing in the commit history or the doc explains why. That reads, from
+the git history alone, like the honest "nothing happened" ending the intro
+above originally claimed.
+
+Checking the shared render host directly tells a different story. Both
+workflow files' exact `filename_prefix` values
+(`H3_bf16lora_test_baseline_int8` and `H3_bf16lora_test_bf16_rank20`) show
+up in `comfyui-local`'s output directory, each with two numbered renders,
+timestamped 2026-08-23 15:16-15:33 UTC, minutes after the branch's single
+commit at 15:12 UTC. Pulling each file's own embedded ComfyUI prompt
+metadata (the `prompt` tag baked into the container by ComfyUI itself, not
+inferred from the filename) confirms the `lora_name` on each matches this
+branch's two workflow files exactly, not a coincidence of similar naming
+from some other branch. That timing is consistent with this project's
+`run-changed-workflows` pipeline firing automatically on push, the same
+mechanism every other branch on this register relies on, though nothing on
+disk proves that specific mechanism over a manual submission.
+
+What's still actually missing: no comparison, no frame-by-frame review, no
+VRAM/RAM numbers, nothing written down anywhere against the design doc's
+four dependent variables. The render happened; the analysis never did. This
+write-up doesn't supply that analysis either, only the confirmation that
+real, matching output exists to eventually run it against.
 
 ## Where it actually landed
 
-No verdict, because no render happened. What exists is a complete,
-ready-to-submit A/B test: two workflow files that differ in exactly one
-field, a design doc stating what would count as a result, and a real model
-file already staged on the render host. Anyone picking this back up doesn't
-need to redo the setup, just push the branch and let its
-`run-changed-workflows` pipeline actually run both arms.
+No verdict, because no analysis happened, not because no render happened.
+What exists now is more complete than the branch's own history shows: two
+workflow files that differ in exactly one field, a design doc stating what
+would count as a result, a real model file staged on the render host, and
+(unrecorded anywhere until now) real output from both arms already sitting
+in `comfyui-local`'s output directory. Anyone picking this back up doesn't
+need to redo the setup or the render, just pull the existing files and do
+the frame-by-frame video/audio comparison and VRAM/RAM check the design doc
+called for and nobody ever ran.

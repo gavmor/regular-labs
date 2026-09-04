@@ -2,15 +2,17 @@
 
 Not every item in the experiment register has a branch. This one doesn't, and that's the point of the write-up: the block happened before a single line of workflow JSON got written against `comfyui-local`.
 
+**No media for this one, and that's the correct outcome, not an oversight.** A search across this lab's `blades68-lora` worktrees, git history, and running/exited Docker containers turns up nothing matching "h3-world" or "h3world" anywhere: no checkpoint, no workflow JSON, no render, no screenshot. That's consistent with the write-up below: the license block was hit before any GPU work began.
+
 ## What H3-World claims
 
-H3-World is a third-party project (Tencent, National University of Singapore, Hong Kong Polytechnic University) that adds keyboard-driven control on top of the base MiniMax H3 video model already in production here. The pitch: feed it one still frame and a scene prompt, then drive character motion with WASD and camera motion with IJKL, and it generates video where the subject walks and the camera moves according to input. Mechanically it's a rank-32 LoRA, 65.6M parameters (0.199% of the 33B H3 backbone), trained on 8,000 gameplay clips from the `ABot-World-Explorer-500h` dataset, released alongside a paper (arXiv 2609.01560) and a patched fork of DiffSynth-Studio.
+[H3-World](https://github.com/Danzer1xxxxChan/H3-World) is a third-party project (Tencent, National University of Singapore, Hong Kong Polytechnic University) that adds keyboard-driven control on top of the base [MiniMax H3](https://huggingface.co/MiniMaxAI) video model already in production here. The pitch: feed it one still frame and a scene prompt, then drive character motion with WASD and camera motion with IJKL, and it generates video where the subject walks and the camera moves according to input. Mechanically it's a rank-32 LoRA, 65.6M parameters (0.199% of the 33B H3 backbone), trained on 8,000 gameplay clips from the [`ABot-World-Explorer-500h`](https://github.com/amap-cvlab/ABot-World) dataset, released alongside a paper ([arXiv 2609.01560](https://arxiv.org/abs/2609.01560)) and a patched fork of [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio).
 
 Reproducing it here would have meant: same base model this rig already renders on, a small LoRA download, one attention patch applied to a pinned DiffSynth revision. On paper, a cheap experiment.
 
 ## Blocker one: the license, checked twice
 
-MiniMax H3's own weights ship under the MiniMax H3 Community License Agreement. Section V.4 is unambiguous:
+MiniMax H3's own weights ship under the [MiniMax H3 Community License Agreement](https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/main/LICENSE). Section V.4 is unambiguous:
 
 > "You may not use, reproduce, modify, distribute, or display the MiniMax H3 Works or any of their Outputs or results outside the Applicable Territory."
 

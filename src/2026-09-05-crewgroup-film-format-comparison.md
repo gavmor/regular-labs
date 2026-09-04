@@ -26,8 +26,22 @@ The dependent variables the design doc commits to measuring are modest and expli
 
 ## Where it actually landed
 
-Here's the honest gap: the two commits on this branch are the design doc and the three workflow JSON files. There is no render-result commit, no output image path, and no verdict recorded anywhere in git. The experiment register's own status for this item, pending visual call, matches exactly what the repository shows: the workflows exist and are ready to run, but nothing in the tracked history confirms what any of the three renders actually looked like once submitted, or that Gavin has weighed in.
+The two commits on this branch, `dec55c6` and its EXPERIMENT.md predecessor, are the design doc and the three workflow JSON files: there is no render-result commit, no output image path, and no verdict recorded anywhere in git. The experiment register's own status for this item, pending visual call, matches what the tracked repository history shows: nothing there confirms what the three renders looked like, or that Gavin has weighed in.
+
+But the renders themselves did happen. The three workflow files' `filename_prefix` values match three PNGs still sitting on the render box's persistent output volume (`comfyui-local:/opt/ComfyUI/output/`), timestamped within a few minutes of `dec55c6` landing: `Blades68_CrewFormat_35mm_00001_.png` (1536x1024, 3:2, 1.5MP), `Blades68_CrewFormat_Instamatic126_00001_.png` (1256x1256, 1:1, 1.5MP), and `Blades68_CrewFormat_MediumFormat6x6_00001_.png` (1616x1616, 1:1, 2.5MP). Every dimension and megapixel figure matches the table above exactly. So the honest state isn't quite "nothing rendered": the renders exist and match spec, they were just never pulled off the render box, committed, or visually reviewed. That review, and any verdict, is still what's missing.
+
+<img src="images/2026-09-05-crewgroup-film-format-comparison/35mm-format.png" alt="35mm-style format render, 1536x1024, 3:2 aspect ratio" width="480">
+
+*35mm-style variant: `Blades68_CrewFormat_35mm_00001_.png`, 1536x1024 (1.5MP), matching the table's 3:2 / 1.5MP entry.*
+
+<img src="images/2026-09-05-crewgroup-film-format-comparison/instamatic126-square-format.png" alt="Instamatic-style square format render, 1256x1256, 1:1 aspect ratio" width="480">
+
+*Instamatic-style variant: `Blades68_CrewFormat_Instamatic126_00001_.png`, 1256x1256 (1.5MP), matching the table's 1:1 / 1.5MP entry.*
+
+<img src="images/2026-09-05-crewgroup-film-format-comparison/mediumformat-6x6-format.png" alt="Medium-format 6x6 square render, 1616x1616, 1:1 aspect ratio, higher resolution" width="480">
+
+*Medium-format variant: `Blades68_CrewFormat_MediumFormat6x6_00001_.png`, 1616x1616 (2.5MP), matching the table's 1:1 / 2.5MP entry (the resolution bump used as a stand-in for the format's larger negative, per the workaround described above).*
 
 ## Grounding
 
-Solid on the setup and the reasoning (the `EXPERIMENT.md` on the branch documents the format choices, the aspect-ratio limitation, and the VRAM constraint in detail), but genuinely thin on the ending. There is no evidence in this repository of what the three renders produced or which format, if any, has been chosen. That absence is itself the honest state of this branch, not a gap in this write-up.
+Solid on the setup and the reasoning (the `EXPERIMENT.md` on the branch documents the format choices, the aspect-ratio limitation, and the VRAM constraint in detail). The renders themselves were located directly on the render box and verified dimension-by-dimension against this article's own table, which the original write-up hadn't done. No visual side-by-side call or sign-off from Gavin exists yet; that part of the gap is real and still stands.

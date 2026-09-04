@@ -2,11 +2,19 @@
 
 Seventh entry from the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-native-098mp-resolution-test`. A quality win that holds up under a real look, paired with a hardware-margin problem that applies to production today, not just to the higher-resolution variant being tested.
 
+<video src="images/2026-09-05-h3-native-098mp-resolution-test/baseline-05mp-960x544.mp4" controls width="480"></video>
+
+*Baseline arm, `H3_promptbuilder_music_real_00002_.mp4` on `comfyui-local`: 960x544, 5.167s, h264+aac. Matches the "960x544 (522,240 px)" baseline row below exactly.*
+
+<video src="images/2026-09-05-h3-native-098mp-resolution-test/variant-098mp-1344x768.mp4" controls width="480"></video>
+
+*Variant arm, `H3_promptbuilder_music_real_00003_.mp4` on `comfyui-local`: 1344x768, 5.167s, h264+aac. Matches the "1344x768 (1,032,192 px)" variant row below exactly; both files carry timestamps roughly matching the two commits' times on 2026-08-23.*
+
 ## The hypothesis
 
-A well-upvoted r/StableDiffusion comment claimed MiniMax H3 was trained at 0.98 megapixels specifically, and that running at that resolution is both faster and lower-VRAM than going above 1.0 MP. Production's real render workflow runs at 0.5 MP, chosen for VRAM headroom on this rig's single shared RTX 3090 (24 GB), but never actually tested against this specific claim.
+A well-upvoted [r/StableDiffusion](https://www.reddit.com/r/StableDiffusion/) comment claimed [MiniMax H3](https://huggingface.co/MiniMaxAI) was trained at 0.98 megapixels specifically, and that running at that resolution is both faster and lower-VRAM than going above 1.0 MP. Production's real render workflow runs at 0.5 MP, chosen for VRAM headroom on this rig's single shared RTX 3090 (24 GB), but never actually tested against this specific claim.
 
-The branch's two commits (`96c2daf` then `27b3b2b`, both 2026-08-23) raised `ResolutionSelector.megapixels` from 0.5 to 0.98 on a fixed-seed production workflow, holding everything else identical: same aspect ratio, same 32-pixel rounding, same seed, same 6-step turbo setup, same reference images. Both arms went into the same Concourse build under one continuous GPU lock hold, the closest available approximation of a controlled A/B on shared hardware.
+The branch's two commits (`96c2daf` then `27b3b2b`, both 2026-08-23) raised `ResolutionSelector.megapixels` from 0.5 to 0.98 on a fixed-seed production workflow, holding everything else identical: same aspect ratio, same 32-pixel rounding, same seed, same 6-step turbo setup, same reference images. Both arms went into the same [Concourse](https://concourse-ci.org) build under one continuous GPU lock hold, the closest available approximation of a controlled A/B on shared hardware.
 
 ## An honest correction before the render even ran
 

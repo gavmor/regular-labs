@@ -2,6 +2,10 @@
 
 Fifth deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-crewgroup-quality-pass`, branched directly from the [cut-versus-continuation comparison](2026-09-05-crewgroup-cut-vs-longmedia.html) at its results commit (`607b5eb`).
 
+<video src="images/2026-09-05-crewgroup-quality-pass/crewgroup-quality-pass-final.mp4" controls width="640"></video>
+
+*Job 30014's deliverable, `crewgroup_quality_pass.mp4` from `workflows/h3_crewgroup_quality_pass/output/` on the branch worktree: 372 of 372 frames, 15.533s, 864x480, h264+aac, matching the "372 of 372 frames exact, 15.5 seconds" claim below.*
+
 ## The hypothesis
 
 The prior branch's deliverable was rejected on sight, described as "hideously smudgy and noisy." This branch isn't a second comparison arm; the continuation-based approach is dropped entirely since it never produced output. The only goal here is one clean cut-based scene, assembled from three independently-framed shots, at a quality bar that would actually get accepted.

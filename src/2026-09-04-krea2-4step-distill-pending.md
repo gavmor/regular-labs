@@ -7,8 +7,10 @@ turn them into an answer doesn't, at least not on record yet.
 
 ## The hypothesis
 
-Production crew-portrait renders on this rig run Krea2 Turbo at 8 steps. A
-r/StableDiffusion-linked LoRA, `lvladikov/Krea2-Turbo-Distill-4step-LoRA`,
+Production crew-portrait renders on this rig run
+[Krea2 Turbo](https://huggingface.co/krea/Krea-2-Turbo) at 8 steps. A
+r/StableDiffusion-linked LoRA,
+[`lvladikov/Krea2-Turbo-Distill-4step-LoRA`](https://huggingface.co/lvladikov/Krea2-Turbo-Distill-4step-LoRA),
 claims a 44% reduction in prediction error against the 8-step teacher at
 checkpoint `chk00014000`, measured by the author across 100 held-out prompts.
 That's the author's own benchmark, not a guarantee for this project's actual
@@ -58,16 +60,46 @@ that entry also states plainly that "the actual synthesis write-up was never
 produced" and that no album or file link survives in this session's visible
 history, i.e. the notebook's "confirmed" is restating the register's own
 categorization rather than pointing at a documented frame-by-frame compare.
-No render artifacts from this branch turned up in this lab's output archive
-either.
+No render artifacts from this branch turned up in this lab's own archive.
+
+## Output: the renders, found late
+
+The three renders were never lost, just never archived anywhere this lab's
+own indexes look. They're still sitting in the `comfyui-local` container's
+persistent output volume, under `krea2_4step_distill_test/`, filed under the
+exact prefixes each arm's workflow writes
+(`militants_baseline_8step`, `militants_test_4step_distill`,
+`militants_isolate_4step_nolora`). All three are 1536x1024 (1.5MP, 3:2),
+matching the design doc's stated resolution, and each shows the same
+five-figure crew scene the design doc describes.
+
+<img src="images/2026-09-04-krea2-4step-distill-pending/militants_baseline_8step.jpg" alt="8-step baseline, no LoRA: five figures, sharp well-defined faces and eyes" width="480">
+<img src="images/2026-09-04-krea2-4step-distill-pending/militants_test_4step_distill_lora.jpg" alt="4-step with distill LoRA at strength 1.0: five figures, faces remain sharp, close to the 8-step baseline" width="480">
+<img src="images/2026-09-04-krea2-4step-distill-pending/militants_isolate_4step_nolora.jpg" alt="4-step, no LoRA (isolate arm): five figures, faces and eyes visibly blurred and undefined compared to the other two arms" width="480">
+
+*Left to right: 8-step baseline, 4-step with the distill LoRA, 4-step isolate
+with no LoRA. Doing the frame-to-frame compare the design doc asked for: the
+4-step+LoRA arm keeps faces and eyes close to the 8-step baseline's sharpness.
+The 4-step isolate arm, step count cut with no LoRA to compensate, is the one
+showing visible face and eye degradation, softened features and less-defined
+eyes across all five figures.*
+
+That's the opposite of what the lab notebook's unwritten "confirmed" claimed.
+This is one reviewer's visual read of N=1 renders per arm, not the rigorous
+frame-by-frame metric comparison the design doc actually asked for, so it
+doesn't settle the question either. But as far as this write-up can trace it,
+the visible evidence points at the step cut as the source of the degradation,
+not the LoRA, which the LoRA appears to be compensating for rather than
+causing.
 
 ## Where it actually landed
 
 As of this write-up: three arms rendered, a real isolate-the-confound design,
-and no recorded visual comparison backing either verdict. Whether the distill
-LoRA degrades face/eye quality on its own, independent of the step drop,
-is not yet answered by anything checkable in this branch's history. What's
-missing to close it out is exactly what the design doc asked for: a
-full-resolution, frame-to-frame compare across the three arms against
-portrait quality, wall-clock time, and peak VRAM, written down rather than
-asserted.
+and, as of this retrofit, a located but informal visual comparison that
+contradicts the lab notebook's stated conclusion rather than backing it up.
+Whether the distill LoRA degrades face and eye quality independent of the
+step drop is still not answered by anything more rigorous than one reviewer's
+side-by-side look at three images. What's still missing is exactly what the
+design doc asked for: a full-resolution, frame-to-frame compare across the
+three arms against portrait quality, wall-clock time, and peak VRAM, written
+down rather than asserted, ideally at N=3 per arm rather than N=1.
