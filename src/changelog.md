@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-04
+
+- New entry: [A 30-second H3 render, blocked twice, fixed once](2026-09-04-h3-30s-longmedia-native.html) — first of a planned per-experiment deep-dive series covering the register's 12 hypothesis-bearing items. This one's the cleanest confirmed win: `feature/h3-30s-longmedia-native-test` traced a `KeyError: 'latent'` crash to an unfiltered stock keyframe list colliding with two unrelated custom-node packages' global monkeypatches, fixed it upstream, and re-ran to a confirmed 30.000s output with no OOM.
+
 ## 2026-09-03
 
 - Both Sankeys revised to include the 12 branches merged since the August 26 survey (verified against `origin/main`'s actual PR-merge commits), routed to a new "Merged / shipped" terminal state under `Pipeline / infra`. An earlier version of the 2026-09-02 write-up deliberately left merged work out; that framing was reconsidered — shipped infrastructure is part of the same body of work, and it turns out to be the single largest band in the diagram.
