@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-04 (H3-World revisit)
+
+- Rewrote [H3-World: a knowing license override, then a second wall the license had nothing to do with](2026-09-06-h3-world-license-block.html): Gavin reviewed the Section V.4 US exclusion documented in the original entry and explicitly authorized proceeding anyway for a private, non-distributed on-rig test, so the "never reached the GPU" framing no longer fit. It still never reached the GPU, but this time for a reason independent of the license — H3-World's directed-attention patch only runs against unpruned BF16 DiffSynth-Studio weights (~130GB combined transformer + text encoder), no on-rig or community quantized/pruned build is architecturally compatible with it, and even the CPU-offload path DiffSynth-Studio does support needs more host RAM (~130GB) than this box has (62GB). Also corrected the "keyboard-controlled" framing to what it actually is: one action preset chosen per render, which Gavin already knew and cares about for adherence-quality comparison, not as a gotcha.
+
 ## 2026-09-04 (cycle update)
 
 - New entry: [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — a register-level update against the 2026-09-02 Sankey: `krea2-4step-chk14000-distill-test` landed a Mixed verdict (step count, not the LoRA, drives the quality loss), `krea2-pixelart-gamelevel-test` landed Refuted (no pixel grid, no dithered palette, no tiling), and `sopro-tts-experiment` resolved to "never started" (zero unique commits vs `main`). Fresh Sankey, three flows re-routed, rest of the register unchanged since 2026-09-02.
