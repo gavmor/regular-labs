@@ -4,12 +4,13 @@ Write-ups from GPU/generative-render experiments: ComfyUI pipelines, H3, Concour
 automation, and whatever else comes out of the generative-ops workbench.
 
 <figure>
-  <img src="images/2026-09-03-experiments-sankey-index/experiments-sankey-index.svg" alt="Sankey flow of 26 active genops experiments from work domains (H3 video, Krea2, H3 audio &amp; sampler, H3 resolution &amp; scaling, H3 multishot, TTS / non-image, Pipeline / infra) to terminal states (Confirmed, Mixed, Refuted, Pending, Blocked, Ongoing)" width="700">
-  <figcaption>26 active genops experiments as of 2026-09-03, by work domain and current verdict. Full breakdown and caveats in <a href="2026-09-02-experiments-sankey.html">the write-up</a>.</figcaption>
+  <img src="images/2026-09-05-register-full-coverage/experiments-sankey-2026-09-05.svg" alt="Sankey flow of 29 open plus 12 merged genops experiments from work domains (H3 video, Krea2, H3 audio &amp; sampler, H3 resolution &amp; scaling, H3 multishot, TTS / non-image, Pipeline / infra) to terminal states (Confirmed, Mixed, Refuted, Pending, Blocked, Ongoing)" width="700">
+  <figcaption>29 open + 12 merged genops experiments as of 2026-09-05, by work domain and current verdict — first cycle with full write-up coverage. Full breakdown and caveats in <a href="2026-09-05-register-full-coverage.html">the write-up</a>.</figcaption>
 </figure>
 
 ## Entries
 
+- [Every branch has a write-up now. Here's what that turned up.](2026-09-05-register-full-coverage.html) — 2026-09-05
 - [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — 2026-09-04
 - [H3-World: a knowing license override, then a second wall the license had nothing to do with](2026-09-06-h3-world-license-block.html) — 2026-09-06
 - [The full resolution sweep, and where the safe ceiling actually sits](2026-09-06-h3-resolution-array-sweep.html) — 2026-09-06
