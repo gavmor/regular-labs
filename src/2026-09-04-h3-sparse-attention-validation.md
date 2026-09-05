@@ -1,11 +1,13 @@
-# Sparse attention for H3: built, staged, never run
+# Sparse attention for H3: it rendered, then got stuck at the door
 
 Item #19 on the [experiment register](2026-09-02-experiments-sankey.html):
-`feature/h3-optimizations-validation`. Like the pixel-art piece, this is a
-"does the claimed thing actually work here" question rather than a formal
-A/B with a result in hand. It got further than the pixel-art branch (real
-infrastructure work, four staged workflow variants) but stops at the same
-place: no render, no verdict.
+`feature/h3-optimizations-validation`. As of 2026-09-04 this was "built,
+staged, never run" — the custom sparse-attention node hadn't survived a
+`comfyui-local` container recreation, and that gap was flagged for Gavin
+rather than silently reinstalled. As of the night of 2026-09-04/05 that's no
+longer true: all four staged workflows ran to completion. What's now stuck
+is one step later than expected: the branch's own Concourse pipeline
+instance can't archive the results to Immich.
 
 ## The hypothesis
 
@@ -20,11 +22,63 @@ scene types: a simple dual-reference scene and a five-person crew-group
 scene. [MiniMax H3](https://huggingface.co/MiniMaxAI) is the video model both
 variants render against.
 
-*Output: not retrievable.* No build log, Immich album, or output file under
-this branch's name turned up in the `comfyui-local` container's output
-volume (searched for `sparse`, `h3opt`, and `validation` keywords) or
-anywhere in the branch worktree itself. This matches the article's own
-account: the render that would have produced media never ran.
+## What actually happened this time
+
+All four workflows submitted clean (`node_errors: {}` for every one), which
+by itself resolves the earlier open question: the sparse-attention custom
+node is present and loading in `comfyui-local` again, whatever changed
+between then and now. Each rendered a real 5.17s H.264+AAC clip and passed
+through labeling successfully:
+
+<video src="images/2026-09-04-h3-sparse-attention-validation/simple-baseline.mp4" controls width="480"></video>
+<video src="images/2026-09-04-h3-sparse-attention-validation/simple-sparse.mp4" controls width="480"></video>
+
+*Simple scene, baseline (left) vs. sparse attention (right). 1344x768, both
+5.17s.*
+
+<video src="images/2026-09-04-h3-sparse-attention-validation/crewgroup-baseline.mp4" controls width="480"></video>
+<video src="images/2026-09-04-h3-sparse-attention-validation/crewgroup-sparse.mp4" controls width="480"></video>
+
+*Crew-group scene, baseline (left) vs. sparse attention (right). 864x480,
+both 5.17s.*
+
+All four were pulled directly from `comfyui-local`'s persistent output
+volume (`/opt/ComfyUI/output/labeled/`), not from the pipeline's own
+archival path, because that path is exactly what failed. The `run-changed-workflows`
+build (`2603135`, errored, 14m49s) got through submission, render, and
+labeling for all four workflows, then hit `put: local-immich-gallery`:
+
+```
+undefined vars: immich_api_key, immich_url
+undefined vars: immich_api_key, immich_url
+undefined vars: immich_api_key, immich_url
+undefined vars: immich_api_key, immich_url
+4 errors occurred
+```
+
+One failure per workflow's album-upload `put`, all the same cause. This is
+isolated to this one branch instance: roughly fifty other `comfyui-branch`
+pipelines ran in the same batch that night and none hit this. The base
+`blades68` pipeline's `set-branch-pipelines` job (build 118) had already
+succeeded just minutes earlier, re-injecting `immich_url`/`immich_api_key`
+into every branch instance's `set_pipeline` call the way it's supposed to
+per the fix already merged into `main`. Why this one branch's instance
+still ended up with unresolved vars at `put` time, when its own pipeline
+config should have had them baked in at `set_pipeline` time, isn't
+something this write-up resolves — that's a pipeline-infrastructure
+question, not a render-quality one, and per the same policy that held the
+custom-node gap open for Gavin rather than patching it silently, it's
+flagged here rather than fixed by editing `branch-pipeline-template.yml`
+directly.
+
+One more loose end, unrelated to the vars bug: the rendered filenames
+(`H3_promptbuilder_music_na_*`, `H3_qualitypass_crewgroup_shot01_wide_*`)
+don't match this experiment's own naming (`h3opt_validation_*`) — the
+album routing picked up the right names from the workflow JSON's own
+basename, but the `SaveVideo`/filename-prefix node inside each workflow
+file still carries whatever name it was copied from. Cosmetic, doesn't
+affect the render itself, but worth fixing before this becomes the crew-group
+production workflow.
 
 ## What was actually built
 
@@ -48,22 +102,24 @@ programmatically identical except for the attention-patch node itself.
 
 ## What's still open
 
-No second commit exists on this branch. None of the four workflows have a
-recorded render result: no build log, no Immich album, no artifact under
-this branch's name in this lab's output archive. The document itself is
-explicit that even a completed single-shot run here would only be a
-scoped Phase-1 pass (N=1 per arm), not enough for a "stable"/"consistent"
-claim, and separately notes that folding this into production would still
-need the crew-group workflow ported into the real production job rather
-than left as a branch-local copy. None of that follow-on work is reachable
-until the first render actually happens.
+No second commit exists on this branch, and no formal frame-to-frame
+comparison has been written up yet: this write-up only confirms the render
+completed and embeds the raw output for future analysis, it doesn't itself
+adjudicate the community's quality claim. Doing that would mean actually
+comparing the baseline/sparse pairs frame-by-frame for the popping-artifact
+the report describes, which hasn't happened. Separately, the pipeline vars
+bug above blocks this from being reproducible on this branch through the
+normal archival path until someone with pipeline-config access looks at it;
+until then, re-running this build will keep producing real video that
+never reaches Immich.
 
 ## Where it actually landed
 
-No verdict. What exists is a real, working sparse-attention build targeted
-correctly at this rig's actual GPU architecture, and four workflows ready
-to test the specific community claim under controlled conditions. Whether
-the reported quality gap between simple and complex scenes shows up here
-is exactly as unknown today as it was before this branch started; the
-infrastructure to answer it is staged, the render that would answer it
-never ran.
+**Rendered, unverified, and stuck at archival.** The infrastructure
+question from 2026-09-04 (does the sparse-attention node still build and
+load on this rig) is answered: yes. The quality question the branch was
+built to test is still open — the video exists now, embedded above, but
+hasn't been analyzed frame-by-frame against the community's claim. And a
+new, narrower problem replaced the old one: this branch's own Concourse
+pipeline instance can't complete a normal archival run, which is a
+different kind of blocker than "never ran."

@@ -11,6 +11,13 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-05 (midnight lab grooming)
+
+Routine Concourse/GPU health check turned up one branch whose status had
+changed since the last write-up.
+
+- Rewrote [Sparse attention for H3: it rendered, then got stuck at the door](2026-09-04-h3-sparse-attention-validation.html): the `comfyui-local` custom-node gap noted in the register-completion pass below is resolved — `feature/h3-optimizations-validation`'s `run-changed-workflows` build (`2603135`, 2026-09-04 20:33–20:47) submitted and rendered all four staged workflows clean (`node_errors: {}` on every one). The build still ended `errored`: all four `local-immich-gallery` archival `put`s failed with `undefined vars: immich_api_key, immich_url`, isolated to this one branch instance among roughly fifty that ran in the same batch. Pulled all four labeled clips directly from `comfyui-local`'s output volume before they age out and embedded them, since the pipeline's own archival path never delivered them to Immich. Root cause of the vars gap is a pipeline-config question, not a render one — flagged rather than fixed by editing `branch-pipeline-template.yml` directly.
+
 ## 2026-09-05 (register completion pass)
 
 Gavin authorized proceeding on four MiniMax-H3-derivative-licensed

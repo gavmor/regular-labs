@@ -26,7 +26,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 - [Three film formats, and a verdict: 3:2 wins for an 11-person crew](2026-09-05-crewgroup-film-format-comparison.html) — 2026-09-05
 - [A 30-second H3 render that took down the host](2026-09-04-h3-30s-attention-stack-oom.html) — 2026-09-04
 - [A fully-specified H3 LoRA test, finally analyzed: a wash on quality, a real speed surprise](2026-09-04-h3-bf16-turbo-lora-never-run.html) — 2026-09-04
-- [Sparse attention for H3: built, staged, never run](2026-09-04-h3-sparse-attention-validation.html) — 2026-09-04
+- [Sparse attention for H3: it rendered, then got stuck at the door](2026-09-04-h3-sparse-attention-validation.html) — 2026-09-04 (updated 2026-09-05)
 - [Three rendered arms, no verdict yet: the Krea2 4-step distill LoRA](2026-09-04-krea2-4step-distill-pending.html) — 2026-09-04
 - [Does Krea2 Turbo actually do 16-bit JRPG game levels? Unanswered](2026-09-04-krea2-pixelart-gamelevel.html) — 2026-09-04
 - [The video warp wasn't the audio mask's fault](2026-09-04-h3-audio-latent-mask-video-quality.html) — 2026-09-04
