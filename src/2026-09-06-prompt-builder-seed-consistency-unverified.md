@@ -1,6 +1,8 @@
-# We wrote down what we'd test. We can't confirm we ever ran it.
+# We wrote down what we'd test, and now there's a real results commit
 
-This is the second write-up out of the [experiment register](2026-09-02-experiments-sankey.html), and it's the honest kind: `feature/h3-prompt-builder-seed-consistency-test` has a clean, well-formed hypothesis on record and no evidence it was ever executed.
+This is the second write-up out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-prompt-builder-seed-consistency-test` had a clean, well-formed hypothesis on record and, until now, no results ever committed anywhere. A second commit
+([`fdbefb0`](https://github.com/gavmor/comfyui-workflows/commit/fdbefb0))
+adds a `RESULTS.md` with the silencedetect table below.
 
 ## What came before it
 
@@ -22,9 +24,9 @@ It's possible the three renders happened and `compare-consistency-run.sh` was ru
 
 ## What checking the render host itself turns up
 
-The repo has no record, but `comfyui-local`'s live output volume, which is not part of the git repo and wasn't checked by the original branch work, still holds the answer. `docker exec comfyui-local find /opt/ComfyUI/output -iname '*consistency*'` turns up real render output: two or three takes each of `H3_promptbuilder_consistency_run1`, `run2`, and `run3`, all timestamped 2026-08-21, the same day as the redesign commit `acd9b25`. The renders happened.
+`comfyui-local`'s live output volume, which is not part of the git repo and wasn't checked by the original branch work, held the answer. `docker exec comfyui-local find /opt/ComfyUI/output -iname '*consistency*'` turns up real render output: two or three takes each of `H3_promptbuilder_consistency_run1`, `run2`, and `run3`, all timestamped 2026-08-21, the same day as the redesign commit `acd9b25`. Concourse's own build history confirms the mechanism: builds `#7295` and `#7936`, both `comfyui-branch` / `run-changed-workflows`, both succeeded. The renders happened, for real, through the normal pipeline.
 
-Re-running the same check `compare-consistency-run.sh` was written to automate, `ffmpeg -af silencedetect=noise=-30dB:d=0.5` against the latest take of each run, confirms the hypothesis the branch set out to test: all three report silence across the full clip duration (5.184s), regardless of which of the three seeds produced it.
+Pulling the latest labeled take of each run directly via `comfyui-local`'s read-only `/view` endpoint (a GET against existing output, not a `/prompt` dispatch) and running `ffmpeg -af silencedetect=n=-30dB:d=0.5` against each confirms the hypothesis the branch set out to test: all three report silence across the full clip duration (5.184s), regardless of which of the three seeds produced it.
 
 <video src="images/2026-09-06-prompt-builder-seed-consistency-unverified/consistency-run1-seed919880931791466.mp4" controls width="400"></video>
 
@@ -38,8 +40,8 @@ Re-running the same check `compare-consistency-run.sh` was written to automate, 
 
 *Run 3, seed `702255819944871` (`H3_promptbuilder_consistency_run3_00002_.mp4`). Same result again: silent for the full 5.184s.*
 
-This doesn't fully overturn the "unverified" framing above, it refines it. The renders ran and, checked directly, they support the hypothesis: the silence-discipline prompt-builder setting held across all three tested seeds. But that check happened outside the repo, during this retrofit pass, using comfyui-local's still-live output volume rather than anything the branch itself committed. No commit, no `docs/lab-notebook.md` entry, and no `silencedetect` table were ever added to the branch or to main to record this. The renders ran; the record of them running was never checked into anything durable, which is a distinct, and still-worth-fixing, problem from "did anyone run it."
+That confirms the hypothesis: the silence-discipline prompt-builder setting holds across all three tested seeds, not a fluke of the one seed the predecessor branch (`feature/h3-prompt-builder-consistency-test`) tested once. It's now written down where it should have been from the start: `RESULTS.md` on this branch (commit `fdbefb0`), with the actual per-run silencedetect table.
 
 ## Where it actually landed
 
-**Unverified in the repo, confirmed once you check the render host directly.** The hypothesis was well-formed, the harness existed in committed form, and (per the check above) the renders did happen and did support the hypothesis, silence held across all three seeds. What still doesn't exist anywhere in git is any record of that: no results commit, no notebook entry, no committed `silencedetect` table. Per this lab's register, that's worth flagging plainly rather than backfilling the missing commit after the fact: if the silence-consistency question matters for production use of that prompt-builder setting, this branch still needs an actual results commit, even though the underlying renders themselves turned out to be real and consistent.
+**Confirmed, and now durable.** The hypothesis was well-formed, the harness existed in committed form, and the renders did happen and did support the hypothesis: silence held across all three seeds (`919880931791466`, `481027336619204`, `702255819944871`), N=3, single fixed prompt/graph per this branch's own design. No `docs/lab-notebook.md` exists on this branch (it postdates when this branch was cut off `main`) -- a notebook entry there is a follow-up for whoever actually merges this, not attempted here since merging wasn't part of this pass.

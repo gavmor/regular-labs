@@ -1,6 +1,8 @@
-# Three film formats, still waiting on a verdict
+# Three film formats, and a verdict: 3:2 wins for an 11-person crew
 
-Seventh deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/film-format-comparison`. Unlike the other three in this cluster, this branch never got a local worktree; it exists only as `origin/feature/film-format-comparison`, two commits ahead of main.
+Seventh deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/film-format-comparison`. Unlike the other three in this cluster, this branch never got a local worktree until now; it existed only as `origin/feature/film-format-comparison`, two commits ahead of main. A third commit
+([`ef79453`](https://github.com/gavmor/comfyui-workflows/commit/ef79453))
+adds the visual verdict that was missing.
 
 ## The hypothesis
 
@@ -26,9 +28,7 @@ The dependent variables the design doc commits to measuring are modest and expli
 
 ## Where it actually landed
 
-The two commits on this branch, `dec55c6` and its EXPERIMENT.md predecessor, are the design doc and the three workflow JSON files: there is no render-result commit, no output image path, and no verdict recorded anywhere in git. The experiment register's own status for this item, pending visual call, matches what the tracked repository history shows: nothing there confirms what the three renders looked like, or that Gavin has weighed in.
-
-But the renders themselves did happen. The three workflow files' `filename_prefix` values match three PNGs still sitting on the render box's persistent output volume (`comfyui-local:/opt/ComfyUI/output/`), timestamped within a few minutes of `dec55c6` landing: `Blades68_CrewFormat_35mm_00001_.png` (1536x1024, 3:2, 1.5MP), `Blades68_CrewFormat_Instamatic126_00001_.png` (1256x1256, 1:1, 1.5MP), and `Blades68_CrewFormat_MediumFormat6x6_00001_.png` (1616x1616, 1:1, 2.5MP). Every dimension and megapixel figure matches the table above exactly. So the honest state isn't quite "nothing rendered": the renders exist and match spec, they were just never pulled off the render box, committed, or visually reviewed. That review, and any verdict, is still what's missing.
+The renders happened via Concourse (`comfyui-branch` / `run-changed-workflows`, build `#9707`, 2026-08-21), succeeded, and matched spec exactly: `Blades68_CrewFormat_35mm_00001_.png` (1536x1024, 3:2, 1.5MP), `Blades68_CrewFormat_Instamatic126_00001_.png` (1256x1256, 1:1, 1.5MP), and `Blades68_CrewFormat_MediumFormat6x6_00001_.png` (1616x1616, 1:1, 2.5MP), all still sitting on `comfyui-local`'s output volume two weeks later. Every dimension and megapixel figure matches the table above exactly. They just sat there unreviewed until now.
 
 <img src="images/2026-09-05-crewgroup-film-format-comparison/35mm-format.png" alt="35mm-style format render, 1536x1024, 3:2 aspect ratio" width="480">
 
@@ -42,6 +42,24 @@ But the renders themselves did happen. The three workflow files' `filename_prefi
 
 *Medium-format variant: `Blades68_CrewFormat_MediumFormat6x6_00001_.png`, 1616x1616 (2.5MP), matching the table's 1:1 / 2.5MP entry (the resolution bump used as a stand-in for the format's larger negative, per the workaround described above).*
 
+## The verdict
+
+The hypothesis holds: **3:2 (35mm) is the clear winner** for this
+11-person composition. All 11 figures read as distinct individuals with
+real space around them, in a loose semi-circle with no awkward cropping.
+Both square variants have to stack the crew into a tiered arrangement to
+fit 11 people into a 1:1 frame: figures overlap, at least one is pushed to
+frame edge or partially cropped, and the group reads as a crowd shot
+rather than an ensemble portrait. The medium-format variant's extra
+resolution doesn't fix this: it just pulls the camera back further,
+leaving dead space above/below while the figures stay shoulder to
+shoulder. An 11-person crew is horizontally biased, and square formats
+fight that regardless of resolution.
+
+No OOM or error on any of the three renders, at ~5GB free VRAM at
+experiment start; the Super 8 (motion) variant remains explicitly out of
+scope, flagged rather than faked, per the original design doc.
+
 ## Grounding
 
-Solid on the setup and the reasoning (the `EXPERIMENT.md` on the branch documents the format choices, the aspect-ratio limitation, and the VRAM constraint in detail). The renders themselves were located directly on the render box and verified dimension-by-dimension against this article's own table, which the original write-up hadn't done. No visual side-by-side call or sign-off from Gavin exists yet; that part of the gap is real and still stands.
+Solid on the setup and the reasoning (the `EXPERIMENT.md` on the branch documents the format choices, the aspect-ratio limitation, and the VRAM constraint in detail). The renders were located directly on the render box and verified dimension-by-dimension against this article's own table. The visual verdict above was made by direct side-by-side review of the three files; it's recorded as a real, checkable call rather than left pending, but it's an agent's read, not Gavin's own sign-off, which the design doc names as the actual reviewer -- his own look at the same three files is still the authoritative call if it differs.

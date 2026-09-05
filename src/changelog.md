@@ -11,6 +11,19 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-05 (register completion pass)
+
+Gavin authorized proceeding on four MiniMax-H3-derivative-licensed
+branches that had been held pending license sign-off. Checking each
+against `comfyui-local` and Concourse's own build history before
+re-rendering anything turned up real, successful past renders for three of
+the four; only the analysis was missing.
+
+- Rewrote [A fully-specified H3 LoRA test, finally analyzed: a wash on quality, a real speed surprise](2026-09-04-h3-bf16-turbo-lora-never-run.html): `feature/h3-bf16-turbo-lora-quality-test`'s two arms (both already rendered via Concourse builds `#52663`/`#53032`) got the frame-by-frame video/audio comparison and per-arm timing the design doc called for. Verdict: the BF16 rank-20 LoRA renders ~30% faster than production's int8-pruned one (a rank effect, not a precision effect), with video quality reading as a wash and audio indistinguishable. Peak VRAM/RAM stays unrecoverable, predating this project's render-stats instrumentation.
+- Rewrote [Three film formats, and a verdict: 3:2 wins for an 11-person crew](2026-09-05-crewgroup-film-format-comparison.html): pulled the three already-rendered PNGs from `comfyui-local` and did the visual side-by-side the design doc asked for. 3:2 (35mm) keeps all 11 figures distinct and uncropped; both square formats force a tiered, overlapping arrangement regardless of resolution.
+- Rewrote [We wrote down what we'd test, and now there's a real results commit](2026-09-06-prompt-builder-seed-consistency-unverified.html): independently re-ran `ffmpeg silencedetect` against all three already-rendered seed variants and committed the results table (`RESULTS.md`) that the branch had been missing. Confirmed: the silence-discipline setting holds across all three tested seeds.
+- [Sparse attention for H3: built, staged, never run](2026-09-04-h3-sparse-attention-validation.html) stays unresolved: the `H3-Optimizations` native kernel this branch's design doc describes installing is no longer present on `comfyui-local` (the container was recreated 2026-08-30, four days after that install), so the branch's four workflows would fail on a missing node if submitted as-is. Reinstalling means a native CUDA build targeted at this rig's `sm_86` plus a restart of the shared, currently-active render host: real infrastructure work on shared production infra, flagged for Gavin's call rather than done silently.
+
 ## 2026-09-04 (H3-World revisit)
 
 - Rewrote [H3-World: a knowing license override, then a second wall the license had nothing to do with](2026-09-06-h3-world-license-block.html): Gavin reviewed the Section V.4 US exclusion documented in the original entry and explicitly authorized proceeding anyway for a private, non-distributed on-rig test, so the "never reached the GPU" framing no longer fit. It still never reached the GPU, but this time for a reason independent of the license — H3-World's directed-attention patch only runs against unpruned BF16 DiffSynth-Studio weights (~130GB combined transformer + text encoder), no on-rig or community quantized/pruned build is architecturally compatible with it, and even the CPU-offload path DiffSynth-Studio does support needs more host RAM (~130GB) than this box has (62GB). Also corrected the "keyboard-controlled" framing to what it actually is: one action preset chosen per render, which Gavin already knew and cares about for adherence-quality comparison, not as a gotcha.

@@ -13,7 +13,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 - [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — 2026-09-04
 - [H3-World: a knowing license override, then a second wall the license had nothing to do with](2026-09-06-h3-world-license-block.html) — 2026-09-06
 - [The full resolution sweep, and where the safe ceiling actually sits](2026-09-06-h3-resolution-array-sweep.html) — 2026-09-06
-- [We wrote down what we'd test. We can't confirm we ever ran it.](2026-09-06-prompt-builder-seed-consistency-unverified.html) — 2026-09-06
+- [We wrote down what we'd test, and now there's a real results commit](2026-09-06-prompt-builder-seed-consistency-unverified.html) — 2026-09-06
 - [A TTS benchmark harness, four models in, ten to go](2026-09-06-tts-voice-clone-benchmark-progress.html) — 2026-09-06
 - [The TTS experiment that never had a first commit](2026-09-06-sopro-tts-never-started.html) — 2026-09-06
 - [A clear win with almost no margin to spare](2026-09-05-h3-native-098mp-resolution-test.html) — 2026-09-05
@@ -23,9 +23,9 @@ automation, and whatever else comes out of the generative-ops workbench.
 - [Cut versus continuation: only one side of this comparison finished](2026-09-05-crewgroup-cut-vs-longmedia.html) — 2026-09-05
 - [Getting one crew-group scene clean, and a collision along the way](2026-09-05-crewgroup-quality-pass.html) — 2026-09-05
 - [OTIO plus ffmpeg concat: frame-exact video, a known audio catch](2026-09-05-otio-ffmpeg-cut-assembly.html) — 2026-09-05
-- [Three film formats, still waiting on a verdict](2026-09-05-crewgroup-film-format-comparison.html) — 2026-09-05
+- [Three film formats, and a verdict: 3:2 wins for an 11-person crew](2026-09-05-crewgroup-film-format-comparison.html) — 2026-09-05
 - [A 30-second H3 render that took down the host](2026-09-04-h3-30s-attention-stack-oom.html) — 2026-09-04
-- [A fully-specified H3 LoRA test that never actually rendered](2026-09-04-h3-bf16-turbo-lora-never-run.html) — 2026-09-04
+- [A fully-specified H3 LoRA test, finally analyzed: a wash on quality, a real speed surprise](2026-09-04-h3-bf16-turbo-lora-never-run.html) — 2026-09-04
 - [Sparse attention for H3: built, staged, never run](2026-09-04-h3-sparse-attention-validation.html) — 2026-09-04
 - [Three rendered arms, no verdict yet: the Krea2 4-step distill LoRA](2026-09-04-krea2-4step-distill-pending.html) — 2026-09-04
 - [Does Krea2 Turbo actually do 16-bit JRPG game levels? Unanswered](2026-09-04-krea2-pixelart-gamelevel.html) — 2026-09-04

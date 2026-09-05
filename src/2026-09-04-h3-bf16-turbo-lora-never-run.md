@@ -1,15 +1,16 @@
-# A fully-specified H3 LoRA test that rendered without anyone following up
+# A fully-specified H3 LoRA test, finally analyzed: a wash on quality, a real speed surprise
 
 Item #12 on the [experiment register](2026-09-02-experiments-sankey.html):
-`feature/h3-bf16-turbo-lora-quality-test`. This one has no build-by-build
+`feature/h3-bf16-turbo-lora-quality-test`. This one had no build-by-build
 story in its own commit history, because there was only ever one commit and
 its design doc's "Results" section was never filled in. That looked, from
 the branch alone, like a legitimate stop at the design-and-stage step. It
-wasn't quite that: real render output for both arms turns out to exist on
+wasn't quite that: real render output for both arms turned out to exist on
 the shared render host, dated minutes after that single commit, matching
-this branch's two workflow files exactly. Nobody ever came back to look at
-it or write it up. See "What's missing, and why" below for how that was
-confirmed.
+this branch's two workflow files exactly. Nobody came back to look at it or
+write it up until now. A second commit
+([`ed80c15`](https://github.com/gavmor/comfyui-workflows/commit/ed80c15))
+fills in the design doc's Results section with the actual analysis below.
 
 <video src="images/2026-09-04-h3-bf16-turbo-lora-never-run/h3-bf16lora-baseline-int8.mp4" controls width="480"></video>
 <video src="images/2026-09-04-h3-bf16-turbo-lora-never-run/h3-bf16lora-rank20-bf16.mp4" controls width="480"></video>
@@ -52,43 +53,60 @@ and re-uploads on the same day as ranks get retuned), which is why a
 separate, later Concourse watch job (not part of this branch) was intended
 to re-run the comparison automatically whenever the file set changes.
 
-## What's missing, and why
+## What was actually found on the render host
 
-The doc's own "Results" section, as committed, reads only: "(To be filled
-in after the Concourse `comfyui-branch` / `run-changed-workflows` build for
-this branch completes both arms.)" No later commit exists on this branch,
-and nothing in the commit history or the doc explains why. That reads, from
-the git history alone, like the honest "nothing happened" ending the intro
-above originally claimed.
-
-Checking the shared render host directly tells a different story. Both
-workflow files' exact `filename_prefix` values
-(`H3_bf16lora_test_baseline_int8` and `H3_bf16lora_test_bf16_rank20`) show
+Both workflow files' exact `filename_prefix` values
+(`H3_bf16lora_test_baseline_int8` and `H3_bf16lora_test_bf16_rank20`) showed
 up in `comfyui-local`'s output directory, each with two numbered renders,
 timestamped 2026-08-23 15:16-15:33 UTC, minutes after the branch's single
 commit at 15:12 UTC. Pulling each file's own embedded ComfyUI prompt
 metadata (the `prompt` tag baked into the container by ComfyUI itself, not
-inferred from the filename) confirms the `lora_name` on each matches this
+inferred from the filename) confirmed the `lora_name` on each matches this
 branch's two workflow files exactly, not a coincidence of similar naming
-from some other branch. That timing is consistent with this project's
-`run-changed-workflows` pipeline firing automatically on push, the same
-mechanism every other branch on this register relies on, though nothing on
-disk proves that specific mechanism over a manual submission.
+from some other branch. Checking Concourse's own build history confirmed
+the mechanism: builds
+[`#52663`](https://github.com/gavmor/comfyui-workflows) and `#53032`, both
+`comfyui-branch` / `run-changed-workflows` runs on 2026-08-23, both
+succeeded, both submitted both workflow files. Real render, real pipeline,
+no OOM, just never looked at.
 
-What's still actually missing: no comparison, no frame-by-frame review, no
-VRAM/RAM numbers, nothing written down anywhere against the design doc's
-four dependent variables. The render happened; the analysis never did. This
-write-up doesn't supply that analysis either, only the confirmation that
-real, matching output exists to eventually run it against.
+## The analysis, run for real
+
+**Wall-clock time**, read per-arm from the Concourse build logs (not total
+build time, which includes container setup): baseline int8 took ~2m00s
+across both builds; the BF16 rank-20 arm took ~1m24s in both. The BF16
+arm was **~30% faster**, the opposite of the naive "higher precision is
+slower" assumption. That's a rank effect, not a precision effect: Kijai's
+rank-20 resize is a much smaller LoRA than production's existing
+int8-pruned one, and fewer compute ops apparently wins out over bf16 vs.
+int8 arithmetic.
+
+**Peak VRAM / RAM**: not recoverable. These builds predate this project's
+`render-stats-shared-task` instrumentation, and the render host doesn't
+retain historical `nvidia-smi` samples. A genuinely open question for any
+future rerun.
+
+**Full-clip video quality**, checked via dense frame sampling across the
+entire clip (not just first/last frame, specifically to catch the kind of
+mid-clip coherence collapse this project has hit before): neither arm
+degraded progressively. Static quality differences existed but read
+inconsistently across two independent review passes: one favored the
+baseline's sharpness and exposure, another favored the BF16 arm's black
+levels and motion handling on a hand gesture mid-clip. Read together: a
+close call, not a decisive gap either direction.
+
+**Audio quality**, via `ffmpeg astats` over the full clip: baseline RMS
+-22.31dB / peak -6.08dB vs. BF16 rank-20 RMS -22.52dB / peak -6.58dB.
+Within noise; no audible or measurable difference.
 
 ## Where it actually landed
 
-No verdict, because no analysis happened, not because no render happened.
-What exists now is more complete than the branch's own history shows: two
-workflow files that differ in exactly one field, a design doc stating what
-would count as a result, a real model file staged on the render host, and
-(unrecorded anywhere until now) real output from both arms already sitting
-in `comfyui-local`'s output directory. Anyone picking this back up doesn't
-need to redo the setup or the render, just pull the existing files and do
-the frame-by-frame video/audio comparison and VRAM/RAM check the design doc
-called for and nobody ever ran.
+The two r/StableDiffusion threads that motivated this branch speculated a
+BF16 LoRA would look better than production's int8-pruned one. It doesn't,
+clearly, but it also isn't clearly worse: video quality is a wash and audio
+is indistinguishable. The real, unpredicted finding is the ~30% wall-clock
+speedup from the rank-20 resize itself, worth a second look on its own
+terms (this run left LoRA strength at production's 0.8, tuned for the
+*other* LoRA, not this one). **N=1/single-seed; not a production change
+recommendation.** Peak VRAM/RAM stays an open question for whoever reruns
+this with the newer instrumentation.
