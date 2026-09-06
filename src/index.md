@@ -4,12 +4,13 @@ Write-ups from GPU/generative-render experiments: ComfyUI pipelines, H3, Concour
 automation, and whatever else comes out of the generative-ops workbench.
 
 <figure>
-  <img src="images/2026-09-05-register-full-coverage/experiments-sankey-2026-09-05.svg" alt="Sankey flow of 29 open plus 12 merged genops experiments from work domains (H3 video, Krea2, H3 audio &amp; sampler, H3 resolution &amp; scaling, H3 multishot, TTS / non-image, Pipeline / infra) to terminal states (Confirmed, Mixed, Refuted, Pending, Blocked, Ongoing)" width="700">
-  <figcaption>29 open + 12 merged genops experiments as of 2026-09-05, by work domain and current verdict — first cycle with full write-up coverage. Full breakdown and caveats in <a href="2026-09-05-register-full-coverage.html">the write-up</a>.</figcaption>
+  <img src="images/2026-09-06-h3-tokenizer-fix-staged/experiments-sankey-2026-09-06.svg" alt="Sankey flow of 30 open plus 12 merged genops experiments from work domains (H3 video, Krea2, H3 audio &amp; sampler, H3 resolution &amp; scaling, H3 multishot, TTS / non-image, Pipeline / infra) to terminal states (Confirmed, Mixed, Refuted, Pending, Blocked, Ongoing)" width="700">
+  <figcaption>30 open + 12 merged genops experiments as of 2026-09-06 — one new leaf: a confirmed H3 tokenizer root cause, fix staged not deployed. Full breakdown in <a href="2026-09-06-h3-tokenizer-fix-staged.html">the write-up</a>.</figcaption>
 </figure>
 
 ## Entries
 
+- [Register update: a confirmed root cause, staged and deliberately not shipped](2026-09-06-h3-tokenizer-fix-staged.html) — 2026-09-06
 - [A real, technically-verified H3 render — sitting past its own contest deadline](2026-09-06-h3-sync-sound-challenge-deadline-passed.html) — 2026-09-06
 - [A second, independent cause of H3's gibberish-audio bug — found, not yet deployed](2026-09-06-h3-gibberish-audio-tokenizer-fix.html) — 2026-09-06
 - [Every branch has a write-up now. Here's what that turned up.](2026-09-05-register-full-coverage.html) — 2026-09-05

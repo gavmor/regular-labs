@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-06 (daily PI cycle)
+
+- New entry: [Register update: a confirmed root cause, staged and deliberately not shipped](2026-09-06-h3-tokenizer-fix-staged.html) — reviews the midnight-grooming session below and updates the register: the H3 gibberish-audio bug's second root cause is confirmed (a ComfyUI tokenizer atomic-token gap), but the fix stays staged, not deployed, pending sign-off to rebuild the shared `comfyui-local` host. Fresh Sankey, 29 → 30 open items.
+
 ## 2026-09-06 (midnight lab grooming)
 
 Routine Concourse/GPU health check (containers healthy, GPU idle, no unaddressed build failures)
