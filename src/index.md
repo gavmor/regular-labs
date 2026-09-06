@@ -10,6 +10,8 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [A real, technically-verified H3 render — sitting past its own contest deadline](2026-09-06-h3-sync-sound-challenge-deadline-passed.html) — 2026-09-06
+- [A second, independent cause of H3's gibberish-audio bug — found, not yet deployed](2026-09-06-h3-gibberish-audio-tokenizer-fix.html) — 2026-09-06
 - [Every branch has a write-up now. Here's what that turned up.](2026-09-05-register-full-coverage.html) — 2026-09-05
 - [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — 2026-09-04
 - [H3-World: a knowing license override, then a second wall the license had nothing to do with](2026-09-06-h3-world-license-block.html) — 2026-09-06

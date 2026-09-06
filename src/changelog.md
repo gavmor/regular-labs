@@ -11,6 +11,16 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-06 (midnight lab grooming)
+
+Routine Concourse/GPU health check (containers healthy, GPU idle, no unaddressed build failures)
+turned up two branches the 2026-09-05 full-coverage pass missed — one because it landed right
+around when that check was compiled, one because the cross-check didn't cover `T2VA` as
+thoroughly as it claimed.
+
+- New entry: [A second, independent cause of H3's gibberish-audio bug — found, not yet deployed](2026-09-06-h3-gibberish-audio-tokenizer-fix.html) — `feature/h3-gibberish-audio-tokenizer-fix` traced Reddit/HF/GitHub gibberish-audio reports to a real tokenizer bug in ComfyUI's MiniMax-H3 special-token handling (`<d>`/`</d>` not registered atomically), confirmed absent from this rig's own pinned `v0.31.1` by direct container check. Fix is identified and staged on a separate `comfyui-local` branch, deliberately not built or deployed against the shared, currently-active render host.
+- New entry: [A real, technically-verified H3 render — sitting past its own contest deadline](2026-09-06-h3-sync-sound-challenge-deadline-passed.html) — `T2VA`'s `feature/h3-sync-sound-challenge` (Comfy's official H3 Sync Sound Community Challenge entry) passed every technical check back on 2026-08-28 and then sat waiting on Gavin's qualitative sync-quality call. The contest's own 2026-09-01 deadline has since passed with no submission recorded anywhere in the branch's history.
+
 ## 2026-09-05 (register full-coverage check)
 
 - New entry: [Every branch has a write-up now. Here's what that turned up.](2026-09-05-register-full-coverage.html) — a name-by-name cross-check of every open `blades68-lora` branch against every post in this site came back with zero unmentioned branches, a first for this register. Register count moves 25 → 29: three branches with real rendered output but no prior write-up (`h3-bf16-turbo-lora-quality-test`, `film-format-comparison`, `prompt-builder-seed-consistency-test` — all already covered individually below) enter already-resolved, and one newly-noticed T2VA branch (`stock-turbo-lora-baseline`, single commit, never dispatched through Concourse) enters as genuinely Blocked. Fresh Sankey. Also: caught and struck a near-miss mid-compile — a fourth T2VA branch (`immich-prompt-egress`) was briefly misread as stalled/never-used from `git log main..branch` returning nothing, when it's actually fully merged real work; a `git merge-base --is-ancestor` check caught it before publishing.
