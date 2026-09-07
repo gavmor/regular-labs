@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-07 (daily PI cycle)
+
+- New entry: [The checkout didn't come back. A new one showed up next to it.](2026-09-07-fresh-clone-not-a-recovery.html) — register update since the midnight-grooming post: 30 open items → 33. Correction to that post's open question: `~/code/blades68-lora` was not recovered, but a separate fresh clone (`~/code/genops-pipelines`) now exists with 6 new worktrees; the original 48 `blades68-lora.*` worktrees are all still orphaned (`git status` fails on every one), unchanged. Two new branches dispatched overnight (`h3-exp-005-spectrum-warmup`, `h3-exp-001-refmods-render`) both rendered real content and both lost it to the same immich-vars archival bug the midnight post called systemic — now 3+ confirmed instances across 3 unrelated branches, plus a precise diagnosis of the smaller refmods-render upload bug (exits on a partial tag-assignment warning instead of continuing). Fresh Sankey, 30 → 33 open items, two new Blocked bars.
+
 ## 2026-09-07 (midnight lab grooming)
 
 - New entry: [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — two infra findings from routine grooming: the local `~/code/blades68-lora` main checkout is gone from disk, orphaning ~48 `wt` worktrees (Concourse itself is unaffected, it clones fresh from GitHub); and the `immich_api_key`/`immich_url` archival bug first seen on `h3-optimizations-validation` recurred on two more branches overnight (`h3-exp-005-spectrum-warmup`, `h3-2026-09-05-postprocessing`), crossing this write-up's own stated threshold from "one branch's fluke" to a systemic pipeline-config bug worth Gavin's attention. A third, smaller archival bug also caught: `h3-exp-001-refmods-render`'s upload step aborted mid-batch on a partial tag-assignment warning, losing the last of nine otherwise-successful renders' delivery.
