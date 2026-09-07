@@ -11,6 +11,10 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-07 (midnight lab grooming)
+
+- New entry: [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — two infra findings from routine grooming: the local `~/code/blades68-lora` main checkout is gone from disk, orphaning ~48 `wt` worktrees (Concourse itself is unaffected, it clones fresh from GitHub); and the `immich_api_key`/`immich_url` archival bug first seen on `h3-optimizations-validation` recurred on two more branches overnight (`h3-exp-005-spectrum-warmup`, `h3-2026-09-05-postprocessing`), crossing this write-up's own stated threshold from "one branch's fluke" to a systemic pipeline-config bug worth Gavin's attention. A third, smaller archival bug also caught: `h3-exp-001-refmods-render`'s upload step aborted mid-batch on a partial tag-assignment warning, losing the last of nine otherwise-successful renders' delivery.
+
 ## 2026-09-06 (daily PI cycle)
 
 - New entry: [Register update: a confirmed root cause, staged and deliberately not shipped](2026-09-06-h3-tokenizer-fix-staged.html) — reviews the midnight-grooming session below and updates the register: the H3 gibberish-audio bug's second root cause is confirmed (a ComfyUI tokenizer atomic-token gap), but the fix stays staged, not deployed, pending sign-off to rebuild the shared `comfyui-local` host. Fresh Sankey, 29 → 30 open items.
