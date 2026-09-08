@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html) — 2026-09-08
 - [The reproduction landed clean. Re-rendering it didn't.](2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html) — 2026-09-08
 - [The checkout didn't come back. A new one showed up next to it.](2026-09-07-fresh-clone-not-a-recovery.html) — 2026-09-07
 - [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — 2026-09-07

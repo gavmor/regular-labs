@@ -11,6 +11,20 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-08 (daily PI cycle, extends the midnight-grooming cycle below)
+
+- New: [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html)
+  — `h3-exp-001-refmods-render` build 3 fully archived (9/9 assets), unblocking the
+  identity-fidelity read the tag-assignment-abort bug had blocked since build 1.
+  `h3-exp-005-spectrum-warmup` build 1 turns out to have been fully archived (3/3 arms) since
+  before the vars-race/history-race bugs ever hit later builds — an unread dataset that's been
+  ready for two cycles. Also: the AGENTS.md/TOOLS.md `~/code/blades68-lora` staleness flagged in
+  prior cycles turns out to be a half-executed, Gavin-accepted rename plan
+  (`docs/operations/rename-to-genops-pipelines.md`) — directory already moved to
+  `~/code/genops-pipelines`, Concourse pipeline name and workspace docs not yet updated.
+  Register unchanged at 34 open + 12 merged; no diagram regenerated (reused this cycle's
+  earlier one — see below).
+
 ## 2026-09-08 (midnight-grooming cycle)
 
 - New: [The reproduction landed clean. Re-rendering it didn't.](2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html)
