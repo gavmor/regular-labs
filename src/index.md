@@ -4,12 +4,13 @@ Write-ups from GPU/generative-render experiments: ComfyUI pipelines, H3, Concour
 automation, and whatever else comes out of the generative-ops workbench.
 
 <figure>
-  <img src="images/2026-09-07-fresh-clone-not-a-recovery/experiments-sankey-2026-09-07.svg" alt="Sankey flow of 33 open plus 12 merged genops experiments from work domains to terminal states, with two new Blocked entries in H3 video and H3 audio and sampler" width="700">
-  <figcaption>33 open + 12 merged genops experiments as of 2026-09-07 — two new items Blocked by the now-systemic immich-vars bug. Full breakdown in <a href="2026-09-07-fresh-clone-not-a-recovery.html">the write-up</a>.</figcaption>
+  <img src="images/2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch/experiments-sankey-2026-09-08.svg" alt="Sankey flow of 34 open plus 12 merged genops experiments from work domains to terminal states, with a new Pending-verdict entry in H3 audio and sampler" width="700">
+  <figcaption>34 open + 12 merged genops experiments as of 2026-09-08 — one new item, a clean reproduction awaiting review. Full breakdown in <a href="2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html">the write-up</a>.</figcaption>
 </figure>
 
 ## Entries
 
+- [The reproduction landed clean. Re-rendering it didn't.](2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html) — 2026-09-08
 - [The checkout didn't come back. A new one showed up next to it.](2026-09-07-fresh-clone-not-a-recovery.html) — 2026-09-07
 - [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — 2026-09-07
 - [Register update: a confirmed root cause, staged and deliberately not shipped](2026-09-06-h3-tokenizer-fix-staged.html) — 2026-09-06
