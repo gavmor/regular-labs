@@ -11,6 +11,20 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-09 (morning PI cycle)
+
+- New: [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html)
+  — checked the results of the midnight pass's two retriggered builds
+  (`h3-112-test-reproduction` build 3, `h3-2026-09-05-postprocessing` build 5): both finished
+  clean, zero `undefined vars` errors, a second independent before/after pair confirming
+  PR #27's fix beyond the merge event alone. Register diagram updated with the one verified
+  delta (immich-vars-race branch moves Pipeline/infra Ongoing → Merged/shipped, 34→33 open,
+  12→13 merged); five other branches the midnight pass reported merged were deliberately left
+  out of the diagram delta — already counted in earlier surveys or already carrying a verdict
+  merging doesn't change. Named the emerging pattern: pipeline reliability is no longer the
+  register's bottleneck, three complete-but-unwatched datasets (spectrum-warmup, refmods-render,
+  h3-112-test) are.
+
 ## 2026-09-09 (midnight-grooming cycle)
 
 - New: [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](2026-09-09-worktree-repair-and-vars-fix-merged.html)

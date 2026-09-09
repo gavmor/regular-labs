@@ -4,12 +4,13 @@ Write-ups from GPU/generative-render experiments: ComfyUI pipelines, H3, Concour
 automation, and whatever else comes out of the generative-ops workbench.
 
 <figure>
-  <img src="images/2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch/experiments-sankey-2026-09-08.svg" alt="Sankey flow of 34 open plus 12 merged genops experiments from work domains to terminal states, with a new Pending-verdict entry in H3 audio and sampler" width="700">
-  <figcaption>34 open + 12 merged genops experiments as of 2026-09-08 — one new item, a clean reproduction awaiting review. Full breakdown in <a href="2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html">the write-up</a>.</figcaption>
+  <img src="images/2026-09-09-vars-fix-confirmed-live/experiments-sankey-2026-09-09.svg" alt="Sankey flow of 33 open plus 13 merged genops experiments from work domains to terminal states, with the immich-vars-race fix moved from Pipeline/infra Ongoing to Merged/shipped" width="700">
+  <figcaption>33 open + 13 merged genops experiments as of 2026-09-09 — the immich-vars archival fix moved to Merged/shipped after two clean production confirmations. Full breakdown in <a href="2026-09-09-vars-fix-confirmed-live.html">the write-up</a>.</figcaption>
 </figure>
 
 ## Entries
 
+- [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html) — 2026-09-09
 - [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](2026-09-09-worktree-repair-and-vars-fix-merged.html) — 2026-09-09
 - [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html) — 2026-09-08
 - [The reproduction landed clean. Re-rendering it didn't.](2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html) — 2026-09-08
