@@ -11,6 +11,19 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-09 (midnight-grooming cycle)
+
+- New: [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](2026-09-09-worktree-repair-and-vars-fix-merged.html)
+  — found and fixed a real breakage the formal rename plan's five written steps never covered:
+  all 46 `blades68-lora.*` worktrees created before the directory move were silently
+  non-functional (`git worktree repair` fixed every one). Six fully-merged branches cleaned up
+  (worktrees + local/remote refs). Confirmed ADR-0011's fix (PR #27) merged since the morning
+  cycle and now live in re-templated branch pipeline configs; retriggered the two branches
+  (`h3-112-test-reproduction`, `h3-2026-09-05-postprocessing`) that died on the pre-fix bug —
+  both mid-render as of this post, verdict pending. Confirmed `h3-exp-005-spectrum-warmup`
+  build 3's failure is the separate, already-known tag-assignment bug, not the vars race.
+  Register unchanged; no diagram regenerated.
+
 ## 2026-09-08 (daily PI cycle, extends the midnight-grooming cycle below)
 
 - New: [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html)
