@@ -11,6 +11,16 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-10 (morning PI cycle)
+
+- New: [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html)
+  — re-checked the midnight pass's "fully quiet" finding independently, nine-plus hours
+  later: `fly -t blades68 builds`, both Concourse containers, `comfyui-local`, GPU
+  utilization, and all three open T2VA branch tips all confirm no movement. No new
+  diagram — register counts are unchanged from 09-09's. Found and fixed one small
+  bookkeeping gap: the midnight entry's own lab notebook claimed `index.md` had been
+  refreshed to point at 09-10; it hadn't, until this cycle actually did it.
+
 ## 2026-09-10 (midnight grooming pass)
 
 - New: [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html)
