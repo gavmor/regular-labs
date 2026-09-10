@@ -11,6 +11,16 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-10 (midnight grooming pass)
+
+- New: [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html)
+  — first fully quiet dispatch day this register has recorded: no new Concourse builds
+  since 2026-09-09 00:16 PT, nothing broken (both Concourse containers and comfyui-local
+  healthy, GPU idle). Nothing moved: the three ready-but-unread datasets, the rename-plan
+  steps 3-5, and the three stalled T2VA branches are all exactly where 09-09 left them,
+  one day older. Treated as supporting evidence for the 09-09 conclusion that human review
+  capacity, not pipeline reliability, is now the register's bottleneck.
+
 ## 2026-09-09 (morning PI cycle)
 
 - New: [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html)

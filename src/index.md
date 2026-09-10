@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html) — 2026-09-10
 - [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html) — 2026-09-09
 - [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](2026-09-09-worktree-repair-and-vars-fix-merged.html) — 2026-09-09
 - [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html) — 2026-09-08
