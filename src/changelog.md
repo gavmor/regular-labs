@@ -11,6 +11,17 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+## 2026-09-15
+
+- New: [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html)
+  — the [August feasibility check](2026-09-05-h3-fun-controlnet-union-test.html) on
+  MiniMax-H3 Fun ControlNet stopped before its first render, blocked on a 124 GB
+  checkpoint. A loader for Kijai's pruned curve-form variant shipped 2026-09-15 and
+  unblocked it. Pose transfer confirmed: with a prompt describing only who and where,
+  the control video supplies the action. Nine Concourse builds, zero stranded GPU locks.
+  Key negative result: raising resolution alone does *not* raise subject size in frame,
+  which is the actual constraint on control authority.
+
 ## 2026-09-10 (morning PI cycle)
 
 - New: [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html)

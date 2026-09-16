@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html) — 2026-09-15
 - [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html) — 2026-09-10
 - [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html) — 2026-09-10
 - [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html) — 2026-09-09
