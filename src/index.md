@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [Only one text encoder works with MiniMax H3, and it isn't a quality question](2026-09-17-h3-clip-encoder-compatibility.html) — 2026-09-17
 - [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html) — 2026-09-15
 - [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html) — 2026-09-10
 - [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html) — 2026-09-10

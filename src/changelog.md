@@ -11,6 +11,19 @@ language: en-us
 
 Updates to labs write-ups, in reverse chronological order.
 
+
+## 2026-09-17
+
+- New: [Only one text encoder works with MiniMax H3, and it isn't a quality question](2026-09-17-h3-clip-encoder-compatibility.html)
+  — answering an r/StableDiffusion question with an experiment. Designed a
+  4-encoder comparison scored on prompt adherence; found that three of the four
+  cannot run at all. H3's projection takes a 5120-dim hidden state, and the
+  smaller Qwen3-VL builds emit 4096 or 2560, so matching vocabulary does not
+  mean compatibility. Includes a thirty-second header check that replaces the
+  whole experiment, and the better news for the asker: ComfyUI offloads the
+  text encoder to CPU after encoding, so its size costs load time and disk
+  rather than sampling headroom on an 8GB card.
+
 ## 2026-09-15
 
 - New: [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html)
