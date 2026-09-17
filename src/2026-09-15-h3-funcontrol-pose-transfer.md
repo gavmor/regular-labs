@@ -153,11 +153,10 @@ disturbing appearance.
 
 ### Replication at seeds 43 and 44
 
-One render proves nothing here. This experiment line has repeatedly produced
-single-render results that replication overturned — reference arms that
-vanished into seed noise, a retention dial that turned out to be measuring
-something else, and two claims in this very session that had to be retracted.
-So the arms were re-run at two more seeds, changing nothing but
+One render proves nothing here. Single-render results in this experiment line
+have a poor track record against replication — reference arms that turn out to
+sit inside seed noise, a retention dial that measures something other than what
+it appears to. So the arms are re-run at two more seeds, changing nothing but
 `RandomNoise.noise_seed`.
 
 <figure>

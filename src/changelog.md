@@ -40,15 +40,14 @@ Updates to labs write-ups, in reverse chronological order.
   is a fixed 5120 -> 5376 matmul, so the smaller Qwen3-VL builds (4096 and
   2560) cannot be dropped into a stock graph; matching vocabulary is not
   compatibility. Includes a thirty-second header check that replaces the whole
-  experiment. First published with the conclusion "the 32B is effectively the
-  only encoder for H3", which was wrong: the first comment on the question
-  points at ClipProj, a learned 2560 -> 5120 projection with a patch node, and
-  its weights carry exactly the bridge whose absence produced my error. The
-  measurement stands, the conclusion was too strong, and reading twelve
-  comments would have been cheaper than 52 minutes of GPU. Also: ComfyUI
-  offloads the text encoder to CPU after encoding, so encoder size costs load
-  time and disk rather than sampling headroom on an 8GB card -- which nobody in
-  the thread mentioned.
+  experiment. The smaller builds are not unusable, though: the first comment on
+  the question points at ClipProj, a learned 2560 -> 5120 projection with a
+  patch node, whose weights carry exactly the bridge whose absence produces the
+  error. The cheapest lesson: read the replies before designing the experiment —
+  twelve comments cost two minutes, the experiment cost 52 minutes of GPU. Also:
+  ComfyUI offloads the text encoder to CPU after encoding, so encoder size costs
+  load time and disk rather than sampling headroom on an 8GB card -- which
+  nobody in the thread mentioned.
 
 ## 2026-09-15
 

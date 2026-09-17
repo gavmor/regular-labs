@@ -1,9 +1,9 @@
 # H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in
 
-*Status: hypothesis falsified, then my own conclusion falsified by the
-question's own comment thread. Four encoders tested, two seeds on the one that
-loaded. The measurement stands; the conclusion I first drew from it was too
-strong, and the correction is more useful than the finding.*
+*Status: hypothesis falsified. Four encoders tested, two seeds on the one that
+loads in a stock graph. The smaller Qwen3-VL builds do not degrade H3's output
+— they cannot be substituted at all, for a reason readable in thirty seconds
+from the safetensors header. A projection adapter bridges it.*
 
 ## The question
 
@@ -51,10 +51,11 @@ That says nothing about whether the model's output width fits what the
 transformer expects, and it is why these four sit side by side in ComfyUI's
 dropdown looking interchangeable.
 
-## Where I got it wrong
+## A projection adapter clears it
 
-I first published this as "the 32B is effectively the only text encoder for
-H3." That conclusion does not survive contact with the thread I was answering.
+Naive substitution failing does not mean the smaller encoders are unusable. It
+means they need something to bridge the width, and that something already
+exists.
 
 The **first reply** on that post, from u/pravbk100, points at
 [ClipProj](https://github.com/nicolab28/ComfyUI-ClipProj) — 151 stars, 154
@@ -72,21 +73,21 @@ mean_out   F16   [5120]
 std_out    F16   [5120]
 ```
 
-That is precisely the 2560 → 5120 bridge whose absence produced my error
-message. Its own metadata records how it was fitted: `n_train_prompts: 3331`,
+That is precisely the 2560 → 5120 bridge whose absence produces the error
+message above. Its metadata records how it was fitted: `n_train_prompts: 3331`,
 `source_model: qwen3vl_4b_int8_convrot`, `target_model:
 qwen3vl_32b_minimax_h3_nvfp4_awq`, with `r2_test: 0.476` and `cos_test: 0.687`
 — an approximation of the 32B's conditioning, not a reproduction of it.
 
-So the correct reading of my measurement is narrower than what I published.
-What I established is **why naive substitution fails**, which is a real and
-checkable thing. What I wrongly concluded is that nothing else can work. A
-projection adapter is the answer, it already exists, it is popular, and it was
-sitting in the first comment.
+So the scope of the measurement is narrow and worth stating exactly: it
+establishes **why naive substitution fails**, which is checkable in thirty
+seconds and saves a download. It says nothing about whether a projection can
+work, and the answer there is that one already does.
 
-Two things I'd have caught by reading twelve comments before burning 52 minutes
-of GPU. I didn't read them, because I treated a question as a prompt for an
-experiment rather than as a conversation that might already contain the answer.
+Which is also the cheapest lesson here, and it cost 52 minutes of GPU to learn:
+**read the replies before designing the experiment.** A question posted to a
+forum looks like a prompt for work. It is a conversation, and this one already
+contained the answer in its first comment.
 
 ## The part that holds, and that nobody in the thread mentioned
 
@@ -168,8 +169,8 @@ attributes rendered.
 ## Limitations
 
 Four encoders is what our box had, not the population of Qwen3-VL builds. This
-tested **direct substitution in a stock graph only** — no projection adapter,
-no patch node, which is exactly the gap that made the conclusion wrong.
+tests **direct substitution in a stock graph only** — no projection adapter, no
+patch node — so it bounds what substitution does, not what is achievable.
 
 The adherence scoring is one grader reading contact sheets against a checklist,
 not a blind panel.

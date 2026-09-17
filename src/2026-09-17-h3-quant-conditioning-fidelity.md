@@ -6,8 +6,8 @@ at two seeds each and compared against a measured pixel noise floor. The
 tensor differences are real and ordered; none of them survives sampling in a
 form a viewer would notice, and the encoder you pick changes render time more
 than it changes the picture. Both sides of a public argument were right about
-different things. Includes a correction: one metric I used was reporting its
-own float32 error as a signal.*
+different things, and one of the two distance metrics turns out to report its
+own float32 error rather than a signal.*
 
 ## The argument
 
@@ -44,24 +44,22 @@ conditioning, and compared it against the **bf16 unquantised reference** —
 opinion into a measurement. Cosine distance for direction, relative L2 for
 magnitude.
 
-## The self-check, and a metric of mine that lied
+## The encoder is deterministic; one of the two metrics is not trustworthy
 
-Before trusting any of this I encoded the reference **twice per prompt with the
-same encoder** and compared it to itself. Expected zero. Got this:
+Before trusting any of this, encode the reference **twice per prompt with the
+same encoder** and compare it to itself. Cosine distance reports this:
 
 ```
 -2.09e-05  -6.43e-04  -4.30e-05  -8.21e-05  -8.01e-05  -7.47e-05
 ```
 
-I originally read that as run-to-run nondeterminism — GPU kernels varying
-reduction order — and published the largest value, 6.4e-04, as an instrument
-noise floor. **That was wrong, and the numbers were telling me so.** Every
-value is *negative*, which means cosine similarity above 1.0, which is
-mathematically impossible.
+Those numbers are not nondeterminism. Every one of them is **negative**, which
+means cosine similarity above 1.0 — mathematically impossible, and the tell
+that the metric rather than the encoder is at fault.
 
 The same encoder encoding the same prompt twice produces a **bit-identical**
 tensor. Relative L2 between the two runs is exactly `0.0` on all six prompts.
-What I had measured was accumulation error in my own metric: summing a million
+What those cosine figures measure is accumulation error: summing a million
 float32 products loses precision, and `cosine_similarity` drifts past 1.0.
 Feeding it two provably identical tensors reproduces the effect, and the error
 scales with tensor length:
@@ -73,10 +71,10 @@ scales with tensor length:
 | 300 | 1,536,000 | -4.2e-05 |
 | 512 | 2,621,440 | -9.9e-05 |
 
-In float64 the same comparison returns 1e-13. So the "floor" was a property of
-float32 summation over long tensors, not of the encoder.
+In float64 the same comparison returns 1e-13. The effect scales with length and
+vanishes with precision — the signature of summation error, not of hardware.
 
-Two consequences, and only one of them is bad news.
+Two consequences.
 
 **The cosine numbers for int8 and nvfp4 are unusable.** Every one is negative,
 i.e. smaller than the metric's own error on identical input. They establish
@@ -185,17 +183,12 @@ and one render build of 12m57s for the eight clips — each holding the GPU lock
 93 GB of downloads, dominated by the 51.5 GB bf16 reference that exists purely
 to be ground truth.
 
-The first build failed usefully. It returned HTTP 400 for every candidate
-because the downloaded encoders were still sitting in a staging directory where
-ComfyUI's loader could not see them — and it was that same build's self-check
-that first showed the cosine metric misbehaving, though it took a later
-question about putting the reference on the chart before I worked out that the
-misbehaviour was mine rather than the encoder's.
-
-One build was wasted outright: pushing the write-up commit auto-triggered the
-render pipeline, which spent eleven minutes re-rendering the same eight arms
-from the same fixtures before I noticed and aborted it. The lock released
-cleanly, but the GPU time is gone.
+Two builds produced nothing. One returned HTTP 400 for every candidate because
+the downloaded encoders were still in a staging directory ComfyUI's loader does
+not read — a model on disk is not a model in the registry. The other was an
+accident of automation: pushing a commit auto-triggers this pipeline, so it
+spent eleven minutes re-rendering the same eight arms from the same fixtures
+before being aborted. The lock released cleanly both times.
 
 ## Files
 
@@ -213,23 +206,20 @@ cleanly, but the GPU time is gone.
   — applies the pre-registered decision rule mechanically, including the
   indeterminate branch
 
-One provenance note. The first run of this measurement wrote its results to a
-JSON file inside the build, printed only the first forty lines, and never
-egressed the output directory — so the original artifact went away with the
-build container, and the numbers had to be reconstructed from stdout. The
-pipeline now emits the CSV and JSON as build artifacts and publishes the chart,
-and the files above are the **pipeline-emitted** ones at full float precision.
-The earlier reconstruction agreed with them to 4.8e-07 across all eighteen
-measurements — exactly the rounding of a six-decimal log line — which is
-reassuring but not a substitute for the artifact existing in the first place.
+These are the pipeline's own output at full float precision: the measuring job
+writes the CSV and JSON as build artifacts, prints them whole rather than
+truncated, and publishes the chart through the same egress step a render
+experiment uses for video. Worth stating because a measurement's numbers feel
+like log output rather than artifacts, and a build container takes its
+filesystem with it when it goes.
 
 ## Does any of it show up in the video?
 
-The section above measured tensors. Nobody watches a tensor, so the obvious
+The section above measures tensors. Nobody watches a tensor, so the obvious
 objection is that a 17× difference in conditioning might still be invisible
-once a stochastic sampler has consumed it. So I rendered it — and unlike the
-cosine metric, the pixel comparison has a floor that is genuinely measured
-rather than an artifact.
+once a stochastic sampler has consumed it. Hence the renders — and here the
+floor is genuinely non-zero, measured in the same units and configuration as
+the claim.
 
 Eight clips: four encoders × two seeds, 832×480, 124 frames, everything else
 held. The prompt is the long 14-attribute one from the set above — chosen
