@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Entries
 
+- [Settling an argument about MiniMax H3 quants with a number](2026-09-17-h3-quant-conditioning-fidelity.html) — 2026-09-17
 - [H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in](2026-09-17-h3-clip-encoder-compatibility.html) — 2026-09-17
 - [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html) — 2026-09-15
 - [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html) — 2026-09-10

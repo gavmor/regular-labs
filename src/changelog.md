@@ -12,6 +12,21 @@ language: en-us
 Updates to labs write-ups, in reverse chronological order.
 
 
+
+## 2026-09-17
+
+- New: [Settling an argument about MiniMax H3 quants with a number](2026-09-17-h3-quant-conditioning-fidelity.html)
+  — the same r/StableDiffusion thread contained a fight about quantisation that
+  nobody could settle, because neither disputant published a number or a
+  method. Measured all three quants' conditioning against the unquantised bf16
+  reference on six prompts. int8_convrot (0.0038 relative L2) and nvfp4_awq
+  (0.0097) both sit at the instrument's noise floor; the third-party
+  int4_convrot is 0.066, seventeen times int8 and the only arm clearing the
+  floor. Both disputants were reporting honestly about different comparisons.
+  The prerequisite nobody had: encoding the same prompt twice with the SAME
+  encoder is not bit-reproducible, so there is a 6.4e-04 noise floor and
+  without it there is no way to say whether a difference is real.
+
 ## 2026-09-17
 
 - New: [H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in](2026-09-17-h3-clip-encoder-compatibility.html)
