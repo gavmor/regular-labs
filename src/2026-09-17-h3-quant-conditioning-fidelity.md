@@ -65,6 +65,8 @@ how two honest people compare the same files and disagree.
 Six prompts spanning short/long, concrete/abstract, one non-English, one heavy
 with rare proper nouns. Against bf16:
 
+![Conditioning distance from bf16 by encoder](images/2026-09-17-h3-quant-conditioning-fidelity/conditioning-distance.png)
+
 | encoder | size | mean cos distance | mean relative L2 | vs noise floor |
 | :-- | --: | --: | --: | :-- |
 | int8_convrot | 27.1 GB | -0.000151 | **0.0038** | at the floor |
@@ -156,6 +158,26 @@ because the downloaded encoders were still sitting in a staging directory where
 ComfyUI's loader could not see them — and it was that same build's self-check
 that revealed the noise floor, which I had written expecting to be zero and
 would otherwise have reported int8's -0.0001 as a real difference.
+
+## Files
+
+- [`h3-exp-008-conditioning-fidelity.csv`](files/2026-09-17-h3-quant-conditioning-fidelity/h3-exp-008-conditioning-fidelity.csv)
+  — all 18 measurements, one row per prompt × encoder
+- [`h3-exp-008-conditioning-fidelity.json`](files/2026-09-17-h3-quant-conditioning-fidelity/h3-exp-008-conditioning-fidelity.json)
+  — the same data plus the noise floor and aggregates
+- [`measure_conditioning_fidelity.py`](files/2026-09-17-h3-quant-conditioning-fidelity/measure_conditioning_fidelity.py)
+  — the measurement script, prompts included, so you can run it against your
+  own encoders
+
+One provenance note. The first run of this measurement wrote its results to a
+JSON file inside the build, printed only the first forty lines, and never
+egressed the output directory — so the original artifact went away with the
+build container, and the numbers had to be reconstructed from stdout. The
+pipeline now emits the CSV and JSON as build artifacts and publishes the chart,
+and the files above are the **pipeline-emitted** ones at full float precision.
+The earlier reconstruction agreed with them to 4.8e-07 across all eighteen
+measurements — exactly the rounding of a six-decimal log line — which is
+reassuring but not a substitute for the artifact existing in the first place.
 
 ## Answer, short version
 
