@@ -1,12 +1,13 @@
 # Settling an argument about MiniMax H3 quants with a number
 
 *Status: complete, in tensors and in pixels. Three quantised text encoders
-measured against the unquantised bf16 reference on six prompts with an
-instrument noise floor, then rendered at two seeds each and compared against a
-measured pixel noise floor. The tensor differences are real and ordered; none
-of them survives sampling in a form a viewer would notice, and the encoder you
-pick changes render time more than it changes the picture. Both sides of a
-public argument were right about different things.*
+measured against the unquantised bf16 reference on six prompts, then rendered
+at two seeds each and compared against a measured pixel noise floor. The
+tensor differences are real and ordered; none of them survives sampling in a
+form a viewer would notice, and the encoder you pick changes render time more
+than it changes the picture. Both sides of a public argument were right about
+different things. Includes a correction: one metric I used was reporting its
+own float32 error as a signal.*
 
 ## The argument
 
@@ -43,7 +44,7 @@ conditioning, and compared it against the **bf16 unquantised reference** —
 opinion into a measurement. Cosine distance for direction, relative L2 for
 magnitude.
 
-## The instrument has a noise floor, and it isn't zero
+## The self-check, and a metric of mine that lied
 
 Before trusting any of this I encoded the reference **twice per prompt with the
 same encoder** and compared it to itself. Expected zero. Got this:
@@ -52,16 +53,41 @@ same encoder** and compared it to itself. Expected zero. Got this:
 -2.09e-05  -6.43e-04  -4.30e-05  -8.21e-05  -8.01e-05  -7.47e-05
 ```
 
-H3's conditioning is not bit-reproducible. GPU kernels vary reduction order
-between runs, so the same encoder on the same prompt lands in a slightly
-different place each time. The largest of those, **6.4e-04**, is the noise
-floor: any candidate at or below it is indistinguishable from the reference
-encoder run twice.
+I originally read that as run-to-run nondeterminism — GPU kernels varying
+reduction order — and published the largest value, 6.4e-04, as an instrument
+noise floor. **That was wrong, and the numbers were telling me so.** Every
+value is *negative*, which means cosine similarity above 1.0, which is
+mathematically impossible.
 
-This is the same discipline as the seed noise floor used elsewhere on this rig
-for pixel comparisons, and it is precisely what the argument was missing.
-Without a floor there is no way to say whether a difference is real, which is
-how two honest people compare the same files and disagree.
+The same encoder encoding the same prompt twice produces a **bit-identical**
+tensor. Relative L2 between the two runs is exactly `0.0` on all six prompts.
+What I had measured was accumulation error in my own metric: summing a million
+float32 products loses precision, and `cosine_similarity` drifts past 1.0.
+Feeding it two provably identical tensors reproduces the effect, and the error
+scales with tensor length:
+
+| tokens | elements | cosine distance on identical input |
+| --: | --: | --: |
+| 60 | 307,200 | -3.3e-06 |
+| 180 | 921,600 | -1.9e-05 |
+| 300 | 1,536,000 | -4.2e-05 |
+| 512 | 2,621,440 | -9.9e-05 |
+
+In float64 the same comparison returns 1e-13. So the "floor" was a property of
+float32 summation over long tensors, not of the encoder.
+
+Two consequences, and only one of them is bad news.
+
+**The cosine numbers for int8 and nvfp4 are unusable.** Every one is negative,
+i.e. smaller than the metric's own error on identical input. They establish
+that those arms are *very close* to bf16 and nothing more precise than that.
+int4's cosine distances are all positive and around 1.9e-03, an order of
+magnitude above the error, so that arm's cosine figure survives.
+
+**Relative L2 is unaffected**, and it is what the conclusions below rest on. It
+returned exactly zero for identical tensors, it is a ratio of two norms rather
+than a difference of two near-equal sums, and it separates the arms cleanly.
+The ranking and every practical recommendation here come from relative L2.
 
 ## Results
 
@@ -70,11 +96,11 @@ with rare proper nouns. Against bf16:
 
 ![Conditioning distance from bf16 by encoder](images/2026-09-17-h3-quant-conditioning-fidelity/conditioning-distance.png)
 
-| encoder | size | mean cos distance | mean relative L2 | vs noise floor |
-| :-- | --: | --: | --: | :-- |
-| int8_convrot | 27.1 GB | -0.000151 | **0.0038** | at the floor |
-| nvfp4_awq | 15.7 GB | -0.000110 | **0.0097** | at the floor |
-| int4_convrot | 14.2 GB | 0.001949 | **0.0663** | 3.0× the floor |
+| encoder | size | mean relative L2 | mean cos distance |
+| :-- | --: | --: | --: |
+| int8_convrot | 27.1 GB | **0.0038** | -0.000151 (unusable, see above) |
+| nvfp4_awq | 15.7 GB | **0.0097** | -0.000110 (unusable, see above) |
+| int4_convrot | 14.2 GB | **0.0663** | 0.001949 |
 
 Per prompt, with no exceptions:
 
@@ -91,13 +117,15 @@ Three things fall out of that table.
 
 **int4 is genuinely different.** 0.066 relative L2 is **17× int8's 0.0038**, and
 it lands between 0.063 and 0.073 on every single prompt. That is a systematic
-offset, not scatter. Its cosine distance is the only one that clears the noise
-floor, at 3.0×.
+offset, not scatter. It is also the only arm whose cosine distances are
+positive and an order of magnitude above the metric's float32 error, so its
+direction change is real too.
 
-**int8 and nvfp4 are both at the noise floor in direction** — their conditioning
-points the same way as bf16's to within run-to-run variation. They differ in
-magnitude, where nvfp4 is about 2.5× further out than int8 (0.0097 vs 0.0038),
-consistently. Still small, but real and measurable.
+**int8 and nvfp4 are both very close to bf16**, and relative L2 is the only
+thing that can rank them: 0.0038 against 0.0097, so nvfp4 sits about 2.5×
+further out, consistently across all six prompts. Small, but ordered and
+reproducible. Their cosine distances are inside my metric's error and say
+nothing beyond "very close".
 
 **The long prompt is the worst case for every quant.** Prompt 2 is the maximum
 for all three arms. More structure to preserve, more room to drift. If you are
@@ -112,17 +140,18 @@ anyone claiming they could see it is making a plausible claim. "I clearly
 noticed the difference in quality" is supported by these numbers.
 
 **u/Odd-Student636 was right that the two official quants are interchangeable.**
-int8 and nvfp4 sit at the noise floor against bf16 — closer to unquantised
-truth than one encoder is to itself between runs. His "no visible difference"
-is correct for that comparison.
+int8 and nvfp4 are both within 0.01 relative L2 of unquantised bf16, against
+int4's 0.066 — a seventeen-fold gap between those two groups. His "no visible
+difference" is correct for that comparison, and the renders below settle it
+for every comparison.
 
 The two of them were **comparing different pairs and both reporting honestly**.
 One compared int4 against int8 and saw a difference. The other compared the
-official quants and saw none. Both were right; neither had a floor to say so
-with.
+official quants and saw none. Both were right; neither had a measurement to
+say so with.
 
 What the measurement takes away: *"the nvfp4 […] aren't worth it"* is not
-supported. nvfp4 is indistinguishable from int8 in direction, at 15.7 GB
+supported. nvfp4 is within a hundredth of bf16 in relative L2, at 15.7 GB
 against 27.1 GB. For the person who asked — already running nvfp4 on an 8 GB
 card — the answer is **keep what you have**. Downloading 27 GB to replace it
 buys a magnitude difference that sits three times below the threshold at which
@@ -159,8 +188,9 @@ to be ground truth.
 The first build failed usefully. It returned HTTP 400 for every candidate
 because the downloaded encoders were still sitting in a staging directory where
 ComfyUI's loader could not see them — and it was that same build's self-check
-that revealed the noise floor, which I had written expecting to be zero and
-would otherwise have reported int8's -0.0001 as a real difference.
+that first showed the cosine metric misbehaving, though it took a later
+question about putting the reference on the chart before I worked out that the
+misbehaviour was mine rather than the encoder's.
 
 One build was wasted outright: pushing the write-up commit auto-triggered the
 render pipeline, which spent eleven minutes re-rendering the same eight arms
@@ -197,7 +227,9 @@ reassuring but not a substitute for the artifact existing in the first place.
 
 The section above measured tensors. Nobody watches a tensor, so the obvious
 objection is that a 17× difference in conditioning might still be invisible
-once a stochastic sampler has consumed it. So I rendered it.
+once a stochastic sampler has consumed it. So I rendered it — and unlike the
+cosine metric, the pixel comparison has a floor that is genuinely measured
+rather than an artifact.
 
 Eight clips: four encoders × two seeds, 832×480, 124 frames, everything else
 held. The prompt is the long 14-attribute one from the set above — chosen
@@ -279,8 +311,8 @@ that actually accumulates.
 In tensors: against unquantised bf16, int8_convrot and nvfp4_awq are both at
 the instrument's noise floor — interchangeable in direction, with nvfp4 about
 2.5× further out in magnitude and still tiny. The third-party int4_convrot is
-17× int8's relative error and the only arm whose difference clears the floor,
-at 3×.
+17× int8's relative error, and the only arm whose direction change is large
+enough to measure reliably.
 
 In pixels: none of it matters. The worst quant pairing differs from bf16 by
 11.84 mean absolute pixels while the same encoder at the next seed differs by

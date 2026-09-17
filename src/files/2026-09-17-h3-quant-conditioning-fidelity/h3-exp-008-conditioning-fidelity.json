@@ -1,18 +1,28 @@
 {
   "experiment_id": "h3-exp-008-quant-conditioning-fidelity",
-  "build": "h3-exp-008-quant/measure-conditioning-fidelity/4",
+  "build": "h3-exp-008-quant/measure-conditioning-fidelity/5",
   "reference": "qwen3vl_32b_minimax_h3_bf16.safetensors",
   "provenance": "EMITTED BY THE PIPELINE, build h3-exp-008-quant/measure-conditioning-fidelity/4, at full float precision. Supersedes the earlier reconstruction from build 3 stdout; the two agree to 4.8e-07 across all 18 measurements, i.e. exactly the rounding of the 6-decimal log lines.",
   "noise_floor": {
     "max_abs_self_cosine_distance": 0.0006426572799682617,
-    "per_prompt": [
+    "max_self_relative_l2": 0.0,
+    "per_prompt_cosine": [
+      -2.086162567138672e-05,
       -0.0006426572799682617,
+      -4.303455352783203e-05,
       -8.213520050048828e-05,
       -8.0108642578125e-05,
-      -7.474422454833984e-05,
-      -4.303455352783203e-05,
-      -2.086162567138672e-05
-    ]
+      -7.474422454833984e-05
+    ],
+    "per_prompt_relative_l2": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "meaning": "same encoder, same prompt, encoded twice. Any candidate at or below this is indistinguishable from run-to-run noise."
   },
   "aggregate": {
     "qwen3vl_32b_minimax_h3_int8_convrot.safetensors": {
@@ -168,5 +178,6 @@
   "immich": {
     "album": "6facbca7-3621-4c1a-a1f9-eea5ad5a4aa9",
     "chart_asset": "ffa0cccc-c37e-4701-866e-7e63b8bb3e6f"
-  }
+  },
+  "correction": "The 6.4e-04 'instrument noise floor' published earlier was NOT run-to-run nondeterminism. bf16 encoding the same prompt twice returns a bit-identical tensor (self-check relative L2 exactly 0.0 on all six prompts). The 6.4e-04 was accumulation error in torch cosine_similarity over ~1M float32 elements: it scales with tensor length (3.3e-06 at 60 tokens to 9.9e-05 at 512), vanishes in float64 (1e-13), and every affected value was NEGATIVE i.e. cosine similarity above 1.0, which is impossible. Consequence: the cosine figures for int8 and nvfp4 are inside the metric's own error and unusable; int4's are an order of magnitude above it and survive. All conclusions in the write-up rest on relative L2, which returned exactly 0.0 for identical tensors and is unaffected."
 }
