@@ -22,10 +22,12 @@ Updates to labs write-ups, in reverse chronological order.
   the control video supplies the action; reproduced at three seeds, every pose arm
   crouches and no control arm does. Pose carries body position only, so props still
   have to come from the prompt. Costs, since nobody publishes them: ~18 min of GPU
-  per 12-second clip (~88× real-time), 20 of 24 GiB VRAM at peak, and about four
-  hours from loader-ships to working result — most of it spent on the harness, not
-  the model. Key negative result: raising resolution alone does *not* raise subject
-  size in frame, which is the actual constraint on control authority.
+  per 12-second clip (~88× real-time), 20 of 24 GiB VRAM at peak, and three days
+  from "here's a ControlNet link" to a replicated published result — 23 days from
+  the first feasibility check. The model work was an afternoon; the rest was
+  drivers, schedulers and storage. Key negative result: raising resolution alone
+  does *not* raise subject size in frame, which is the actual constraint on
+  control authority.
 
 ## 2026-09-10 (morning PI cycle)
 

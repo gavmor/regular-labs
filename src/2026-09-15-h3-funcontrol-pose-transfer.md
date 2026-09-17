@@ -5,8 +5,9 @@ across every build. Nothing here is a novel result — pose-conditioned video
 generation is a known technique and the node is someone else's work. What this
 write-up establishes is narrower and, for us, more useful: **it runs on this
 rig, on one 24 GB card, through our pipeline, and the effect survives
-replication.** Roughly four hours from "a loader shipped this morning" to a
-render that answers the question; 18 minutes of GPU per 12-second clip; 20 of
+replication.** Three days from "here's a ControlNet link" to a replicated,
+published result — 23 days if you count from the first feasibility check that
+said this rig couldn't do it. 18 minutes of GPU per 12-second clip, 20 of
 24 GiB VRAM at peak. The [August feasibility check](2026-09-05-h3-fun-controlnet-union-test.html)
 on this exact technique stopped before its first render — "can this rig run it
 at all," answered no, blocked on a 124 GB checkpoint. That blocker cleared on
@@ -231,23 +232,45 @@ Running a second arm in the same process without freeing VRAM first put the
 ControlNet arm at `Free (according to CUDA): 155.69 MiB` and killed it
 mid-sampler. On 24 GiB this is a real constraint, not a footnote.
 
-**Development time.** First commit on the branch at 13:17, working
-pose-transfer result at 17:22 — **about four hours** from "a loader shipped
-this morning" to a render that answers the question. Another five hours the
-next day for replication, the write-up, and repairing infrastructure that
-broke underneath it.
+**Development time.** This is the number I set out to publish and then got
+wrong on the first pass, so here it is at three honest scales.
 
-That second number is the honest one, and most of it was not the technique.
-The four hours were: verify the checkpoint variant, build a pose extractor
-because none was installed, discover that resolution alone does not fix
-subject size, and throw away two experimental designs that could not answer
-the question. The technique itself — wire the node in, point it at a skeleton
-— was maybe twenty minutes of that.
+| span | elapsed |
+| :-- | --: |
+| Active build: first commit → working result | ~4 hours |
+| Asked → published, replicated result | **~3 days** |
+| First feasibility check → published result | **23 days** |
+
+The four-hour figure is real but measures the wrong thing: it is time on task
+for one branch on one afternoon. Quoting it alone implies you could sit down
+after lunch and be done, and that is not what happened.
+
+The **three days** is the number that matters. A ControlNet link arrived on
+2026-09-12; the result published on 2026-09-16. In between: a second link with
+a working node, a day of building, an overnight driver upgrade that took the
+GPU out, a Concourse database that turned out to have no persistent volume, a
+stale job timeout that killed the replication run, and roughly five hours of
+infrastructure repair that produced no renders at all. None of that is
+interesting as technique and all of it was required to get a result out.
+
+The **23 days** is the full story. The [August feasibility check](2026-09-05-h3-fun-controlnet-union-test.html)
+looked at this exact technique on 2026-08-24 and concluded *blocked, N=0* —
+the checkpoint wanted ~124 GB. Nothing changed on this end. Someone else
+shipped a loader for a pruned variant, and that is what moved it. Most of the
+elapsed time was waiting for the ecosystem, not working.
+
+Within the active four hours, the split was: verify the checkpoint variant,
+build a pose extractor because none was installed, discover that resolution
+alone does not fix subject size, and discard two experimental designs that
+could not answer the question. Wiring the node in — the part a tutorial would
+cover — was maybe twenty minutes.
 
 Your mileage will differ wildly, because everyone's rig differs. But if you
-are weighing whether to try this on a single consumer card: budget an
-afternoon, not a week, and expect the time to go into the harness rather than
-the model.
+are weighing whether to try this on a single consumer card: the model work is
+an afternoon, and the calendar is a week. The gap between those two numbers is
+the part nobody publishes, and it is almost entirely harness — drivers,
+schedulers, storage, and discovering which of your measurements were
+measuring nothing.
 
 ## Conclusion
 
