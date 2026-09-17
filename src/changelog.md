@@ -14,15 +14,20 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-17
 
-- New: [Only one text encoder works with MiniMax H3, and it isn't a quality question](2026-09-17-h3-clip-encoder-compatibility.html)
-  — answering an r/StableDiffusion question with an experiment. Designed a
-  4-encoder comparison scored on prompt adherence; found that three of the four
-  cannot run at all. H3's projection takes a 5120-dim hidden state, and the
-  smaller Qwen3-VL builds emit 4096 or 2560, so matching vocabulary does not
-  mean compatibility. Includes a thirty-second header check that replaces the
-  whole experiment, and the better news for the asker: ComfyUI offloads the
-  text encoder to CPU after encoding, so its size costs load time and disk
-  rather than sampling headroom on an 8GB card.
+- New: [H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in](2026-09-17-h3-clip-encoder-compatibility.html)
+  — answering an r/StableDiffusion question with an experiment. H3's projection
+  is a fixed 5120 -> 5376 matmul, so the smaller Qwen3-VL builds (4096 and
+  2560) cannot be dropped into a stock graph; matching vocabulary is not
+  compatibility. Includes a thirty-second header check that replaces the whole
+  experiment. First published with the conclusion "the 32B is effectively the
+  only encoder for H3", which was wrong: the first comment on the question
+  points at ClipProj, a learned 2560 -> 5120 projection with a patch node, and
+  its weights carry exactly the bridge whose absence produced my error. The
+  measurement stands, the conclusion was too strong, and reading twelve
+  comments would have been cheaper than 52 minutes of GPU. Also: ComfyUI
+  offloads the text encoder to CPU after encoding, so encoder size costs load
+  time and disk rather than sampling headroom on an 8GB card -- which nobody in
+  the thread mentioned.
 
 ## 2026-09-15
 

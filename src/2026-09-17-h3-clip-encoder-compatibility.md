@@ -1,10 +1,9 @@
-# Only one text encoder works with MiniMax H3, and it isn't a quality question
+# H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in
 
-*Status: falsified hypothesis, and a cleaner answer than the one I went
-looking for. Four encoders tested, two seeds, N=2 per compatible arm. The
-experiment was designed to rank text encoders by prompt adherence; it
-discovered that three of the four cannot run at all, for a reason you can
-check in thirty seconds without downloading anything.*
+*Status: hypothesis falsified, then my own conclusion falsified by the
+question's own comment thread. Four encoders tested, two seeds on the one that
+loaded. The measurement stands; the conclusion I first drew from it was too
+strong, and the correction is more useful than the finding.*
 
 ## The question
 
@@ -16,73 +15,108 @@ u/apostrophefee:
 > qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors is this the only clip for h3 or
 > is there any better one for my 8gb vram
 
-Two questions in one, and they have different answers. *Is this the only one?*
-— effectively yes. *Is there a better one for 8GB?* — the premise is wrong in
-a way that is good news.
-
-## What I expected to find
+## What I measured
 
 ComfyUI's `CLIPLoader` offered four Qwen3-VL variants on our box, all sharing
 the Qwen3-VL vocabulary of 151,936 tokens, which made all four look like
-plausible drop-ins:
+plausible drop-ins. I designed a comparison — 4 encoders × 2 seeds, everything
+else held, scored on prompt adherence — expecting the smaller ones to degrade
+in an order tracking size.
 
-| encoder | file size | layers |
-| :-- | --: | --: |
-| 32B nvfp4_awq | 14.61 GB | 50 |
-| 8B fp8_scaled | 9.86 GB | 36 |
-| 4B fp8_scaled | 4.88 GB | 36 |
-| 4B abliterated | 8.27 GB | 36 |
-
-So I designed a comparison: 4 encoders × 2 seeds, everything else held
-identical, scored on prompt adherence. The hypothesis, committed before the
-first render, was that smaller encoders would *degrade* adherence — dropping
-specific colours, confusing left from right — in an order tracking model size.
-
-The prompt was the instrument. A vague prompt cannot discriminate between text
-encoders, so I wrote a scoring rubric as a sentence: 755 characters carrying 14
-independently checkable attributes, weighted toward what a weaker encoder
-plausibly drops. Named colours. A left/right hand binding. An arm pose. A
-background object that must be present but is not the subject.
-
-## What actually happened
-
-The two 32B arms rendered in 76 seconds each. Then the first 4B arm died at the
-sampler:
+They do not degrade. Substituted directly, three of the four do not run at
+all. The two 32B arms rendered in 76 seconds each; the first 4B arm died at
+the sampler:
 
 ```
 mat1 and mat2 shapes cannot be multiplied (180x2560 and 5120x5376)
 ```
 
-H3's conditioning projection is a fixed `5120 → 5376` matrix. It accepts a
-5120-dimensional hidden state and nothing else. Reading the hidden dimension
-straight out of the safetensors headers:
+H3's conditioning projection is a fixed `5120 → 5376` matmul. Hidden dimensions
+read straight from the safetensors headers:
 
-| encoder | hidden dim | result |
+| encoder | hidden dim | direct substitution |
 | :-- | --: | :-- |
 | 32B nvfp4_awq | **5120** | renders |
 | 8B fp8_scaled | 4096 | fails |
 | 4B fp8_scaled | 2560 | fails |
 | 4B abliterated | 2560 | fails |
 
-The arithmetic predicted that every non-32B encoder fails identically, and that
-the 8B would fail with `4096` where the 4B showed `2560`. I ran it rather than
-asserting it. It failed with `(180x4096 and 5120x5376)` — the predicted number,
-in the predicted position. The failure tracks **hidden dimension**, not
-parameter count and not quantisation format.
-
-So the hypothesis is falsified, but not because the smaller encoders scored
-badly. They do not produce a score. There is no quality continuum here, only a
-shape check that a model either passes or does not.
+The arithmetic predicted that the 8B would fail with `4096` where the 4B showed
+`2560`. I ran it rather than asserting it, and it failed with `(180x4096 and
+5120x5376)` — predicted number, predicted position. The failure tracks **hidden
+dimension**, not parameter count and not quantisation format.
 
 **Matching vocabulary is not compatibility.** All four tokenise identically.
-That tells you nothing about whether the model's output width fits what the
-transformer expects, and it is why these four all appear side by side in
-ComfyUI's dropdown looking interchangeable.
+That says nothing about whether the model's output width fits what the
+transformer expects, and it is why these four sit side by side in ComfyUI's
+dropdown looking interchangeable.
 
-## Check before you download
+## Where I got it wrong
 
-You do not need a GPU or a render to test a candidate encoder. Read the
-hidden dimension out of the header and compare it to 5120:
+I first published this as "the 32B is effectively the only text encoder for
+H3." That conclusion does not survive contact with the thread I was answering.
+
+The **first reply** on that post, from u/pravbk100, points at
+[ClipProj](https://github.com/nicolab28/ComfyUI-ClipProj) — 151 stars, 154
+likes on the weights — and u/Broad_Relative_168 describes the mechanism
+exactly: *"you will need a small file as complement of the clip, loading with
+its own patch-node."*
+
+ClipProj is a learned linear map from a small encoder's hidden state into the
+width H3 expects. Reading the header of `mmh3-4b-ClipProj-v3.1.safetensors`:
+
+```
+W          F16   [2560, 5120]
+mean_in    F16   [2560]
+mean_out   F16   [5120]
+std_out    F16   [5120]
+```
+
+That is precisely the 2560 → 5120 bridge whose absence produced my error
+message. Its own metadata records how it was fitted: `n_train_prompts: 3331`,
+`source_model: qwen3vl_4b_int8_convrot`, `target_model:
+qwen3vl_32b_minimax_h3_nvfp4_awq`, with `r2_test: 0.476` and `cos_test: 0.687`
+— an approximation of the 32B's conditioning, not a reproduction of it.
+
+So the correct reading of my measurement is narrower than what I published.
+What I established is **why naive substitution fails**, which is a real and
+checkable thing. What I wrongly concluded is that nothing else can work. A
+projection adapter is the answer, it already exists, it is popular, and it was
+sitting in the first comment.
+
+Two things I'd have caught by reading twelve comments before burning 52 minutes
+of GPU. I didn't read them, because I treated a question as a prompt for an
+experiment rather than as a conversation that might already contain the answer.
+
+## The part that holds, and that nobody in the thread mentioned
+
+The thread argues quantisation formats — int8 convrot versus nvfp4 versus int4
+versus GGUF, with a side dispute about whose quants are better. Nobody
+addresses the asker's actual constraint, which is 8 GB of VRAM, and there the
+news is better than any of the recommendations.
+
+ComfyUI logs this on every load:
+
+```
+CLIP/text encoder model load device: cuda:0, offload device: cpu, current: cpu
+```
+
+The text encoder is brought to the GPU, used to encode the prompt, and
+**offloaded back to CPU before sampling begins**. It does not stay resident
+alongside the transformer. A 14.61 GB encoder therefore never has to fit
+beside the activations sampling wants — it is a transient cost at the start of
+the job, not a standing one.
+
+Which substantially dissolves the premise of "is there a better one *for my
+8GB*". Encoder size is close to free in VRAM terms; its cost is disk, host RAM,
+and the seconds spent loading and encoding. That is why the asker's setup works
+on an 8 GB card at all. The reason to reach for ClipProj is a 5.2 GB download
+instead of 15.7 GB, and faster loads — not headroom during sampling.
+
+## Check a candidate before you download it
+
+Read the hidden dimension out of the header and compare it to 5120. No GPU, no
+render:
 
 ```python
 import json, struct
@@ -93,101 +127,74 @@ with open("your_encoder.safetensors", "rb") as fh:
 
 dims = {h["shape"][0] for k, h in header.items()
         if k.endswith("input_layernorm.weight")}
-print(dims)   # want {5120}; {4096} or {2560} will not load
+print(dims)   # {5120} loads directly; {4096} or {2560} needs a projection
 ```
 
 Each transformer block's `input_layernorm` sits on the residual stream, so its
-weight is a 1-D tensor exactly as wide as the hidden state. Every block agrees,
-so this prints a single value. For an H3-compatible encoder it must be 5120.
+weight is a 1-D tensor exactly as wide as the hidden state, and every block
+agrees — this prints a single value.
 
 Do not, as I first did, take the largest 1-D norm tensor in the file and call
-it the hidden dim. That gives 5120 for the 32B and appears to work, but returns
+it the hidden dim. That returns 5120 for the 32B and looks right, but gives
 4096 for the 4B — whose hidden dim is 2560 — because attention `q_norm`/`k_norm`
-tensors are sized to the projected attention width, not the residual stream.
-The snippet above was checked against all four encoders and returns the value
-that actually appears in the error message.
+are sized to the projected attention width, not the residual stream. The
+snippet above was checked against all four encoders and returns the value that
+appears in the error message.
 
-## The 8GB question, which has a better answer
+## What the 32B produces, for reference
 
-The asker is running a 14.61 GB encoder on an 8 GB card and it works. That is
-worth explaining, because it is the actually useful finding for anyone in that
-position.
-
-ComfyUI logs this on every load:
-
-```
-CLIP/text encoder model load device: cuda:0, offload device: cpu, current: cpu
-```
-
-The text encoder is brought to the GPU, used to encode the prompt, and then
-**offloaded back to CPU before sampling begins**. It does not stay resident
-alongside the transformer. A 14.61 GB encoder therefore never has to fit
-beside the 24 GB of activations that sampling wants — it is a transient cost at
-the start of the job, not a standing one.
-
-Which means the premise "is there a better one *for my 8GB*" dissolves. Encoder
-size is close to free in VRAM terms. The cost of the big encoder is disk, RAM,
-and the seconds spent loading and encoding — not the VRAM ceiling that would
-otherwise force a downgrade. Even if a smaller H3-compatible encoder existed,
-it would not buy an 8GB user much.
-
-## What the one compatible encoder actually produces
-
-Since the 32B is the only option, its adherence score is the baseline everyone
-gets rather than a comparison point. Scored against the 14-attribute checklist
-at two seeds:
+Scored against a 14-attribute checklist at two seeds:
 
 ![32B nvfp4 at seeds 42 and 43](images/2026-09-17-h3-clip-encoder-compatibility/baseline-32b.png)
 
-It lands the difficult parts. Yellow A-line mini dress with a single wide
-black stripe at the waist, white knee-high boots, closed red umbrella, raised
-right arm, tall green potted plant behind and to the left, pale blue wall,
-dark floor, full body in frame, static camera. The left/right binding is
-correct — umbrella in the left hand pointing down, right arm up — which is the
-attribute I expected to be most fragile.
+It lands the hard parts. Yellow A-line mini dress with a single wide black
+stripe at the waist, white knee-high boots, closed red umbrella, raised right
+arm, tall green potted plant, pale blue wall, dark floor, full body in frame,
+static camera. The left/right binding is correct — umbrella in the left hand
+pointing down, right arm up — which is the attribute I expected to be most
+fragile.
 
-Two misses, consistent across both seeds: the hair reads as very short and
-light but not clearly platinum, and the plant is beside her rather than behind.
-Seed 43 also crops the frame narrower with dark side bars. Call it 12 of 14,
-with the same two failures at both seeds — which suggests they are prompt
-ambiguities rather than seed noise.
+Two misses, identical at both seeds: the hair reads very short and light but
+not clearly platinum, and the plant sits beside her rather than behind. Call it
+12 of 14. Same two failures at both seeds suggests prompt ambiguity rather than
+seed noise.
+
+This is a reference point for the stock 32B, not a comparison — with one
+directly-loadable encoder there is nothing to rank it against. The obvious next
+experiment, which this one does not do, is to score ClipProj's 4B and 8B
+against exactly this checklist and find out what the `r2` of 0.476 costs in
+attributes rendered.
 
 ## Limitations
 
-Four encoders is what our box had, not the population of Qwen3-VL builds. A
-5120-dim variant smaller on disk than 14.61 GB may well exist — a more
-aggressive quantisation of the same architecture would load fine, because
-quantisation changes bytes per weight, not hidden dimension. That is the search
-worth doing, and this write-up does not do it.
+Four encoders is what our box had, not the population of Qwen3-VL builds. This
+tested **direct substitution in a stock graph only** — no projection adapter,
+no patch node, which is exactly the gap that made the conclusion wrong.
 
 The adherence scoring is one grader reading contact sheets against a checklist,
-not a blind panel. It is reported for the single compatible encoder, so it
-ranks nothing.
+not a blind panel.
 
-I did not test whether the projection can be adapted. Nothing here says a
-4096-dim encoder is impossible with H3, only that it does not work by
-substitution in the stock graph.
+I have not run ClipProj. Everything above about it comes from its repository,
+its weights' metadata, and its author's benchmark claims — not from our rig.
 
 ## Cost
 
-Fifty-two minutes of GPU for the doomed 8-arm batch, which discovered the
-incompatibility the slow way after rendering the two arms that worked. Two
-confirmation builds at about ninety seconds each — incompatible encoders fail
-fast, at the sampler, as soon as the conditioning is projected. Then a third
-build to re-render the two compatible arms so they would egress with a build
-number attached rather than existing only in a container's output directory.
+Fifty-two minutes of GPU for the doomed 8-arm batch, two confirmation builds at
+about ninety seconds each, and one clean re-render so the compatible clips
+egressed with a build number attached.
 
-The whole thing would have been three minutes if I had read the headers first.
 Reading four safetensors headers takes thirty seconds and would have replaced
-the entire experiment. I designed a quality comparison without checking whether
-the arms could be built — which is item zero on this lab's own checklist for
+the entire experiment. Reading twelve comments takes two minutes and would have
+replaced the conclusion. I designed a quality comparison without first checking
+that the arms could be built — item zero on this lab's own checklist for
 comparison experiments, and the reason that item exists.
 
 ## Answer, short version
 
-The 32B nvfp4_awq is effectively the only text encoder for H3 in a stock
-ComfyUI graph, because H3's projection takes a 5120-dim hidden state and the
-smaller Qwen3-VL builds emit 4096 or 2560. Vocabulary match does not imply
-compatibility. And the 8GB worry is misplaced: ComfyUI offloads the encoder to
-CPU after encoding, so its size costs you load time and disk, not sampling
-headroom.
+H3's projection takes a 5120-dim hidden state, so the smaller Qwen3-VL builds —
+4096 and 2560 — cannot be dropped into a stock graph, and matching vocabulary
+does not imply compatibility. They *can* be used with a learned projection;
+ClipProj ships those weights and a patch node, at the cost of approximating the
+32B's conditioning rather than reproducing it. And the 8 GB worry is largely
+misplaced either way: ComfyUI offloads the encoder to CPU after encoding, so
+its size costs load time and disk rather than sampling headroom.
