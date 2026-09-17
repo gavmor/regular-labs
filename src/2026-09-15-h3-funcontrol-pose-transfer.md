@@ -1,11 +1,17 @@
 # Pose transfer works: the woman in the dress follows the briefcase poses
 
-*Status: smoke-tested, positive, N=1. Nine Concourse builds, zero stranded GPU
-locks. The [August feasibility check](2026-09-05-h3-fun-controlnet-union-test.html)
+*Status: reproduced, N=3 per arm (seeds 42/43/44). Zero stranded GPU locks
+across every build. Nothing here is a novel result — pose-conditioned video
+generation is a known technique and the node is someone else's work. What this
+write-up establishes is narrower and, for us, more useful: **it runs on this
+rig, on one 24 GB card, through our pipeline, and the effect survives
+replication.** Roughly four hours from "a loader shipped this morning" to a
+render that answers the question; 18 minutes of GPU per 12-second clip; 20 of
+24 GiB VRAM at peak. The [August feasibility check](2026-09-05-h3-fun-controlnet-union-test.html)
 on this exact technique stopped before its first render — "can this rig run it
 at all," answered no, blocked on a 124 GB checkpoint. That blocker cleared on
 2026-09-15 when a loader shipped for Kijai's pruned variant. This is the same
-experiment, unblocked and answered.*
+experiment, unblocked and carried through.*
 
 <figure>
   <img src="images/2026-09-15-h3-funcontrol-pose-transfer/pose-transfer-compare.png" alt="Three rows of six frames: a pose skeleton control video, a render following it in which a woman in a 1960s mini dress kneels and handles a briefcase, and a no-control render in which she stands still" width="800">
@@ -17,19 +23,22 @@ experiment, unblocked and answered.*
 MiniMax-H3 accepts a pose-skeleton control video through a third-party
 ControlNet node ([wyzborrero/ComfyUI-H3-FunControl](https://github.com/wyzborrero/ComfyUI-H3-FunControl),
 published the morning of 2026-09-15) that loads Kijai's curve-form pruned
-checkpoint instead of Alibaba's full-width release. The question: can it impose
-a *specific* motion on a subject it has never seen — pose transfer — on a
-single RTX 3090?
+checkpoint instead of Alibaba's full-width release. The question was never
+whether pose conditioning works in general — it does, and has for a while on
+other model families. The question was whether it works *here*: one RTX 3090,
+this ComfyUI install, our Concourse pipeline, on a subject the control has
+never seen.
 
-It can. With a prompt describing only *who and where*, and a control video
-supplying *what happens*, H3 rendered a woman in a 1960s mini dress kneeling,
-opening a briefcase, and assembling a tripod — an action sequence the prompt
-never mentions. The matched no-control arm, same prompt and seed, produced a
-woman standing still.
+It does. With a prompt describing only *who and where*, and a control video
+supplying *what happens*, H3 rendered a woman in a 1960s mini dress kneeling
+and reaching toward the floor — an action the prompt never mentions. The
+matched no-control arm, same prompt and seed, produced a woman standing still.
+Repeated at three seeds, the split is clean: every pose arm crouches, no
+control arm does.
 
 Two earlier experimental designs could not have established this, for opposite
-reasons. The design error is the more transferable result, so both are recorded
-below.
+reasons. The design error is the more transferable part of the write-up, so
+both are recorded below.
 
 ## Hypothesis
 
@@ -142,6 +151,41 @@ locked-off camera. **No action described.**
 Identity and wardrobe held in both arms, so the pose drove the body without
 disturbing appearance.
 
+### Replication at seeds 43 and 44
+
+One render proves nothing here. This experiment line has repeatedly produced
+single-render results that replication overturned — reference arms that
+vanished into seed noise, a retention dial that turned out to be measuring
+something else, and two claims in this very session that had to be retracted.
+So the arms were re-run at two more seeds, changing nothing but
+`RandomNoise.noise_seed`.
+
+<figure>
+  <img src="images/2026-09-15-h3-funcontrol-pose-transfer/seed-replicates.png" alt="Five rows of six frames: the pose skeleton control, two renders with pose control at seeds 43 and 44 in which the woman crouches low and reaches toward the floor, and two renders without control at the same seeds in which she stands upright throughout" width="800">
+  <figcaption>Top: the control skeleton. Middle two rows: pose control on, seeds 43 and 44 — she crouches, one knee down, reaching toward the floor, then rises. Bottom two rows: same seeds, no control — she stands, essentially one pose throughout.</figcaption>
+</figure>
+
+| seed | with pose control | no control |
+| :-- | :-- | :-- |
+| 42 | crouches, rises, exits | stands |
+| 43 | crouches, rises | stands |
+| 44 | crouches, rises | stands |
+
+Three for three, with no exceptions in either direction. The crouch lands in
+the middle timepoints in both pose arms, matching where the skeleton kneels.
+
+The render times corroborate it independently: pose arms took 1081 s and
+1079 s against 865 s and 867 s for the no-control arms — roughly 215 s of extra
+work per arm, at both new seeds. The ControlNet is not quietly no-op'ing.
+
+### What pose control does not do
+
+No briefcase and no tripod appear in any pose arm. The control carries **body
+position only** — it has no channel for objects, so the woman performs the
+kneeling-and-reaching motion of handling something with nothing there. For
+production use that is the practical boundary: pose supplies the action, the
+prompt still has to supply the props.
+
 ### The failure mode worth knowing about
 
 In the contradiction design at 0.98 MP, something stranger than "control
@@ -152,54 +196,100 @@ conditioning had gained enough authority to enter the image without gaining
 enough to steer the subject, so it was absorbed as a foreign object. That is
 the signature of an under-weighted control, distinct from one doing nothing.
 
-### Cost
+### What it actually cost
 
-| configuration | render | peak VRAM |
+The thing I always want to know when someone reports a result, and rarely
+find: how long did this take in real hours, on real hardware?
+
+**Render time**, measured from ComfyUI's own execution timestamps rather than
+wall-clock guesses, at 1312×736 × 294 frames (12.25 s of video at 24 fps):
+
+| arm | renders | each | per second of output |
+| :-- | --: | --: | --: |
+| no control | 5 | 855–874 s (~14.4 min) | ~70 s |
+| with pose control | 3 | 1077–1101 s (~18.1 min) | ~88 s |
+
+So **roughly 70× real-time without the control, 88× with it** — about 26 %
+slower, or 222 s of extra compute per clip, consistent across every seed. Put
+plainly: a twelve-second shot is a fifteen-to-eighteen-minute wait, and a
+four-arm comparison ties up the card for an hour.
+
+**Memory.** The generation itself is 943 tokens per latent frame, 74 latent
+frames, **69,782 sequence tokens**. The ControlNet materialises a control
+tensor the size of the video sequence alongside the image tensor — the OOM
+traceback named them explicitly, `control (83190, 5376)` and `img (83190,
+5376)`, about 0.83 GiB each in bf16.
+
+| configuration | peak VRAM | of 24 GiB |
 | :-- | --: | --: |
-| no control, 0.98 MP | 919 s | — |
-| pose control, 0.98 MP | 1154 s | ~20 GiB |
-| native `ref_videos` v2v, 0.98 MP | 1334 s | 20.9 GiB |
+| no control | ~16.2 GiB | 68 % |
+| pose control | ~20.0 GiB | 83 % |
+| native `ref_videos` v2v | ~20.9 GiB | 87 % |
 
-The ControlNet materialises a control tensor the size of the video sequence
-alongside the image tensor, roughly doubling peak activation memory. It fits in
-24 GiB with about 3.6 GiB of headroom — but only on a clean card, which cost
-one build to learn.
+It fits on a 3090 with roughly 3.6 GiB spare — but only on a *clean* card.
+Running a second arm in the same process without freeing VRAM first put the
+ControlNet arm at `Free (according to CUDA): 155.69 MiB` and killed it
+mid-sampler. On 24 GiB this is a real constraint, not a footnote.
+
+**Development time.** First commit on the branch at 13:17, working
+pose-transfer result at 17:22 — **about four hours** from "a loader shipped
+this morning" to a render that answers the question. Another five hours the
+next day for replication, the write-up, and repairing infrastructure that
+broke underneath it.
+
+That second number is the honest one, and most of it was not the technique.
+The four hours were: verify the checkpoint variant, build a pose extractor
+because none was installed, discover that resolution alone does not fix
+subject size, and throw away two experimental designs that could not answer
+the question. The technique itself — wire the node in, point it at a skeleton
+— was maybe twenty minutes of that.
+
+Your mileage will differ wildly, because everyone's rig differs. But if you
+are weighing whether to try this on a single consumer card: budget an
+afternoon, not a week, and expect the time to go into the harness rather than
+the model.
 
 ## Conclusion
 
 Pose transfer works on this stack. The node loads, applies, costs real compute,
 and imposes a specific unprompted action on a novel subject while preserving
-prompt-specified identity.
+prompt-specified identity — reproducibly, across three seeds.
 
-The operative division of labour: **the prompt says who and where; the pose says
-what happens.** Fighting them is a diagnostic, not a workflow — a lesson that
-cost four builds to learn properly.
+None of that is a discovery. It is a reproduction: someone else's node, a
+known technique, a checkpoint someone else pruned. The value is knowing it
+runs *here*, what it costs on a 24 GB card, where its authority runs out, and
+that the August "this rig cannot do it" verdict is now retired.
+
+The operative division of labour: **the prompt says who and where; the pose
+says what happens.** Fighting them is a diagnostic, not a workflow — a lesson
+that cost four builds to learn properly.
 
 This also makes ControlNet and H3's native `ref_videos` complementary rather
 than competing. `ref_videos` transfers appearance and idiom; pose control
-transfers motion. They are answers to different questions, and the mid-session
-claim that one is "clearly better" does not survive the decomposed design.
+transfers motion, and neither carries props. They answer different questions,
+and the mid-session claim that one is "clearly better" does not survive the
+decomposed design.
 
 ### Limitations
 
-- **N=1.** One seed, one prompt, one skeleton. This experiment line has
-  repeatedly produced single-render results that replication overturned.
 - **The source is H3's own output.** This shows H3 reproducing motion it can
-  already generate. Driving from genuinely external footage is the harder test,
-  and is not done.
+  already generate. Driving from genuinely external footage is the harder
+  test, and is not done.
+- **One prompt, one skeleton.** Three seeds establish the effect is not noise;
+  they say nothing about how it generalises across subjects or actions.
 - **No quantitative pose-adherence metric.** The verdict is visual. Two pixel
   metrics were attempted and both failed — one used each clip's own opening
-  frames as a baseline (so a structure present from frame zero registered as no
-  change), the other used a brightness threshold defeated by a darker render.
-  Consistent with earlier findings in this line that pixel distance measures
-  magnitude, not kind.
+  frames as a baseline (so a structure present from frame zero registered as
+  no change), the other used a brightness threshold defeated by a darker
+  render. Consistent with earlier findings in this line that pixel distance
+  measures magnitude, not kind.
 
 ### Next
 
-1. Seed replicates at 43/44 — the cheapest check that the effect is real.
-2. Pose extracted from genuinely external footage.
-3. A control-window sweep at fixed resolution.
-4. Pose control combined with a worn-cohort reference artifact — motion and
+1. Pose extracted from genuinely external footage — the real generalisation
+   test.
+2. A control-window sweep at fixed resolution.
+3. Pose control combined with a worn-cohort reference artifact — motion and
    wardrobe arriving through independent channels.
 
 ## Corrections
@@ -221,15 +311,23 @@ recorded rather than quietly edited away:
   experiment." Interrupted and disclosed. The standing rule is that all
   generative work runs through Concourse; the fix was then verified by a
   pipeline build rather than by hand.
+- **A build failure read as an experiment failure.** The first replicate run
+  died at 45m26s. That was a stale job timeout, sized when arms rendered in
+  94–132 s at the 0.4 MP quick preset; a four-arm build at 0.98 MP needs about
+  67 minutes. Two arms had already finished. Raised to 3 h in both the
+  standalone pipeline and the branch template.
 
 ## Artifacts
 
-Nine `render-and-review` builds, eight green, one partial failure (the OOM
-above). Every render held the cross-pipeline GPU lock and egressed through a
-pipeline `put:` — **zero stranded locks across all nine**, on infrastructure
-that was stranding them seven times in fourteen hours two days earlier.
+Eleven `render-and-review` builds. Every render held the cross-pipeline GPU
+lock and egressed through a pipeline `put:` — **zero stranded locks**, on
+infrastructure that was stranding them seven times in fourteen hours two days
+earlier. Two builds failed without producing a result: one to an
+out-of-memory, one to a stale 45-minute job timeout that predated the move to
+the 0.98 MP preset. Both are recorded in Corrections; neither cost a
+conclusion.
 
-Six Immich albums, from the source clip through to the final pose-transfer
-pair. Machine-readable design and provenance live alongside the fixtures in
+Seven Immich albums, from the source clip through to the seed replicates.
+Machine-readable design and provenance live alongside the fixtures in
 [`EXPERIMENT.yml`](https://github.com/gavmor/comfyui-workflows/blob/feature/h3-funcontrol-pose-20260915/EXPERIMENT.yml)
 on `feature/h3-funcontrol-pose-20260915`.

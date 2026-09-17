@@ -17,10 +17,15 @@ Updates to labs write-ups, in reverse chronological order.
   — the [August feasibility check](2026-09-05-h3-fun-controlnet-union-test.html) on
   MiniMax-H3 Fun ControlNet stopped before its first render, blocked on a 124 GB
   checkpoint. A loader for Kijai's pruned curve-form variant shipped 2026-09-15 and
-  unblocked it. Pose transfer confirmed: with a prompt describing only who and where,
-  the control video supplies the action. Nine Concourse builds, zero stranded GPU locks.
-  Key negative result: raising resolution alone does *not* raise subject size in frame,
-  which is the actual constraint on control authority.
+  unblocked it. Not a novel technique — a reproduction, confirming it runs on one
+  24 GB card through our own pipeline. With a prompt describing only who and where,
+  the control video supplies the action; reproduced at three seeds, every pose arm
+  crouches and no control arm does. Pose carries body position only, so props still
+  have to come from the prompt. Costs, since nobody publishes them: ~18 min of GPU
+  per 12-second clip (~88× real-time), 20 of 24 GiB VRAM at peak, and about four
+  hours from loader-ships to working result — most of it spent on the harness, not
+  the model. Key negative result: raising resolution alone does *not* raise subject
+  size in frame, which is the actual constraint on control authority.
 
 ## 2026-09-10 (morning PI cycle)
 
