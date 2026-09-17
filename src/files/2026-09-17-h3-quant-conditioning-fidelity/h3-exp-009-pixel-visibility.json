@@ -1,0 +1,21 @@
+{
+  "reference": "bf16",
+  "stride": 4,
+  "within_encoder_seed_floor": {
+    "bf16: s42 vs s43": 64.88541412353516,
+    "int4: s42 vs s43": 63.943687438964844,
+    "int8: s42 vs s43": 64.30104064941406,
+    "nvfp4: s42 vs s43": 66.62942504882812
+  },
+  "floor_min": 63.943687438964844,
+  "floor_max": 66.62942504882812,
+  "between_encoder_matched_seed": {
+    "int4 vs bf16 @ s42": 7.299897193908691,
+    "int4 vs bf16 @ s43": 11.83617877960205,
+    "int8 vs bf16 @ s42": 3.943845272064209,
+    "int8 vs bf16 @ s43": 5.748153209686279,
+    "nvfp4 vs bf16 @ s42": 6.478065013885498,
+    "nvfp4 vs bf16 @ s43": 5.971757888793945
+  },
+  "verdict": "INVISIBLE. Every between-encoder difference is smaller than the smallest same-encoder seed-to-seed difference. Which quant you use matters less than which seed you rolled."
+}

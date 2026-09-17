@@ -1,9 +1,11 @@
 # Settling an argument about MiniMax H3 quants with a number
 
-*Status: complete. Three quantised text encoders measured against the
-unquantised bf16 reference on six prompts, with an instrument noise floor. The
-result gives both sides of a public argument something they were right about,
-and takes something away from each.*
+*Status: complete, in tensors and in pixels. Three quantised text encoders
+measured against the unquantised bf16 reference on six prompts with an
+instrument noise floor, then rendered at two seeds each and compared against a
+measured pixel noise floor. The tensor differences are real and ordered; none
+of them survives sampling in a form a viewer would notice. Both sides of a
+public argument were right about different things.*
 
 ## The argument
 
@@ -132,19 +134,19 @@ video is a separate question this measurement does not answer.
 
 ## What this does not settle
 
-Conditioning distance is not pixels. A difference in the tensor still has to
-survive being consumed by a stochastic diffusion process, and this rig's seed
-noise floor for video is 62.13 mean absolute pixel difference — large. It is
-entirely possible for int4's 3× conditioning difference to vanish below that,
-which would make *both* disputants right in an even more annoying way. That is
-the obvious next experiment and it needs renders, not encodes.
-
 GGUF Q4_K_M, recommended in the same thread by u/dobomex761604, is not tested
 here. It requires a third-party loader node, and including it would have
 confounded the quantisation question with a loader-implementation question.
 
-Six prompts is a small set. The per-prompt consistency is reassuring — int4's
-range is narrow and never overlaps the others — but it is six.
+Six prompts for the tensor measurement, one prompt and two seeds for the pixel
+measurement. The per-prompt consistency is reassuring — int4's range is narrow
+and never overlaps the others — but it is six, and the render comparison rests
+on a single prompt chosen to be the hardest case.
+
+The pixel test compares each quant against bf16 at a matched seed. It does not
+establish that no prompt anywhere produces a visible divergence; it establishes
+that on the prompt most likely to expose one, at this resolution and step
+count, the divergence is five to sixteen times smaller than seed variation.
 
 ## Cost
 
@@ -179,11 +181,76 @@ The earlier reconstruction agreed with them to 4.8e-07 across all eighteen
 measurements — exactly the rounding of a six-decimal log line — which is
 reassuring but not a substitute for the artifact existing in the first place.
 
+## Does any of it show up in the video?
+
+The section above measured tensors. Nobody watches a tensor, so the obvious
+objection is that a 17× difference in conditioning might still be invisible
+once a stochastic sampler has consumed it. So I rendered it.
+
+Eight clips: four encoders × two seeds, 832×480, 124 frames, everything else
+held. The prompt is the long 14-attribute one from the set above — chosen
+deliberately, because it was the **worst case for every quant** in the
+conditioning measurement. If quantisation is going to become visible anywhere,
+it is on a long attribute-dense prompt, not on "a red apple".
+
+The two seeds are the whole trick. Rendering each encoder twice gives a
+**measured pixel noise floor for this exact prompt and configuration** — four
+independent estimates of it. An earlier experiment on this rig put that floor
+at 62.13, but that was a different prompt at a different resolution, and
+borrowing it would be a borrowed threshold masquerading as a measurement.
+
+| comparison | mean abs pixel difference |
+| :-- | --: |
+| **same encoder**, seed 42 vs 43 — int4 | 63.94 |
+| **same encoder**, seed 42 vs 43 — int8 | 64.30 |
+| **same encoder**, seed 42 vs 43 — bf16 | 64.89 |
+| **same encoder**, seed 42 vs 43 — nvfp4 | 66.63 |
+| int8 vs bf16, matched seed | **3.94 – 5.75** |
+| nvfp4 vs bf16, matched seed | **5.97 – 6.48** |
+| int4 vs bf16, matched seed | **7.30 – 11.84** |
+
+Every between-encoder difference is smaller than every within-encoder one, by
+a factor of five to sixteen. The worst quant pairing, int4 against unquantised
+bf16, differs by 11.84 — while *the same encoder* rerolled to the next seed
+differs by 63.94.
+
+Here is what that looks like. Four encoders, same prompt, same seed:
+
+![Four encoders at seed 42](images/2026-09-17-h3-quant-pixel-visibility/four-encoders-same-seed.png)
+
+Same woman, same platinum crop, same yellow dress with the black waist stripe,
+same white boots, same closed red umbrella, same potted palm, same pale blue
+wall, same wave arriving at the same point in the clip. The rows are not
+byte-identical — the palm's fronds sit slightly differently, and int4's frames
+are a touch softer around the hair — but you would not pick them out of a
+lineup.
+
+And for scale, the same encoder at the next seed:
+
+![bf16 at two seeds](images/2026-09-17-h3-quant-pixel-visibility/same-encoder-two-seeds.png)
+
+Different woman, different plant in a different pot, different framing with the
+figure pushed right and the clip letterboxed. *That* is a visible difference,
+and it comes from changing nothing but the seed.
+
+So the conditioning difference is real and it does not survive sampling in any
+form a viewer would notice. Both readings in the original thread were correct
+about different things, and the practical consequence is blunt: **pick your
+quant on disk size and load time.** You will not see it.
+
 ## Answer, short version
 
-Against unquantised bf16, int8_convrot and nvfp4_awq are both at the
-instrument's noise floor — interchangeable in direction, with nvfp4 about 2.5×
-further out in magnitude and still tiny. The third-party int4_convrot is 17×
-int8's relative error and the only arm whose difference clears the floor, at
-3×. Both sides of the argument were reporting honestly about different
-comparisons. If you are on 8 GB and already running nvfp4, keep it.
+In tensors: against unquantised bf16, int8_convrot and nvfp4_awq are both at
+the instrument's noise floor — interchangeable in direction, with nvfp4 about
+2.5× further out in magnitude and still tiny. The third-party int4_convrot is
+17× int8's relative error and the only arm whose difference clears the floor,
+at 3×.
+
+In pixels: none of it matters. The worst quant pairing differs from bf16 by
+11.84 mean absolute pixels while the same encoder at the next seed differs by
+63.94 — a factor of five to sixteen across every arm. Same woman, same dress,
+same umbrella, same wave.
+
+So both sides of the argument were reporting honestly about different things,
+and the practical answer is to pick on disk size and load time. If you are on
+8 GB and already running nvfp4, keep it.
