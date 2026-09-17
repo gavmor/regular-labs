@@ -271,6 +271,26 @@ the part nobody publishes, and it is almost entirely harness — drivers,
 schedulers, storage, and discovering which of your measurements were
 measuring nothing.
 
+## Files
+
+- [`h3-pose-control.api.json`](files/2026-09-15-h3-funcontrol-pose-transfer/h3-pose-control.api.json)
+  — the pose-conditioned graph
+- [`h3-no-control.api.json`](files/2026-09-15-h3-funcontrol-pose-transfer/h3-no-control.api.json)
+  — identical minus the ControlNet, the baseline arm
+- [`make_pose_control.py`](files/2026-09-15-h3-funcontrol-pose-transfer/make_pose_control.py)
+  — builds a skeleton control video from ordinary footage, no preprocessor
+  node required
+- [README](files/2026-09-15-h3-funcontrol-pose-transfer/README.html) — what you
+  have to change before these will run on your machine
+
+Two caveats up front, because "workflow included" usually implies more than it
+delivers. These are **API-format** graphs — what our pipeline submits, so
+exactly what produced the clips above, but ComfyUI's drag-and-drop expects the
+UI format. And they name **our** checkpoints, several of them quantized builds
+rather than stock releases, so you will be swapping filenames. The ControlNet
+is the one that is not interchangeable: the loader takes only the curve-form
+pruned variant.
+
 ## Conclusion
 
 Pose transfer works on this stack. The node loads, applies, costs real compute,
