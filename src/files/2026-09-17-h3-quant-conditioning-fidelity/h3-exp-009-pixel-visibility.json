@@ -17,5 +17,17 @@
     "nvfp4 vs bf16 @ s42": 6.478065013885498,
     "nvfp4 vs bf16 @ s43": 5.971757888793945
   },
-  "verdict": "INVISIBLE. Every between-encoder difference is smaller than the smallest same-encoder seed-to-seed difference. Which quant you use matters less than which seed you rolled."
+  "verdict": "INVISIBLE. Every between-encoder difference is smaller than the smallest same-encoder seed-to-seed difference. Which quant you use matters less than which seed you rolled.",
+  "render_time_seconds": {
+    "note": "same prompt, seeds, sampler and step count; only the encoder differs. Identical across both seeds. Encoder is offloaded to CPU before sampling, so this is load-and-encode overhead, not diffusion.",
+    "nvfp4_awq": 74,
+    "int4_convrot": 80,
+    "int8_convrot": 88,
+    "bf16": 103
+  },
+  "immich": {
+    "album": "9a80b209-152e-4532-9856-fabb76f770ee",
+    "assets": 8,
+    "verified": "8 distinct asset ids via POST /api/search/metadata; no content-hash dedup collapse"
+  }
 }

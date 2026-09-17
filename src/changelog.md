@@ -25,7 +25,13 @@ Updates to labs write-ups, in reverse chronological order.
   floor. Both disputants were reporting honestly about different comparisons.
   The prerequisite nobody had: encoding the same prompt twice with the SAME
   encoder is not bit-reproducible, so there is a 6.4e-04 noise floor and
-  without it there is no way to say whether a difference is real.
+  without it there is no way to say whether a difference is real. Then rendered
+  it — eight clips, four encoders at two seeds — and none of it is visible: the
+  worst quant pairing differs from bf16 by 11.84 mean absolute pixels while the
+  same encoder at the next seed differs by 63.94. Two contact sheets, because
+  what the argument lacked is that nobody posted a picture. The deciding factor
+  turns out to be speed, which nobody raised: nvfp4 renders a clip in 74 s
+  against int8's 88 s, 11 GB smaller and visually identical.
 
 ## 2026-09-17
 

@@ -4,7 +4,8 @@
 measured against the unquantised bf16 reference on six prompts with an
 instrument noise floor, then rendered at two seeds each and compared against a
 measured pixel noise floor. The tensor differences are real and ordered; none
-of them survives sampling in a form a viewer would notice. Both sides of a
+of them survives sampling in a form a viewer would notice, and the encoder you
+pick changes render time more than it changes the picture. Both sides of a
 public argument were right about different things.*
 
 ## The argument
@@ -150,16 +151,21 @@ count, the divergence is five to sixteen times smaller than seed variation.
 
 ## Cost
 
-Three Concourse builds, 3m39s, 10m38s and 12m1s, each holding the GPU lock.
+Three encode-only builds for the tensor measurement, 3m39s, 10m38s and 12m1s,
+and one render build of 12m57s for the eight clips — each holding the GPU lock.
 93 GB of downloads, dominated by the 51.5 GB bf16 reference that exists purely
-to be ground truth. No renders: the whole measurement is encodes, which is why
-it costs minutes rather than the hours a pixel comparison would.
+to be ground truth.
 
 The first build failed usefully. It returned HTTP 400 for every candidate
 because the downloaded encoders were still sitting in a staging directory where
 ComfyUI's loader could not see them — and it was that same build's self-check
 that revealed the noise floor, which I had written expecting to be zero and
 would otherwise have reported int8's -0.0001 as a real difference.
+
+One build was wasted outright: pushing the write-up commit auto-triggered the
+render pipeline, which spent eleven minutes re-rendering the same eight arms
+from the same fixtures before I noticed and aborted it. The lock released
+cleanly, but the GPU time is gone.
 
 ## Files
 
@@ -170,6 +176,12 @@ would otherwise have reported int8's -0.0001 as a real difference.
 - [`measure_conditioning_fidelity.py`](files/2026-09-17-h3-quant-conditioning-fidelity/measure_conditioning_fidelity.py)
   — the measurement script, prompts included, so you can run it against your
   own encoders
+- [`h3-exp-009-pixel-visibility.json`](files/2026-09-17-h3-quant-conditioning-fidelity/h3-exp-009-pixel-visibility.json)
+  — the render comparison: seed floors, between-encoder differences, render
+  times, Immich asset ids
+- [`compare_pixel_visibility.py`](files/2026-09-17-h3-quant-conditioning-fidelity/compare_pixel_visibility.py)
+  — applies the pre-registered decision rule mechanically, including the
+  indeterminate branch
 
 One provenance note. The first run of this measurement wrote its results to a
 JSON file inside the build, printed only the first forty lines, and never
@@ -238,6 +250,30 @@ form a viewer would notice. Both readings in the original thread were correct
 about different things, and the practical consequence is blunt: **pick your
 quant on disk size and load time.** You will not see it.
 
+### Which makes speed the deciding factor
+
+Render time came out of the same eight clips, and it is ordered by encoder,
+identical across both seeds:
+
+| encoder | size | render time | relative L2 vs bf16 |
+| :-- | --: | --: | --: |
+| nvfp4_awq | 15.7 GB | **74 s** | 0.0097 |
+| int4_convrot | 14.2 GB | 80 s | 0.0663 |
+| int8_convrot | 27.1 GB | 88 s | 0.0038 |
+| bf16 | 51.5 GB | 103 s | — (reference) |
+
+Same prompt, same seeds, same sampler, same step count — the only thing that
+changed is which encoder loaded, and the spread is 74 to 103 seconds on a
+124-frame clip. The encoder is offloaded to CPU before sampling begins, so this
+is load-and-encode overhead rather than anything happening during diffusion.
+
+That inverts the thread's recommendation on a dimension nobody raised. int8 is
+the closest to unquantised truth, and it is also the slowest of the three
+quants and the largest by 11 GB. nvfp4 is **14 seconds faster per clip** than
+int8, 11 GB smaller, and visually indistinguishable from it. On a rig where a
+four-arm comparison is an hour of GPU time, 14 seconds a clip is the difference
+that actually accumulates.
+
 ## Answer, short version
 
 In tensors: against unquantised bf16, int8_convrot and nvfp4_awq are both at
@@ -252,5 +288,6 @@ In pixels: none of it matters. The worst quant pairing differs from bf16 by
 same umbrella, same wave.
 
 So both sides of the argument were reporting honestly about different things,
-and the practical answer is to pick on disk size and load time. If you are on
-8 GB and already running nvfp4, keep it.
+and the practical answer is to pick on speed and disk size. nvfp4 is the
+fastest of the three at 74 s a clip against int8's 88 s, 11 GB smaller, and
+visually identical. If you are on 8 GB and already running nvfp4, keep it.
