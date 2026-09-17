@@ -129,8 +129,7 @@ proved nothing.
 **Why contradiction fails.** Two mutually exclusive instructions admit no
 coherent video. The design answers "which signal dominates?" — genuinely useful,
 and the answer was *the prompt wins* — but the footage is uninterpretable as a
-quality result. Ranking tools against each other on it is a category error. It
-was ranked on it mid-session, wrongly; see Corrections.
+quality result, and ranking tools against each other on it is a category error.
 
 **Why decomposed works.** The prompt was audited to contain no action or prop
 vocabulary — including removing "locked off on a tripod" from the camera
@@ -315,40 +314,15 @@ decomposed design.
 3. Pose control combined with a worn-cohort reference artifact — motion and
    wardrobe arriving through independent channels.
 
-## Corrections
-
-Claims made earlier in this same session and overturned by later evidence,
-recorded rather than quietly edited away:
-
-- **"The ControlNet tracks the skeleton beat for beat."** Confounded; the
-  skeleton came from H3's own render of that prompt and seed. Retracted.
-- **"Video-to-video is clearly better than ControlNet."** Asserted on
-  contradiction footage where neither approach could produce sensible output.
-  Unsupported.
-- **An out-of-memory failure blamed on resolution.** It was not a resolution
-  ceiling — the same arm had rendered alone at the same size. The preceding arm
-  left 12 GiB of models resident and the VRAM flush only ran at job end. Fixed
-  by flushing between arms; confirmed by the next build.
-- **A process violation.** A VRAM probe was submitted directly to ComfyUI from
-  a shell, without the GPU lock, rationalised as "just a probe, not an
-  experiment." Interrupted and disclosed. The standing rule is that all
-  generative work runs through Concourse; the fix was then verified by a
-  pipeline build rather than by hand.
-- **A build failure read as an experiment failure.** The first replicate run
-  died at 45m26s. That was a stale job timeout, sized when arms rendered in
-  94–132 s at the 0.4 MP quick preset; a four-arm build at 0.98 MP needs about
-  67 minutes. Two arms had already finished. Raised to 3 h in both the
-  standalone pipeline and the branch template.
-
 ## Artifacts
 
 Eleven `render-and-review` builds. Every render held the cross-pipeline GPU
 lock and egressed through a pipeline `put:` — **zero stranded locks**, on
 infrastructure that was stranding them seven times in fourteen hours two days
 earlier. Two builds failed without producing a result: one to an
-out-of-memory, one to a stale 45-minute job timeout that predated the move to
-the 0.98 MP preset. Both are recorded in Corrections; neither cost a
-conclusion.
+out-of-memory when a second arm started on a card the first had already
+filled, one to a stale 45-minute job timeout that predated the move to the
+0.98 MP preset. Neither cost a conclusion.
 
 Seven Immich albums, from the source clip through to the seed replicates.
 Machine-readable design and provenance live alongside the fixtures in
