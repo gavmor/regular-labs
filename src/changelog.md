@@ -13,6 +13,22 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-09-18
+
+- New: [A guide video does not tell MiniMax H3 what to do](2026-09-18-h3-guide-video-control.html)
+  — a reply to the pose-transfer post argued that its published limitation was
+  an artifact of using a stick figure, and that rendering a guide video with Wan
+  VACE first would carry the props across. Tested against both of H3's video
+  inputs: the structural one (`H3FunControlApply.control_video`) and the
+  semantic one (`ref_videos`, where the text encoder actually sees the frames).
+  Neither transfers the briefcase, the tripod, or the kneel — though the guide
+  is far from inert, moving the output 2.25–3.57x further than a seed change
+  does, toward stillness. The prompt's own named object appears while the body
+  follows the skeleton, which is the first direct test of advice the earlier
+  write-up gave. The guide costs 42.5 minutes to produce, against a claimed two.
+
+
+
 ## 2026-09-17
 
 - New: [Settling an argument about MiniMax H3 quants with a number](2026-09-17-h3-quant-conditioning-fidelity.html)

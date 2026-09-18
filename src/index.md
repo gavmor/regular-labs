@@ -13,6 +13,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 One experiment each: what was asked, how it was measured, what it cost,
 and what the result does and does not support.
 
+- [A guide video does not tell MiniMax H3 what to do](2026-09-18-h3-guide-video-control.html) — 2026-09-18
 - [Settling an argument about MiniMax H3 quants with a number](2026-09-17-h3-quant-conditioning-fidelity.html) — 2026-09-17
 - [H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in](2026-09-17-h3-clip-encoder-compatibility.html) — 2026-09-17
 - [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html) — 2026-09-15

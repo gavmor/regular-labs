@@ -1,0 +1,57 @@
+{
+  "arms": {
+    "skeleton_s43": {
+      "path": "/tmp/exp012/skeleton_s43_00002_.mp4",
+      "frames": 294,
+      "bytes": 1536308
+    },
+    "skeleton_s44": {
+      "path": "/tmp/exp012/skeleton_s44_00002_.mp4",
+      "frames": 294,
+      "bytes": 1550807
+    },
+    "vace_s43": {
+      "path": "/tmp/exp012/vace_s43_00001_.mp4",
+      "frames": 294,
+      "bytes": 941214
+    },
+    "vace_s44": {
+      "path": "/tmp/exp012/vace_s44_00001_.mp4",
+      "frames": 294,
+      "bytes": 998620
+    }
+  },
+  "grids": {
+    "skeleton_s43": "/tmp/exp012/grids/skeleton_s43.png",
+    "skeleton_s44": "/tmp/exp012/grids/skeleton_s44.png",
+    "vace_s43": "/tmp/exp012/grids/vace_s43.png",
+    "vace_s44": "/tmp/exp012/grids/vace_s44.png",
+    "compare_s43": "/tmp/exp012/grids/arms-compare-s43.png"
+  },
+  "pixels": {
+    "skeleton_seed_floor": 11.38,
+    "vace_seed_floor": 7.16,
+    "between_s43": 25.39,
+    "between_s44": 25.54,
+    "max_between_vs_min_floor": 3.567
+  },
+  "readings_pending": {
+    "skeleton_s43": {
+      "props_present": null,
+      "subject_intact": null
+    },
+    "skeleton_s44": {
+      "props_present": null,
+      "subject_intact": null
+    },
+    "vace_s43": {
+      "props_present": null,
+      "subject_intact": null
+    },
+    "vace_s44": {
+      "props_present": null,
+      "subject_intact": null
+    }
+  },
+  "decision_rule": "SUPPORTED: props in BOTH vace arms and NEITHER skeleton arm, subject intact. REFUTED: no props in any arm. INDETERMINATE: props at one seed only, props in both arms, or props present but subject overwritten by the guide's figure."
+}
