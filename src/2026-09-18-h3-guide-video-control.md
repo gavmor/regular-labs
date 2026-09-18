@@ -57,6 +57,18 @@ Both are tested:
 The second exists because the disputant's words are "qualified reference vid",
 and H3's own reference-video input is `ref_videos`.
 
+### How the clips are read
+
+Prop presence and posture are read by eye from frame grids — six frames per
+clip at fixed indices, identical across arms. That is a deliberate instrument
+for a discrete question (is the object there, is the subject kneeling) and a
+poor one for a continuous question. Six of 294 frames is two per cent of the
+clip, and a grid cannot show a freeze, a drift, or a stutter.
+
+Anything about motion over time therefore comes from measurement rather than
+from the grids: mean absolute difference between frames one second apart,
+reported per clip and, where it matters, per interval.
+
 ### The null
 
 H3 is deterministic here. The same graph at a fixed seed and control, rendered
@@ -81,9 +93,13 @@ Same prompt, same seed, three control conditions:
 
 ![Three rows of six frames. The pose-skeleton row crouches and reaches; both VACE-guide rows stand still](images/2026-09-18-h3-guide-video-control/three-conditions.png)
 
-The skeleton row crouches to one knee and reaches toward the floor. Both guided
-rows stand essentially motionless for all 294 frames. No briefcase, no tripod,
-no kneel — through either input.
+The skeleton row crouches to one knee and reaches toward the floor. The guided
+rows hold a single upright posture across all six sampled instants. No
+briefcase, no tripod, no kneel — through either input.
+
+A frame grid shows posture at six moments and says nothing about what happens
+between them, so the motion figures below carry the temporal claim, not this
+image.
 
 Mean absolute pixel difference, stride 8:
 
@@ -108,7 +124,8 @@ an action.
 A sparse prompt might plausibly leave H3 with too little to hold onto. The
 complex-subject row above uses a prompt specifying skin, hair, face, physique,
 wardrobe and a named held object, drawn from a seeded palette grammar rather
-than written to taste. It changes nothing: the guided arms still stand still.
+than written to taste. It changes nothing: the guided arms hold the same
+upright posture, and their measured motion stays low.
 
 ### What the prompt does carry
 
@@ -156,17 +173,23 @@ second apart — confirms the pattern holds per body plan:
 Absolute values are not comparable across subjects — mist displaces fewer
 pixels than a velvet dress whatever it does — but the within-subject ratio is.
 
+These are averages over the clip, and an average hides the shape of the motion.
+The automaton's guided arm is the one that rewards a closer look: its motion is
+back-loaded, rising from 1.32 in the first third to 2.96 in the last, where the
+woman's guided arm is flat throughout (2.39 to 2.33). Low average motion is not
+the same as stillness.
+
 ### A pose is not an action
 
-The automaton's guided arm is the exception worth naming. It is static, like
-every other guided arm, but it is static **half-kneeling** rather than standing.
-That posture is why its motion score is the highest of the three guided arms
-and its ratio the lowest.
+The automaton's guided arm is the exception worth naming. Where the other
+guided subjects stand, it **kneels** — one knee down — and it is already
+kneeling when the clip opens. It never kneels *down*; the posture is there from
+the first frame and stays for all 294.
 
 So the guide does not simply suppress movement. It transfers a *pose* and fails
-to transfer the *action*: the kneel arrives as a frozen attitude instead of a
-movement through time. The human arms alone supported only the weaker statement
-that the subject stands still.
+to transfer the *action*. The guide's figure walks in, kneels, opens a case and
+extracts a tripod; what reaches the output is the kneel as a standing
+condition, with none of the movement that produced it.
 
 This is one observation at one seed and was not predicted. It deserves its own
 design before anything is built on it.
@@ -254,6 +277,7 @@ makes a same-day answer possible and the part nobody counts.
 - [Pixel scores, ref_videos](files/2026-09-18-h3-guide-video-control/h3-exp-012-pixel-scores.json)
 - [The scoring script](files/2026-09-18-h3-guide-video-control/score_prop_transfer.py)
 - [Motion scores by body plan](files/2026-09-18-h3-guide-video-control/h3-exp-013-motion.json)
+- [Per-interval motion profiles](files/2026-09-18-h3-guide-video-control/h3-exp-013-motion-profile.json)
 - [The guide-render script](files/2026-09-18-h3-guide-video-control/render_vace_guide.py)
 
 Workflows are API-format and name local checkpoints; they are a starting point,
