@@ -1,6 +1,6 @@
 # A clear win with almost no margin to spare
 
-Seventh entry from the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-native-098mp-resolution-test`. A quality win that holds up under a real look, paired with a hardware-margin problem that applies to production today, not just to the higher-resolution variant being tested.
+Seventh entry from the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-native-098mp-resolution-test`. A quality win that holds up under a real look, paired with a hardware-margin problem that applies to production today, not just to the higher-resolution variant being tested.
 
 <video src="images/2026-09-05-h3-native-098mp-resolution-test/baseline-05mp-960x544.mp4" controls width="480"></video>
 

@@ -1,6 +1,6 @@
 # Three film formats, and a verdict: 3:2 wins for an 11-person crew
 
-Seventh deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/film-format-comparison`. Unlike the other three in this cluster, this branch never got a local worktree until now; it existed only as `origin/feature/film-format-comparison`, two commits ahead of main. A third commit
+Seventh deep dive out of the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/film-format-comparison`. Unlike the other three in this cluster, this branch never got a local worktree until now; it existed only as `origin/feature/film-format-comparison`, two commits ahead of main. A third commit
 ([`ef79453`](https://github.com/gavmor/comfyui-workflows/commit/ef79453))
 adds the visual verdict that was missing.
 

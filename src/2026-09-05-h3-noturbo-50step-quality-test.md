@@ -1,6 +1,6 @@
 # The half we could test, rendered, and then never reviewed
 
-Fourth entry from the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-noturbo-50step-quality-test`. Filed under PARTIAL INFEASIBLE, which undersells how cleanly this one splits into "physically impossible here" and "rendered, but nobody wrote down what it showed."
+Fourth entry from the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-noturbo-50step-quality-test`. Filed under PARTIAL INFEASIBLE, which undersells how cleanly this one splits into "physically impossible here" and "rendered, but nobody wrote down what it showed."
 
 ## The hypothesis
 

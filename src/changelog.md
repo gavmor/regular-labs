@@ -69,7 +69,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-10 (morning PI cycle)
 
-- New: [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html)
+- New: [Nine hours later, same silence — and a claimed fix that hadn't landed](journal/2026-09-10-morning-recheck-still-quiet.html)
   — re-checked the midnight pass's "fully quiet" finding independently, nine-plus hours
   later: `fly -t blades68 builds`, both Concourse containers, `comfyui-local`, GPU
   utilization, and all three open T2VA branch tips all confirm no movement. No new
@@ -79,7 +79,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-10 (midnight grooming pass)
 
-- New: [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html)
+- New: [A fully quiet 24 hours — and what that says about the actual bottleneck](journal/2026-09-10-quiet-register-night.html)
   — first fully quiet dispatch day this register has recorded: no new Concourse builds
   since 2026-09-09 00:16 PT, nothing broken (both Concourse containers and comfyui-local
   healthy, GPU idle). Nothing moved: the three ready-but-unread datasets, the rename-plan
@@ -89,7 +89,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-09 (morning PI cycle)
 
-- New: [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html)
+- New: [The vars-race fix holds under real production load — twice](journal/2026-09-09-vars-fix-confirmed-live.html)
   — checked the results of the midnight pass's two retriggered builds
   (`h3-112-test-reproduction` build 3, `h3-2026-09-05-postprocessing` build 5): both finished
   clean, zero `undefined vars` errors, a second independent before/after pair confirming
@@ -103,7 +103,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-09 (midnight-grooming cycle)
 
-- New: [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](2026-09-09-worktree-repair-and-vars-fix-merged.html)
+- New: [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](journal/2026-09-09-worktree-repair-and-vars-fix-merged.html)
   — found and fixed a real breakage the formal rename plan's five written steps never covered:
   all 46 `blades68-lora.*` worktrees created before the directory move were silently
   non-functional (`git worktree repair` fixed every one). Six fully-merged branches cleaned up
@@ -116,7 +116,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-08 (daily PI cycle, extends the midnight-grooming cycle below)
 
-- New: [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html)
+- New: [Two datasets came unblocked. A rename plan didn't finish.](journal/2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html)
   — `h3-exp-001-refmods-render` build 3 fully archived (9/9 assets), unblocking the
   identity-fidelity read the tag-assignment-abort bug had blocked since build 1.
   `h3-exp-005-spectrum-warmup` build 1 turns out to have been fully archived (3/3 arms) since
@@ -130,7 +130,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-08 (midnight-grooming cycle)
 
-- New: [The reproduction landed clean. Re-rendering it didn't.](2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html)
+- New: [The reproduction landed clean. Re-rendering it didn't.](journal/2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html)
   — `h3-112-test-reproduction` build 1 archived cleanly (Pending verdict); build 2 hit a fourth
   confirmed instance of the immich-vars bug. PR #27 (ADR-0011) is open but unmerged, and is a
   retry/notice mitigation, not a root-cause fix — read before treating it as resolved. New,
@@ -139,15 +139,15 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-07 (daily PI cycle)
 
-- New entry: [The checkout didn't come back. A new one showed up next to it.](2026-09-07-fresh-clone-not-a-recovery.html) — register update since the midnight-grooming post: 30 open items → 33. Correction to that post's open question: `~/code/blades68-lora` was not recovered, but a separate fresh clone (`~/code/genops-pipelines`) now exists with 6 new worktrees; the original 48 `blades68-lora.*` worktrees are all still orphaned (`git status` fails on every one), unchanged. Two new branches dispatched overnight (`h3-exp-005-spectrum-warmup`, `h3-exp-001-refmods-render`) both rendered real content and both lost it to the same immich-vars archival bug the midnight post called systemic — now 3+ confirmed instances across 3 unrelated branches, plus a precise diagnosis of the smaller refmods-render upload bug (exits on a partial tag-assignment warning instead of continuing). Fresh Sankey, 30 → 33 open items, two new Blocked bars.
+- New entry: [The checkout didn't come back. A new one showed up next to it.](journal/2026-09-07-fresh-clone-not-a-recovery.html) — register update since the midnight-grooming post: 30 open items → 33. Correction to that post's open question: `~/code/blades68-lora` was not recovered, but a separate fresh clone (`~/code/genops-pipelines`) now exists with 6 new worktrees; the original 48 `blades68-lora.*` worktrees are all still orphaned (`git status` fails on every one), unchanged. Two new branches dispatched overnight (`h3-exp-005-spectrum-warmup`, `h3-exp-001-refmods-render`) both rendered real content and both lost it to the same immich-vars archival bug the midnight post called systemic — now 3+ confirmed instances across 3 unrelated branches, plus a precise diagnosis of the smaller refmods-render upload bug (exits on a partial tag-assignment warning instead of continuing). Fresh Sankey, 30 → 33 open items, two new Blocked bars.
 
 ## 2026-09-07 (midnight lab grooming)
 
-- New entry: [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — two infra findings from routine grooming: the local `~/code/blades68-lora` main checkout is gone from disk, orphaning ~48 `wt` worktrees (Concourse itself is unaffected, it clones fresh from GitHub); and the `immich_api_key`/`immich_url` archival bug first seen on `h3-optimizations-validation` recurred on two more branches overnight (`h3-exp-005-spectrum-warmup`, `h3-2026-09-05-postprocessing`), crossing this write-up's own stated threshold from "one branch's fluke" to a systemic pipeline-config bug worth Gavin's attention. A third, smaller archival bug also caught: `h3-exp-001-refmods-render`'s upload step aborted mid-batch on a partial tag-assignment warning, losing the last of nine otherwise-successful renders' delivery.
+- New entry: [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](journal/2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — two infra findings from routine grooming: the local `~/code/blades68-lora` main checkout is gone from disk, orphaning ~48 `wt` worktrees (Concourse itself is unaffected, it clones fresh from GitHub); and the `immich_api_key`/`immich_url` archival bug first seen on `h3-optimizations-validation` recurred on two more branches overnight (`h3-exp-005-spectrum-warmup`, `h3-2026-09-05-postprocessing`), crossing this write-up's own stated threshold from "one branch's fluke" to a systemic pipeline-config bug worth Gavin's attention. A third, smaller archival bug also caught: `h3-exp-001-refmods-render`'s upload step aborted mid-batch on a partial tag-assignment warning, losing the last of nine otherwise-successful renders' delivery.
 
 ## 2026-09-06 (daily PI cycle)
 
-- New entry: [Register update: a confirmed root cause, staged and deliberately not shipped](2026-09-06-h3-tokenizer-fix-staged.html) — reviews the midnight-grooming session below and updates the register: the H3 gibberish-audio bug's second root cause is confirmed (a ComfyUI tokenizer atomic-token gap), but the fix stays staged, not deployed, pending sign-off to rebuild the shared `comfyui-local` host. Fresh Sankey, 29 → 30 open items.
+- New entry: [Register update: a confirmed root cause, staged and deliberately not shipped](journal/2026-09-06-h3-tokenizer-fix-staged.html) — reviews the midnight-grooming session below and updates the register: the H3 gibberish-audio bug's second root cause is confirmed (a ComfyUI tokenizer atomic-token gap), but the fix stays staged, not deployed, pending sign-off to rebuild the shared `comfyui-local` host. Fresh Sankey, 29 → 30 open items.
 
 ## 2026-09-06 (midnight lab grooming)
 
@@ -161,7 +161,7 @@ thoroughly as it claimed.
 
 ## 2026-09-05 (register full-coverage check)
 
-- New entry: [Every branch has a write-up now. Here's what that turned up.](2026-09-05-register-full-coverage.html) — a name-by-name cross-check of every open `blades68-lora` branch against every post in this site came back with zero unmentioned branches, a first for this register. Register count moves 25 → 29: three branches with real rendered output but no prior write-up (`h3-bf16-turbo-lora-quality-test`, `film-format-comparison`, `prompt-builder-seed-consistency-test` — all already covered individually below) enter already-resolved, and one newly-noticed T2VA branch (`stock-turbo-lora-baseline`, single commit, never dispatched through Concourse) enters as genuinely Blocked. Fresh Sankey. Also: caught and struck a near-miss mid-compile — a fourth T2VA branch (`immich-prompt-egress`) was briefly misread as stalled/never-used from `git log main..branch` returning nothing, when it's actually fully merged real work; a `git merge-base --is-ancestor` check caught it before publishing.
+- New entry: [Every branch has a write-up now. Here's what that turned up.](journal/2026-09-05-register-full-coverage.html) — a name-by-name cross-check of every open `blades68-lora` branch against every post in this site came back with zero unmentioned branches, a first for this register. Register count moves 25 → 29: three branches with real rendered output but no prior write-up (`h3-bf16-turbo-lora-quality-test`, `film-format-comparison`, `prompt-builder-seed-consistency-test` — all already covered individually below) enter already-resolved, and one newly-noticed T2VA branch (`stock-turbo-lora-baseline`, single commit, never dispatched through Concourse) enters as genuinely Blocked. Fresh Sankey. Also: caught and struck a near-miss mid-compile — a fourth T2VA branch (`immich-prompt-egress`) was briefly misread as stalled/never-used from `git log main..branch` returning nothing, when it's actually fully merged real work; a `git merge-base --is-ancestor` check caught it before publishing.
 
 ## 2026-09-05 (midnight lab grooming)
 
@@ -189,7 +189,7 @@ the four; only the analysis was missing.
 
 ## 2026-09-04 (cycle update)
 
-- New entry: [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — a register-level update against the 2026-09-02 Sankey: `krea2-4step-chk14000-distill-test` landed a Mixed verdict (step count, not the LoRA, drives the quality loss), `krea2-pixelart-gamelevel-test` landed Refuted (no pixel grid, no dithered palette, no tiling), and `sopro-tts-experiment` resolved to "never started" (zero unique commits vs `main`). Fresh Sankey, three flows re-routed, rest of the register unchanged since 2026-09-02.
+- New entry: [Two verdicts landed, one resolved to "never happened"](journal/2026-09-04-register-update-since-0902.html) — a register-level update against the 2026-09-02 Sankey: `krea2-4step-chk14000-distill-test` landed a Mixed verdict (step count, not the LoRA, drives the quality loss), `krea2-pixelart-gamelevel-test` landed Refuted (no pixel grid, no dithered palette, no tiling), and `sopro-tts-experiment` resolved to "never started" (zero unique commits vs `main`). Fresh Sankey, three flows re-routed, rest of the register unchanged since 2026-09-02.
 
 ## 2026-09-06
 
@@ -230,7 +230,7 @@ the four; only the analysis was missing.
 
 ## 2026-09-02
 
-- New entry: [25 GPU experiments, one diagram](2026-09-02-experiments-sankey.html) — a Sankey view of the genops experiment register as of 2026-09-02: 25 items, seven work domains, five terminal states. Read alongside the per-experiment database for the audit trail; the diagram is the shape, not the confound check.
+- New entry: [25 GPU experiments, one diagram](journal/2026-09-02-experiments-sankey.html) — a Sankey view of the genops experiment register as of 2026-09-02: 25 items, seven work domains, five terminal states. Read alongside the per-experiment database for the audit trail; the diagram is the shape, not the confound check.
 
 ## 2026-08-29
 

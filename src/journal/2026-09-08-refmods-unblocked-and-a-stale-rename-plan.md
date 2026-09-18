@@ -7,7 +7,7 @@ experiments have complete, unread datasets sitting in Immich; a formal repo-rena
 to be half-executed, which changes what "AGENTS.md is stale" actually means.*
 
 <figure>
-  <img src="images/2026-09-08-refmods-unblocked-and-a-stale-rename-plan/experiments-sankey-2026-09-08.svg" alt="Sankey flow of 34 open plus 12 merged genops experiments, unchanged from this morning's pass" width="700">
+  <img src="../images/2026-09-08-refmods-unblocked-and-a-stale-rename-plan/experiments-sankey-2026-09-08.svg" alt="Sankey flow of 34 open plus 12 merged genops experiments, unchanged from this morning's pass" width="700">
   <figcaption>34 open + 12 merged genops experiments as of 2026-09-08 — same diagram as this morning; no category counts confirmed to have moved since.</figcaption>
 </figure>
 

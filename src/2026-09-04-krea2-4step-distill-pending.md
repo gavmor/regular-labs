@@ -1,6 +1,6 @@
 # Verdict: the distill LoRA recovers most of the 4-step quality loss, but not all of it
 
-Another item off the [experiment register](2026-09-02-experiments-sankey.html):
+Another item off the [experiment register](journal/2026-09-02-experiments-sankey.html):
 `feature/krea2-4step-chk14000-distill-test`. This one now has an ending: all
 three arms confirmed rendered through the branch's own Concourse pipeline
 and uploaded to Immich, and a real frame-to-frame comparison against the

@@ -5,7 +5,7 @@
 Between last night and this morning, every remaining branch in
 `blades68-lora` — and all but one in `T2VA` — picked up either a
 per-experiment deep-dive or got folded into a register-level update. This
-post checked that directly rather than taking the [index](index.html) at its
+post checked that directly rather than taking the [index](../index.html) at its
 word: a name-by-name cross-check of every open `blades68-lora` branch against
 every post in `src/` came back with zero unmentioned branches. That's the
 first time this register has hit full coverage.
@@ -15,7 +15,7 @@ sat with only a hypothesis on record — sometimes for two weeks — and one
 already-known "blocked" item turned out to be blocked by something new.
 
 <figure>
-  <img src="images/2026-09-05-register-full-coverage/experiments-sankey-2026-09-05.svg" alt="Sankey flow of 29 open plus 12 merged genops experiments from work domains to terminal states, updated 2026-09-05: h3-bf16-turbo-lora-quality-test moved to Mixed, crewgroup-film-format-comparison moved to Confirmed, prompt-builder-seed-consistency-test moved to Confirmed, and one newly-noticed T2VA branch (stock-turbo-lora-baseline) enters as Blocked" width="800">
+  <img src="../images/2026-09-05-register-full-coverage/experiments-sankey-2026-09-05.svg" alt="Sankey flow of 29 open plus 12 merged genops experiments from work domains to terminal states, updated 2026-09-05: h3-bf16-turbo-lora-quality-test moved to Mixed, crewgroup-film-format-comparison moved to Confirmed, prompt-builder-seed-consistency-test moved to Confirmed, and one newly-noticed T2VA branch (stock-turbo-lora-baseline) enters as Blocked" width="800">
   <figcaption>29 open + 12 merged, up from 25 open on 2026-09-04. The growth is real work surfacing, not scope creep — see "Why the count jumped" below.</figcaption>
 </figure>
 
@@ -28,7 +28,7 @@ passes disagreed on which arm looked sharper. Audio is indistinguishable by
 `ffmpeg astats`. The real finding is unpredicted: the BF16 rank-20 LoRA
 rendered **~30% faster** than production's int8-pruned one — a rank-size
 effect, not the precision effect either source thread was testing for.
-[Full write-up](2026-09-04-h3-bf16-turbo-lora-never-run.html) (title's
+[Full write-up](../2026-09-04-h3-bf16-turbo-lora-never-run.html) (title's
 stale, content's current — same cosmetic mismatch as the krea2-4step post
 two days ago, not fixing titles retroactively for this pass).
 
@@ -36,7 +36,7 @@ two days ago, not fixing titles retroactively for this pass).
 variants rendered clean back on 2026-08-21; the visual side-by-side never
 happened. It has now: 3:2 (35mm) is the clear winner for an 11-person crew,
 both square formats force a tiered/overlapping arrangement to fit everyone
-in. [Full write-up](2026-09-05-crewgroup-film-format-comparison.html).
+in. [Full write-up](../2026-09-05-crewgroup-film-format-comparison.html).
 Flagged in the commit itself as an agent-executed call, not Gavin's own —
 he's the named reviewer in the design doc, so his look still overrides this
 one if it differs.
@@ -47,14 +47,14 @@ and never recorded, the repo alone can't tell you which. Pulling all three
 renders and running `silencedetect` directly answers it either way: full-clip
 silence on all three seeds. The silence-discipline prompt-builder setting is
 seed-consistent, not a fluke of the one seed a predecessor branch tested
-once. [Full write-up](2026-09-06-prompt-builder-seed-consistency-unverified.html)
+once. [Full write-up](../2026-09-06-prompt-builder-seed-consistency-unverified.html)
 (same title-lag as above).
 
 ## One blocker traded for another
 
 `feature/h3-optimizations-validation` had been open since 2026-08-26 on a
 different question: did the sparse-attention custom node even survive a
-`comfyui-local` container recreation? That's answered now — [it does](2026-09-04-h3-sparse-attention-validation.html),
+`comfyui-local` container recreation? That's answered now — [it does](../2026-09-04-h3-sparse-attention-validation.html),
 all four comparison workflows submitted clean and rendered real clips. But
 the build still errored: every `local-immich-gallery` archival step failed
 with `undefined vars: immich_api_key, immich_url`, isolated to this one

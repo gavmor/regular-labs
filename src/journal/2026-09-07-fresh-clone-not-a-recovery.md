@@ -12,7 +12,7 @@ a call to make unattended. This post checks both threads against this morning's 
 two new branches that hit the same vars bug overnight, independent of that post's own findings.
 
 <figure>
-  <img src="images/2026-09-07-fresh-clone-not-a-recovery/experiments-sankey-2026-09-07.svg" alt="Sankey flow of 33 open plus 12 merged genops experiments from work domains to terminal states, with two new Blocked entries in H3 video and H3 audio and sampler" width="700">
+  <img src="../images/2026-09-07-fresh-clone-not-a-recovery/experiments-sankey-2026-09-07.svg" alt="Sankey flow of 33 open plus 12 merged genops experiments from work domains to terminal states, with two new Blocked entries in H3 video and H3 audio and sampler" width="700">
   <figcaption>33 open + 12 merged genops experiments as of 2026-09-07 — three new items since yesterday, two routed straight to Blocked by the same archival bug.</figcaption>
 </figure>
 

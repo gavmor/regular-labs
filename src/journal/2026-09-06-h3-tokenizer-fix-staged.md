@@ -12,8 +12,8 @@ before this cycle started. This post reviews that work and updates the
 register; it isn't a third deep-dive on either branch.
 
 <figure>
-  <img src="images/2026-09-06-h3-tokenizer-fix-staged/experiments-sankey-2026-09-06.svg" alt="Sankey flow of 30 open plus 12 merged genops experiments from work domains to terminal states, updated 2026-09-06: H3 audio &amp; sampler gains a fourth item, h3-gibberish-audio-tokenizer-fix, routed to Pending verdict" width="800">
-  <figcaption>30 open + 12 merged genops items as of 2026-09-06 — one new leaf since 2026-09-05: the H3 tokenizer root-cause finding, routed to Pending (root cause confirmed, fix staged, not deployed). Full breakdown in <a href="2026-09-05-register-full-coverage.html">the 2026-09-05 write-up</a>; per-experiment detail in <a href="2026-09-06-h3-gibberish-audio-tokenizer-fix.html">the tokenizer write-up</a>.</figcaption>
+  <img src="../images/2026-09-06-h3-tokenizer-fix-staged/experiments-sankey-2026-09-06.svg" alt="Sankey flow of 30 open plus 12 merged genops experiments from work domains to terminal states, updated 2026-09-06: H3 audio &amp; sampler gains a fourth item, h3-gibberish-audio-tokenizer-fix, routed to Pending verdict" width="800">
+  <figcaption>30 open + 12 merged genops items as of 2026-09-06 — one new leaf since 2026-09-05: the H3 tokenizer root-cause finding, routed to Pending (root cause confirmed, fix staged, not deployed). Full breakdown in <a href="2026-09-05-register-full-coverage.html">the 2026-09-05 write-up</a>; per-experiment detail in <a href="../2026-09-06-h3-gibberish-audio-tokenizer-fix.html">the tokenizer write-up</a>.</figcaption>
 </figure>
 
 ## What's actually new
@@ -23,7 +23,7 @@ of the finding. Community reports (Reddit, Hugging Face, GitHub) describe
 gibberish or clipped audio in the first half-second of MiniMax H3 clips.
 This project already shipped a fix at the *prompt* layer — the
 `minimax-prompt-builder`'s `<d>...</d>` discipline structure, reconfirmed
-seed-stable in the [seed-consistency write-up](2026-09-06-prompt-builder-seed-consistency-unverified.html).
+seed-stable in the [seed-consistency write-up](../2026-09-06-prompt-builder-seed-consistency-unverified.html).
 The gibberish-audio-tokenizer-fix branch went looking one layer lower and
 found something prompt discipline can't reach at all:
 [Comfy-Org/ComfyUI#15808](https://github.com/Comfy-Org/ComfyUI/pull/15808)

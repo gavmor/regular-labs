@@ -9,7 +9,7 @@ two independent before/after pairs confirming the fix, not one. Register:
 checked unchanged.*
 
 <figure>
-  <img src="images/2026-09-09-vars-fix-confirmed-live/experiments-sankey-2026-09-09.svg" alt="Sankey flow of 33 open plus 13 merged genops experiments, updated from 2026-09-08's 34+12 by moving the immich-vars-race fix from Pipeline/infra Ongoing to Merged/shipped" width="800">
+  <img src="../images/2026-09-09-vars-fix-confirmed-live/experiments-sankey-2026-09-09.svg" alt="Sankey flow of 33 open plus 13 merged genops experiments, updated from 2026-09-08's 34+12 by moving the immich-vars-race fix from Pipeline/infra Ongoing to Merged/shipped" width="800">
   <figcaption>33 open + 13 merged genops items as of 2026-09-09 — one verified delta from 2026-09-08: the immich-vars-race fix moves from Pipeline/infra's "Ongoing" bucket to "Merged/shipped."</figcaption>
 </figure>
 

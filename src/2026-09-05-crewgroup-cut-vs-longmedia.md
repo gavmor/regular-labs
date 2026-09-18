@@ -1,6 +1,6 @@
 # Cut versus continuation: only one side of this comparison finished
 
-Fourth deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-crewgroup-longmedia-vs-cut-comparison`. It picks up where the [30-second LongMedia render](2026-09-04-h3-30s-longmedia-native.html) left off, on a harder, more honest test subject.
+Fourth deep dive out of the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-crewgroup-longmedia-vs-cut-comparison`. It picks up where the [30-second LongMedia render](2026-09-04-h3-30s-longmedia-native.html) left off, on a harder, more honest test subject.
 
 <video src="images/2026-09-05-crewgroup-cut-vs-longmedia/crewgroup-cut-based-assembly.mp4" controls width="640"></video>
 

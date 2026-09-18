@@ -1,6 +1,6 @@
 # A real, technically-verified H3 render — sitting past its own contest deadline
 
-Another gap the [2026-09-05 full-coverage check](2026-09-05-register-full-coverage.html) missed:
+Another gap the [2026-09-05 full-coverage check](journal/2026-09-05-register-full-coverage.html) missed:
 it audited `blades68-lora` name-by-name and `T2VA` for all but one branch
 (`stock-turbo-lora-baseline`, entered as Blocked). `T2VA`'s `feature/h3-sync-sound-challenge` was
 the second miss — real work, no write-up, and a time-sensitive detail nobody had flagged: its

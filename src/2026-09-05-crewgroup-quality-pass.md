@@ -1,6 +1,6 @@
 # Getting one crew-group scene clean, and a collision along the way
 
-Fifth deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-crewgroup-quality-pass`, branched directly from the [cut-versus-continuation comparison](2026-09-05-crewgroup-cut-vs-longmedia.html) at its results commit (`607b5eb`).
+Fifth deep dive out of the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-crewgroup-quality-pass`, branched directly from the [cut-versus-continuation comparison](2026-09-05-crewgroup-cut-vs-longmedia.html) at its results commit (`607b5eb`).
 
 <video src="images/2026-09-05-crewgroup-quality-pass/crewgroup-quality-pass-final.mp4" controls width="640"></video>
 

@@ -8,24 +8,16 @@ automation, and whatever else comes out of the generative-ops workbench.
   <figcaption>33 open + 13 merged genops experiments as of 2026-09-09 — the immich-vars archival fix moved to Merged/shipped after two clean production confirmations. Full breakdown in <a href="2026-09-09-vars-fix-confirmed-live.html">the write-up</a>.</figcaption>
 </figure>
 
-## Entries
+## Reports
+
+One experiment each: what was asked, how it was measured, what it cost,
+and what the result does and does not support.
 
 - [Settling an argument about MiniMax H3 quants with a number](2026-09-17-h3-quant-conditioning-fidelity.html) — 2026-09-17
 - [H3's text encoder takes a 5120-wide hidden state, and that's why you can't just swap one in](2026-09-17-h3-clip-encoder-compatibility.html) — 2026-09-17
 - [Pose transfer works: the woman in the dress follows the briefcase poses](2026-09-15-h3-funcontrol-pose-transfer.html) — 2026-09-15
-- [Nine hours later, same silence — and a claimed fix that hadn't landed](2026-09-10-morning-recheck-still-quiet.html) — 2026-09-10
-- [A fully quiet 24 hours — and what that says about the actual bottleneck](2026-09-10-quiet-register-night.html) — 2026-09-10
-- [The vars-race fix holds under real production load — twice](2026-09-09-vars-fix-confirmed-live.html) — 2026-09-09
-- [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](2026-09-09-worktree-repair-and-vars-fix-merged.html) — 2026-09-09
-- [Two datasets came unblocked. A rename plan didn't finish.](2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html) — 2026-09-08
-- [The reproduction landed clean. Re-rendering it didn't.](2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html) — 2026-09-08
-- [The checkout didn't come back. A new one showed up next to it.](2026-09-07-fresh-clone-not-a-recovery.html) — 2026-09-07
-- [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — 2026-09-07
-- [Register update: a confirmed root cause, staged and deliberately not shipped](2026-09-06-h3-tokenizer-fix-staged.html) — 2026-09-06
 - [A real, technically-verified H3 render — sitting past its own contest deadline](2026-09-06-h3-sync-sound-challenge-deadline-passed.html) — 2026-09-06
 - [A second, independent cause of H3's gibberish-audio bug — found, not yet deployed](2026-09-06-h3-gibberish-audio-tokenizer-fix.html) — 2026-09-06
-- [Every branch has a write-up now. Here's what that turned up.](2026-09-05-register-full-coverage.html) — 2026-09-05
-- [Two verdicts landed, one resolved to "never happened"](2026-09-04-register-update-since-0902.html) — 2026-09-04
 - [H3-World: a knowing license override, then a second wall the license had nothing to do with](2026-09-06-h3-world-license-block.html) — 2026-09-06
 - [The full resolution sweep, and where the safe ceiling actually sits](2026-09-06-h3-resolution-array-sweep.html) — 2026-09-06
 - [We wrote down what we'd test, and now there's a real results commit](2026-09-06-prompt-builder-seed-consistency-unverified.html) — 2026-09-06
@@ -48,8 +40,26 @@ automation, and whatever else comes out of the generative-ops workbench.
 - [A sampler swap that came in slower and softer](2026-09-04-h3-ersde-bongtangent-sampler.html) — 2026-09-04
 - [Blocked before the six-clip chain could even run](2026-09-04-h3-motioncontext-chain-6clip-blocked.html) — 2026-09-04
 - [A 30-second H3 render, blocked twice, fixed once](2026-09-04-h3-30s-longmedia-native.html) — 2026-09-04
-- [25 GPU experiments, one diagram](2026-09-02-experiments-sankey.html) — 2026-09-02
 - [Reproducing "50 tok/s at 100k context on 16GB" — and what it doesn't tell you](2026-08-29-qwen38-27b-100k-context-reproduction.html) — 2026-08-29
 - [A drawing-tutorial sheet made entirely by MiniMax H3](2026-08-28-drawing-tutorial-sheet.html) — 2026-08-28
+
+## Journal
+
+Lab notes rather than findings — register counts, what moved and what
+stalled, infrastructure that broke and why. Time-anchored by nature; the
+reports above are the durable record.
+
+- [Nine hours later, same silence — and a claimed fix that hadn't landed](journal/2026-09-10-morning-recheck-still-quiet.html) — 2026-09-10
+- [A fully quiet 24 hours — and what that says about the actual bottleneck](journal/2026-09-10-quiet-register-night.html) — 2026-09-10
+- [The vars-race fix holds under real production load — twice](journal/2026-09-09-vars-fix-confirmed-live.html) — 2026-09-09
+- [The rename plan had an unwritten sixth step. The vars-race fix finally merged.](journal/2026-09-09-worktree-repair-and-vars-fix-merged.html) — 2026-09-09
+- [Two datasets came unblocked. A rename plan didn't finish.](journal/2026-09-08-refmods-unblocked-and-a-stale-rename-plan.html) — 2026-09-08
+- [The reproduction landed clean. Re-rendering it didn't.](journal/2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch.html) — 2026-09-08
+- [The checkout didn't come back. A new one showed up next to it.](journal/2026-09-07-fresh-clone-not-a-recovery.html) — 2026-09-07
+- [The blades68-lora checkout vanished, and the immich-vars bug is now confirmed systemic](journal/2026-09-07-blades68-checkout-vanished-immich-vars-systemic.html) — 2026-09-07
+- [Register update: a confirmed root cause, staged and deliberately not shipped](journal/2026-09-06-h3-tokenizer-fix-staged.html) — 2026-09-06
+- [Every branch has a write-up now. Here's what that turned up.](journal/2026-09-05-register-full-coverage.html) — 2026-09-05
+- [Two verdicts landed, one resolved to "never happened"](journal/2026-09-04-register-update-since-0902.html) — 2026-09-04
+- [25 GPU experiments, one diagram](journal/2026-09-02-experiments-sankey.html) — 2026-09-02
 
 See the [changelog](changelog.html) for what's in progress.

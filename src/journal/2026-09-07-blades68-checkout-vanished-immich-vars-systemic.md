@@ -29,7 +29,7 @@ touched.
 
 ## The `immich_api_key`/`immich_url` bug just crossed from "one branch's fluke" to systemic
 
-The [2026-09-04 sparse-attention write-up](2026-09-04-h3-sparse-attention-validation.html) first
+The [2026-09-04 sparse-attention write-up](../2026-09-04-h3-sparse-attention-validation.html) first
 caught this: a `comfyui-branch` build's `local-immich-gallery` archival `put` step failing with
 `undefined vars: immich_api_key, immich_url`, isolated — at the time — to one branch instance
 among roughly fifty that ran clean in the same `set-branch-pipelines` batch. The standing call

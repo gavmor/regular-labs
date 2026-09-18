@@ -1,6 +1,6 @@
 # Sparse attention for H3: it rendered, then got stuck at the door
 
-Item #19 on the [experiment register](2026-09-02-experiments-sankey.html):
+Item #19 on the [experiment register](journal/2026-09-02-experiments-sankey.html):
 `feature/h3-optimizations-validation`. As of 2026-09-04 this was "built,
 staged, never run" — the custom sparse-attention node hadn't survived a
 `comfyui-local` container recreation, and that gap was flagged for Gavin

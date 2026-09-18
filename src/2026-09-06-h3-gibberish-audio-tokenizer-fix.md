@@ -2,7 +2,7 @@
 
 Found during routine grooming, not a self-reported branch: `feature/h3-gibberish-audio-tokenizer-fix`
 landed its one commit (`94f7adb`) right around when the [2026-09-05 full-coverage
-check](2026-09-05-register-full-coverage.html) was being compiled, and its Concourse build
+check](journal/2026-09-05-register-full-coverage.html) was being compiled, and its Concourse build
 (`run-changed-workflows/1`, succeeded 2026-09-05 14:11-14:12) came in just after — the kind of
 timing gap full coverage of *write-ups* can't fully close, same caveat that post itself named.
 

@@ -1,6 +1,6 @@
 # A fully-specified H3 LoRA test, finally analyzed: a wash on quality, a real speed surprise
 
-Item #12 on the [experiment register](2026-09-02-experiments-sankey.html):
+Item #12 on the [experiment register](journal/2026-09-02-experiments-sankey.html):
 `feature/h3-bf16-turbo-lora-quality-test`. This one had no build-by-build
 story in its own commit history, because there was only ever one commit and
 its design doc's "Results" section was never filled in. That looked, from

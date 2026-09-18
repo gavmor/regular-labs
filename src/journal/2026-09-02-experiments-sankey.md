@@ -18,7 +18,7 @@ underlying source files — the Mermaid source, the per-experiment
 source-of-truth table, and the survey notes — are linked at the bottom.
 
 <figure>
-  <img src="images/2026-09-02-experiments-sankey/experiments-sankey.svg" alt="Sankey flow of 25 open plus 12 merged genops experiments from work domains (H3 video, Krea2, H3 audio &amp; sampler, H3 resolution &amp; scaling, H3 multishot, TTS / non-image, Pipeline / infra) to terminal states (Confirmed, Mixed, Refuted, Pending, Blocked, Ongoing, Merged / shipped)" width="800">
+  <img src="../images/2026-09-02-experiments-sankey/experiments-sankey.svg" alt="Sankey flow of 25 open plus 12 merged genops experiments from work domains (H3 video, Krea2, H3 audio &amp; sampler, H3 resolution &amp; scaling, H3 multishot, TTS / non-image, Pipeline / infra) to terminal states (Confirmed, Mixed, Refuted, Pending, Blocked, Ongoing, Merged / shipped)" width="800">
   <figcaption>25 open plus 12 merged genops items as of 2026-09-02, grouped by work domain and routed to current verdict.</figcaption>
 </figure>
 

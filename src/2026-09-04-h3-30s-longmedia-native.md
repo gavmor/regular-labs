@@ -1,6 +1,6 @@
 # A 30-second H3 render, blocked twice, fixed once
 
-This is the first deep dive out of the [experiment register](2026-09-02-experiments-sankey.html). One full write-up per hypothesis-bearing item, starting with the cleanest confirmed win in it: `feature/h3-30s-longmedia-native-test`.
+This is the first deep dive out of the [experiment register](journal/2026-09-02-experiments-sankey.html). One full write-up per hypothesis-bearing item, starting with the cleanest confirmed win in it: `feature/h3-30s-longmedia-native-test`.
 
 <video src="images/2026-09-04-h3-30s-longmedia-native/h3-30s-longmedia-native.mp4" controls width="640"></video>
 
@@ -45,7 +45,7 @@ One honest loose end, recorded rather than quietly fixed: the `comfyui-local` im
 
 ## Build 4: the confirmed re-run
 
-Same graph, byte-identical seed/prompt/resolution/sampler settings, only a cosmetic `_meta.title` touch to make the branch-diff trigger pick the file up again. Result: `execution_success`, confirmed from ComfyUI's own history (not the driver script's status line, which, per a [known gotcha](2026-09-02-experiments-sankey.html) on this lab, lost its terminal mid-run and exited misleadingly; Concourse's own build status is what's reported here).
+Same graph, byte-identical seed/prompt/resolution/sampler settings, only a cosmetic `_meta.title` touch to make the branch-diff trigger pick the file up again. Result: `execution_success`, confirmed from ComfyUI's own history (not the driver script's status line, which, per a [known gotcha](journal/2026-09-02-experiments-sankey.html) on this lab, lost its terminal mid-run and exited misleadingly; Concourse's own build status is what's reported here).
 
 | stage | peak host RAM | peak GPU VRAM |
 |---|---|---|

@@ -1,6 +1,6 @@
 # OTIO plus ffmpeg concat: frame-exact video, a known audio catch
 
-Sixth deep dive out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/otio-ffmpeg-cut-based-editing-test`, the tooling spike that both the [cut-versus-continuation comparison](2026-09-05-crewgroup-cut-vs-longmedia.html) and the [quality pass](2026-09-05-crewgroup-quality-pass.html) went on to build directly on top of.
+Sixth deep dive out of the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/otio-ffmpeg-cut-based-editing-test`, the tooling spike that both the [cut-versus-continuation comparison](2026-09-05-crewgroup-cut-vs-longmedia.html) and the [quality pass](2026-09-05-crewgroup-quality-pass.html) went on to build directly on top of.
 
 <video src="images/2026-09-05-otio-ffmpeg-cut-assembly/cut_test_assembly.mp4" controls width="480"></video>
 

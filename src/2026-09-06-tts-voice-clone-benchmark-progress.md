@@ -1,6 +1,6 @@
 # A TTS benchmark harness, five models in, nine to go
 
-Fourth write-up out of the [experiment register](2026-09-02-experiments-sankey.html), and the first one that isn't a pass/fail hypothesis test. `feature/tts-voice-clone-benchmark` is building a [Concourse](https://concourse-ci.org/)-orchestrated harness to compare roughly 14 local zero-shot voice-cloning models on identical inputs. This is a progress snapshot, not a verdict: five models are wired and validated so far, nine are not.
+Fourth write-up out of the [experiment register](journal/2026-09-02-experiments-sankey.html), and the first one that isn't a pass/fail hypothesis test. `feature/tts-voice-clone-benchmark` is building a [Concourse](https://concourse-ci.org/)-orchestrated harness to compare roughly 14 local zero-shot voice-cloning models on identical inputs. This is a progress snapshot, not a verdict: five models are wired and validated so far, nine are not.
 
 ## What it's actually testing
 

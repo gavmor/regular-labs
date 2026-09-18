@@ -1,6 +1,6 @@
 # We wrote down what we'd test, and now there's a real results commit
 
-This is the second write-up out of the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-prompt-builder-seed-consistency-test` had a clean, well-formed hypothesis on record and, until now, no results ever committed anywhere. A second commit
+This is the second write-up out of the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-prompt-builder-seed-consistency-test` had a clean, well-formed hypothesis on record and, until now, no results ever committed anywhere. A second commit
 ([`fdbefb0`](https://github.com/gavmor/comfyui-workflows/commit/fdbefb0))
 adds a `RESULTS.md` with the silencedetect table below.
 

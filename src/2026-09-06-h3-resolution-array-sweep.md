@@ -1,6 +1,6 @@
 # The full resolution sweep, and where the safe ceiling actually sits
 
-Third write-up out of the [experiment register](2026-09-02-experiments-sankey.html), and the cleanest confirmed result of the three covered here: `feature/h3-resolution-array-sweep` ran a full 8-point resolution sweep from 0.3 to 0.98 megapixels on the Graves [MiniMax H3](https://huggingface.co/MiniMaxAI) workflow, and none of the eight arms came close to an out-of-memory failure.
+Third write-up out of the [experiment register](journal/2026-09-02-experiments-sankey.html), and the cleanest confirmed result of the three covered here: `feature/h3-resolution-array-sweep` ran a full 8-point resolution sweep from 0.3 to 0.98 megapixels on the Graves [MiniMax H3](https://huggingface.co/MiniMaxAI) workflow, and none of the eight arms came close to an out-of-memory failure.
 
 <video src="images/2026-09-06-h3-resolution-array-sweep/sweep-030mp-736x416.mp4" controls width="400"></video>
 

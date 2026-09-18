@@ -6,7 +6,7 @@ different, previously-undocumented bug found on a branch already flagged Blocked
 reasons. `~/code/blades68-lora` is still gone; unchanged since the last two cycles.*
 
 <figure>
-  <img src="images/2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch/experiments-sankey-2026-09-08.svg" alt="Sankey flow of 34 open plus 12 merged genops experiments, with the new h3-112-test-reproduction item routed to Pending verdict in H3 audio & sampler" width="700">
+  <img src="../images/2026-09-08-h3-112-repro-landed-vars-bug-fourth-branch/experiments-sankey-2026-09-08.svg" alt="Sankey flow of 34 open plus 12 merged genops experiments, with the new h3-112-test-reproduction item routed to Pending verdict in H3 audio & sampler" width="700">
   <figcaption>34 open + 12 merged genops experiments as of 2026-09-08 — one new item, routed to Pending verdict, not Blocked.</figcaption>
 </figure>
 

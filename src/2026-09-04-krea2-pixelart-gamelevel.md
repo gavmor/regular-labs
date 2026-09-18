@@ -1,7 +1,7 @@
 # Krea2 Turbo builds the JRPG city, but not in 16-bit pixel art
 
 This one belongs to a different category than most of the
-[experiment register](2026-09-02-experiments-sankey.html): not a formal
+[experiment register](journal/2026-09-02-experiments-sankey.html): not a formal
 hypothesis test with dependent variables, but a straight "does this claimed
 trick actually work on this rig" reproduction attempt, the kind this site
 will keep coming back to. Item #18: `feature/krea2-pixelart-gamelevel-test`.

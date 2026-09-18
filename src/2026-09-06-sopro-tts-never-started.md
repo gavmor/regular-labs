@@ -1,6 +1,6 @@
 # The TTS experiment that never had a first commit
 
-`feature/sopro-tts-experiment` is a real entry in the [experiment register](2026-09-02-experiments-sankey.html), and its honest status is that it never happened. The branch exists. It carries zero commits of its own.
+`feature/sopro-tts-experiment` is a real entry in the [experiment register](journal/2026-09-02-experiments-sankey.html), and its honest status is that it never happened. The branch exists. It carries zero commits of its own.
 
 ## What's actually there
 

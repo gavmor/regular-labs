@@ -1,6 +1,6 @@
 # Slower, and not even the same shot
 
-Sixth entry from the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-latent-upscale-speed-test`. Refuted on its own speed claim at N=3, and it turned up a second problem nobody was even testing for.
+Sixth entry from the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-latent-upscale-speed-test`. Refuted on its own speed claim at N=3, and it turned up a second problem nobody was even testing for.
 
 ## The hypothesis
 

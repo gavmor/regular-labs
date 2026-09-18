@@ -1,6 +1,6 @@
 # A checkpoint this rig can stage but never load
 
-Fifth entry from the [experiment register](2026-09-02-experiments-sankey.html): `feature/h3-fun-controlnet-union-test`. One commit (`bc16f46`, 2026-08-24), zero renders, and a clean answer to a narrower question than the branch name suggests: not "is this technique good," but "can this rig run it at all."
+Fifth entry from the [experiment register](journal/2026-09-02-experiments-sankey.html): `feature/h3-fun-controlnet-union-test`. One commit (`bc16f46`, 2026-08-24), zero renders, and a clean answer to a narrower question than the branch name suggests: not "is this technique good," but "can this rig run it at all."
 
 ## The question
 
