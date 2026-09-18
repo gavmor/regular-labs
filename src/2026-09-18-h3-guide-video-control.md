@@ -1,9 +1,10 @@
 # A guide video does not tell MiniMax H3 what to do
 
-*Status: complete for two of H3's video inputs, N=2 seeds each. A VACE-rendered
-guide containing a briefcase and a tripod transfers neither the objects nor the
-action, through either input. A pose skeleton transfers the action; the prompt
-supplies the objects.*
+*Status: complete for two of H3's video inputs, N=2 seeds each, plus a
+three-body-plan scope check. A VACE-rendered guide containing a briefcase and a
+tripod transfers neither the objects nor the action, through either input. A
+pose skeleton transfers the action — to a human, a machine, or a cloud of vapor
+alike; the prompt supplies the objects.*
 
 ## The question
 
@@ -124,6 +125,52 @@ This is the first direct test of advice the earlier write-up gave. That advice �
 props must come from the prompt — was inferred from props being *absent* under
 pose control; nobody had put one in a prompt and checked. It holds.
 
+### The subject does not have to be human
+
+A pose skeleton describes human joints. Whether that is *why* it works is a
+separate question, and one the earlier write-up never asked: every subject
+tested until now has been a person.
+
+Three body plans, drawn from a seeded palette grammar, under the same skeleton:
+
+![Three rows of six frames: a woman, an automaton, and a translucent vapor entity all walk in, kneel, work at floor level and rise](images/2026-09-18-h3-guide-video-control/body-plans.png)
+
+The automaton walks in, kneels, works at floor level and stands, in the same
+choreography as the woman. The vapor entity does the same while remaining
+translucent mist throughout. Neither has human joints in the sense the skeleton
+describes. Both follow it.
+
+Each subject also stays what the prompt asked for. The machine is brass and
+steel from first frame to last; the mist never solidifies. The control supplies
+the choreography and takes nothing from the identity.
+
+Temporal motion within each clip — mean absolute difference between frames one
+second apart — confirms the pattern holds per body plan:
+
+| subject | pose skeleton | VACE guide | ratio |
+|---|---|---|---|
+| woman | 8.83 | 3.91 | 2.26x |
+| automaton | 6.93 | 4.30 | 1.61x |
+| vapor entity | 4.26 | 1.20 | 3.55x |
+
+Absolute values are not comparable across subjects — mist displaces fewer
+pixels than a velvet dress whatever it does — but the within-subject ratio is.
+
+### A pose is not an action
+
+The automaton's guided arm is the exception worth naming. It is static, like
+every other guided arm, but it is static **half-kneeling** rather than standing.
+That posture is why its motion score is the highest of the three guided arms
+and its ratio the lowest.
+
+So the guide does not simply suppress movement. It transfers a *pose* and fails
+to transfer the *action*: the kneel arrives as a frozen attitude instead of a
+movement through time. The human arms alone supported only the weaker statement
+that the subject stands still.
+
+This is one observation at one seed and was not predicted. It deserves its own
+design before anything is built on it.
+
 ## Who was right
 
 The dispute resolves cleanly, and not entirely in either direction.
@@ -136,8 +183,10 @@ the action.
 
 The published limitation survives, and the mechanism is now better described
 than it was: **the control video contributes structure, the prompt contributes
-content.** A pose skeleton is a good structural signal. A photoreal guide is a
-worse one, because its structure is buried in appearance the model does not use.
+content.** A pose skeleton is a good structural signal — good enough to move a
+machine and a cloud of vapor through a human choreography. A photoreal guide is
+a worse one, because its structure is buried in appearance the model does not
+use.
 
 An explanation offered mid-experiment — that FunControl reads structure
 regardless of appearance, and so the text-encoder path might succeed where the
@@ -166,7 +215,7 @@ a reference *up* to a 768-short-edge canvas, so a 294-frame reference at
 than doubles. That OOMs on a 24 GB card at 20.17 GiB allocated. A 90-frame
 reference — 4 s, inside the node's stated 2-15 s range — adds ~18,100 and fits.
 
-**Eight builds, roughly 5h20m of GPU under lock.** Three of those builds failed
+**Nine builds, roughly 7h15m of GPU under lock.** Three of those builds failed
 and their causes are worth stating: a missing module in a task script; a guide
 generated at the source clip's resolution rather than the shot's, which the node
 correctly rejected on a token-count mismatch; and the reference-length OOM
@@ -191,9 +240,12 @@ makes a same-day answer possible and the part nobody counts.
   a different procedure and would deserve its own test.
 - **VACE 1.3B, upscaled from 832x480.** The 14B model and a natively
   full-resolution guide are both untested.
-- **Non-human subjects.** Everything here is a human body. Whether a pose
-  skeleton drives a subject with no human anatomy is a separate question, and an
-  experiment on it is running as this is published.
+- **Three body plans at one seed each.** The non-human arms are a scope check,
+  not a survey. A marginal reading would need the seed replicate the human arms
+  have.
+- **The frozen-mid-kneel result is a single observation** and was not
+  predicted. It is reported because it sharpens the description of the failure,
+  not because one arm settles it.
 
 ## Files
 
@@ -201,6 +253,7 @@ makes a same-day answer possible and the part nobody counts.
 - [Pixel scores, complex subject](files/2026-09-18-h3-guide-video-control/h3-exp-011-pixel-scores.json)
 - [Pixel scores, ref_videos](files/2026-09-18-h3-guide-video-control/h3-exp-012-pixel-scores.json)
 - [The scoring script](files/2026-09-18-h3-guide-video-control/score_prop_transfer.py)
+- [Motion scores by body plan](files/2026-09-18-h3-guide-video-control/h3-exp-013-motion.json)
 - [The guide-render script](files/2026-09-18-h3-guide-video-control/render_vace_guide.py)
 
 Workflows are API-format and name local checkpoints; they are a starting point,

@@ -26,6 +26,9 @@ Updates to labs write-ups, in reverse chronological order.
   does, toward stillness. The prompt's own named object appears while the body
   follows the skeleton, which is the first direct test of advice the earlier
   write-up gave. The guide costs 42.5 minutes to produce, against a claimed two.
+  A scope check across three body plans — a woman, an automaton, and a
+  translucent vapor entity — finds the pose skeleton drives all three through
+  the same choreography while each stays what the prompt asked for.
 
 
 
