@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-09-19
+
+- [A reference video keeps a character across seeds](2026-09-19-h3-reference-video-consistency.html) — supplying a prior H3 render as `ref_videos` cuts seed-to-seed variation 82% and holds the reference's own character.
+
 ## 2026-09-18
 
 - New: [A guide video does not tell MiniMax H3 what to do](2026-09-18-h3-guide-video-control.html)

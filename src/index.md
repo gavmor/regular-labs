@@ -10,6 +10,8 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
+- [A reference video keeps a character across seeds](2026-09-19-h3-reference-video-consistency.html)
+
 One experiment each: what was asked, how it was measured, what it cost,
 and what the result does and does not support.
 

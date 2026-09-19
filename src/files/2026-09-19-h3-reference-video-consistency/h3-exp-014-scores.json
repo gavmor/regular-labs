@@ -1,0 +1,129 @@
+{
+  "noref": {
+    "seed_pairs": {
+      "s43_s44": 36.93,
+      "s43_s45": 33.67,
+      "s43_s46": 34.56,
+      "s44_s45": 21.41,
+      "s44_s46": 42.68,
+      "s45_s46": 28.89
+    },
+    "seed_variation": 33.02,
+    "motion_per_seed": {
+      "43": 0.45,
+      "44": 0.66,
+      "45": 0.54,
+      "46": 0.34
+    },
+    "motion": 0.5,
+    "motion_2dp": "0.50"
+  },
+  "ref": {
+    "seed_pairs": {
+      "s43_s44": 3.81,
+      "s43_s45": 5.58,
+      "s43_s46": 6.96,
+      "s44_s45": 5.46,
+      "s44_s46": 7.0,
+      "s45_s46": 7.27
+    },
+    "seed_variation": 6.01,
+    "motion_per_seed": {
+      "43": 1.45,
+      "44": 1.59,
+      "45": 2.46,
+      "46": 3.79
+    },
+    "motion": 2.32
+  },
+  "deltas": {
+    "seed_variation_change_pct": -81.8,
+    "motion_change_pct": 364.0
+  },
+  "distance_to_reference_clip": {
+    "noref": [
+      37.1,
+      18.68,
+      17.07,
+      33.27
+    ],
+    "ref": [
+      10.72,
+      9.82,
+      10.1,
+      5.01
+    ]
+  },
+  "reference_clip_own_motion": 4.91,
+  "verdict": "STABILISING and FAITHFUL -- reference arms match the reference's garment; confirmed by eye",
+  "garment_lower_rgb": {
+    "REFERENCE CLIP": [
+      98.0,
+      80.8,
+      77.8
+    ],
+    "noref_s43": [
+      121.0,
+      106.4,
+      105.1
+    ],
+    "noref_s44": [
+      104.6,
+      90.1,
+      85.3
+    ],
+    "noref_s45": [
+      106.6,
+      93.4,
+      87.3
+    ],
+    "noref_s46": [
+      84.9,
+      79.8,
+      70.7
+    ],
+    "ref_s43": [
+      100.1,
+      73.5,
+      70.2
+    ],
+    "ref_s44": [
+      101.1,
+      73.9,
+      70.6
+    ],
+    "ref_s45": [
+      97.7,
+      75.0,
+      71.4
+    ],
+    "ref_s46": [
+      95.2,
+      75.5,
+      71.3
+    ]
+  },
+  "distance_to_reference_clip_mean": {
+    "noref": 26.53,
+    "ref": 8.91
+  },
+  "garment_lower_rgb_r_minus_b": {
+    "ref_arms": [
+      29.9,
+      30.4,
+      26.3,
+      23.9
+    ],
+    "noref_arms": [
+      15.9,
+      19.3,
+      19.4,
+      14.2
+    ]
+  },
+  "context_from_prior_experiments": {
+    "exp012_ref_videos_seed_floor": 7.16,
+    "exp012_shot_tokens": 82041,
+    "note": "exp-012 used a FOREIGN reference (Wan render of a different subject)."
+  }
+}

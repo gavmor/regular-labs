@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 SRC = "/home/user/code/regular-labs"
-SLUG = "2026-09-18-h3-guide-video-control"
+SLUG = "2026-09-19-h3-reference-video-consistency"
 MD = f"{SRC}/src/{SLUG}.md"
 HTML = f"{SRC}/site/{SLUG}.html"
 
@@ -78,10 +78,9 @@ data = ""
 for f in os.listdir(f"{SRC}/src/files/{SLUG}"):
     if f.endswith(".json"):
         data += open(f"{SRC}/src/files/{SLUG}/{f}").read()
-for n in ["11.38", "17.3", "25.59", "21.69", "10.82", "17.09", "29.0", "21.84",
-          "7.16", "25.39", "25.54",
-          "8.83", "3.91", "6.93", "4.3", "4.26", "1.2", "2.26", "1.61", "3.55",
-          "1.32", "2.96", "2.39", "2.33", "1.01", "1.28"]:
+for n in ["33.02","6.01","0.50","2.32","26.53","8.91","4.91","81.8","364",
+          "3.81","7.27","21.41","42.68","0.34","0.66","1.45","3.79",
+          "23.9","30.4","14.2","19.4","7.16","82041"]:
     if n not in data:
         fails.append(f"prose number {n} not found in committed data files")
 
