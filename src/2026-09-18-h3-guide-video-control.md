@@ -1,7 +1,7 @@
 # A guide video does not tell MiniMax H3 what to do
 
 *Status: complete. Both of H3's video inputs tested at two seeds; three body
-plans at one. A VACE-rendered guide containing a briefcase and a tripod
+plans, the automaton at two seeds and the other two at one. A VACE-rendered guide containing a briefcase and a tripod
 transfers neither the objects nor the action through either input. A pose
 skeleton transfers the action — to a human, a machine, or a cloud of vapor
 alike — and the prompt supplies the objects.*
@@ -166,24 +166,23 @@ second apart — confirms the pattern holds per body plan:
 Absolute values are not comparable across subjects — mist displaces fewer
 pixels than a velvet dress whatever it does — but the within-subject ratio is.
 
-These are clip averages, and the shape behind them differs. The woman's guided
-arm is flat throughout (2.39 in the first third, 2.33 in the last); the
-automaton's is back-loaded, rising from 1.32 to 2.96. A low average means the
-subject is not performing the guide's action — not that it is frozen.
+These are clip averages, and a low average means the subject is not performing
+the guide's action — not that it is frozen. The shape behind the average is not
+stable across seeds: the automaton's guided arm rises from 1.32 to 2.96 across
+one clip and holds flat at 1.01 to 1.28 at the next seed. Only the gap between
+controls replicates.
 
 ### A pose is not an action
 
-The automaton's guided arm shows what the guide does transmit. Where the other
-guided subjects stand, it **kneels**, one knee down — and it is kneeling in the
-first frame and still kneeling in the last. It never kneels *down*.
+The automaton shows what the guide does transmit, because the two controls
+split cleanly on it. Under the pose skeleton it walks on camera, kneels, works
+at something on the ground, and walks off — the guide's whole action. Under the
+guide itself it is kneeling in the first frame and still kneeling in the last.
+It never kneels *down*.
 
-The guide's figure walks in, kneels, opens a case and extracts a tripod. What
-reaches the output is the kneel as a standing condition, with none of the
-movement that produced it. The guide transfers a *pose*; the action does not
-survive the trip.
-
-One arm at one seed. The claim it supports is narrow and stated as such: a
-posture can cross where a movement does not.
+Both hold at two seeds. What crosses is the kneel as a standing condition, with
+none of the movement that produced it: the guide transfers a *pose*, and the
+action does not survive the trip.
 
 ## Who was right
 
@@ -255,12 +254,12 @@ answer took a day.
   a different procedure and would deserve its own test.
 - **VACE 1.3B, upscaled from 832x480.** The 14B model and a natively
   full-resolution guide are both untested.
-- **Three body plans at one seed each.** Three points, not a survey of what H3
-  will accept as a body. A marginal reading would need the seed replicate the
-  human arms have.
-- **The pose-without-action reading rests on one arm at one seed.** It is
-  reported because it distinguishes two failure modes that look alike in a
-  still, not because one arm settles which one dominates.
+- **Three body plans, only one of them replicated.** The automaton ran at two
+  seeds; the woman and the vapor entity at one. Three points, not a survey of
+  what H3 will accept as a body.
+- **The pose-without-action reading rests on one subject at two seeds.** The
+  automaton is the only arm where a guided subject adopts a posture at all, so
+  the distinction it draws is not yet known to generalise.
 
 ## Files
 

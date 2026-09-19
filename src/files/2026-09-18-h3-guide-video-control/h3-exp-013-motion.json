@@ -7,5 +7,9 @@
   "ghost_echo_vace": 1.2,
   "human_scrappy_skeleton_over_vace": 2.26,
   "hull_skeleton_over_vace": 1.61,
-  "ghost_echo_skeleton_over_vace": 3.55
+  "ghost_echo_skeleton_over_vace": 3.55,
+  "hull_skeleton_s44": 4.86,
+  "hull_vace_s44": 1.08,
+  "hull_vace_s44_first_third": 1.01,
+  "hull_vace_s44_last_third": 1.28
 }
