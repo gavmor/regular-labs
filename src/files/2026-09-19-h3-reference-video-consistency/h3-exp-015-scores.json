@@ -1,0 +1,107 @@
+{
+  "distance_to_reference_clip_2dp": {
+    "skel_noref": ["14.10", "18.20", "14.99", "17.48"],
+    "skel_ref": ["4.80", "26.54", "4.34", "4.15"]
+  },
+  "skel_noref": {
+    "seed_pairs": {
+      "s43_s44": 17.99,
+      "s43_s45": 14.95,
+      "s43_s46": 16.97,
+      "s44_s45": 19.01,
+      "s44_s46": 21.67,
+      "s45_s46": 16.26
+    },
+    "seed_variation": 17.81,
+    "motion_per_seed": {
+      "43": 3.41,
+      "44": 4.23,
+      "45": 4.3,
+      "46": 3.44
+    },
+    "motion": 3.85
+  },
+  "skel_ref": {
+    "seed_pairs": {
+      "s43_s44": 22.44,
+      "s43_s45": 2.56,
+      "s43_s46": 2.61,
+      "s44_s45": 22.82,
+      "s44_s46": 23.22,
+      "s45_s46": 1.81
+    },
+    "seed_variation": 12.58,
+    "motion_per_seed": {
+      "43": 3.99,
+      "44": 3.75,
+      "45": 4.09,
+      "46": 4.12
+    },
+    "motion": 3.99
+  },
+  "deltas": {
+    "motion_change_pct": 3.6,
+    "seed_variation_change_pct": -29.4
+  },
+  "brightness": {
+    "clip_mean_luma": {
+      "ref_s43": 79.0,
+      "ref_s44": 56.7,
+      "ref_s45": 79.0,
+      "ref_s46": 79.3
+    },
+    "note": "ref_s44 renders ~28% darker than its siblings. Geometry, wall line, motion centroid and garment hue ratio all match; the difference is exposure."
+  },
+  "brightness_normalised": {
+    "skel_noref": 24.58,
+    "skel_ref": 7.91,
+    "pairs_noref": {
+      "s43_s44": 22.68,
+      "s43_s45": 22.73,
+      "s43_s46": 26.12,
+      "s44_s45": 25.51,
+      "s44_s46": 29.1,
+      "s45_s46": 21.33
+    },
+    "pairs_ref": {
+      "s43_s44": 10.83,
+      "s43_s45": 4.18,
+      "s43_s46": 4.3,
+      "s44_s45": 12.5,
+      "s44_s46": 12.66,
+      "s45_s46": 3.01
+    },
+    "seed_variation_change_pct": -67.8,
+    "note": "Normalising per-clip brightness drops s44's pairwise distances from ~23 to ~12 but not to the ~3-4 of the other three, so exposure explains roughly half of its divergence, not all."
+  },
+  "garment_r_minus_b": {
+    "skel_noref_s43": 19.3,
+    "skel_noref_s44": 18.6,
+    "skel_noref_s45": 25.2,
+    "skel_noref_s46": 20.1,
+    "skel_ref_s43": 23.6,
+    "skel_ref_s44": 23.9,
+    "skel_ref_s45": 23.7,
+    "skel_ref_s46": 23.5
+  },
+  "distance_to_reference_clip": {
+    "skel_noref": [
+      14.1,
+      18.2,
+      14.99,
+      17.48
+    ],
+    "skel_ref": [
+      4.8,
+      26.54,
+      4.34,
+      4.15
+    ]
+  },
+  "verdict": "PRESERVES (registered rule): motion +3.6%, inside the 25% band. Seed variation falls 29.4% raw, 67.8% brightness-normalised.",
+  "ruled_out_for_s44": {
+    "temporal_shift": "best alignment offset is 0 frames; no improvement",
+    "spatial_shift": "best dx/dy is 0/0; 0% improvement",
+    "framing": "motion centroid x identical to 0.2px across all four"
+  }
+}
