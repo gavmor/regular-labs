@@ -172,6 +172,17 @@ p code, li code { background: var(--bg-nav); padding: 0.1em 0.35em; border-radiu
 a { color: var(--text); text-decoration-color: var(--text-faint); }
 a:hover { color: var(--text); text-decoration-color: var(--text); }
 
+/* Images size to the column, never past it. Figure grids and frame strips
+   here run up to 2520px wide; without this they set the page width and the
+   whole document side-scrolls on a phone. height:auto keeps the aspect
+   ratio once max-width takes over. */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem 0;
+}
+
 blockquote {
   margin: 0 0 2rem;
   padding: 0.1rem 0 0.1rem 1.25rem;
@@ -263,6 +274,15 @@ em.verdict {
   main { padding: 4rem 1.25rem 3rem; max-width: none; }
   table { display: block; overflow-x: auto; }
   main code { overflow-wrap: anywhere; }
+  /* A 2520x708 frame strip scaled to 340px is 96px tall and unreadable.
+     Let the very wide ones keep usable height and scroll sideways inside
+     their own box, so the page itself still does not side-scroll. */
+  main p:has(> img) {
+    overflow-x: auto;
+    text-indent: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  main p:has(> img) img { max-width: none; min-width: 100%; width: auto; max-height: 45vh; }
   @media (prefers-reduced-motion: reduce) {
     nav, .nav-overlay, .nav-toggle-label span { transition: none; }
   }
