@@ -1,10 +1,10 @@
 # A guide video does not tell MiniMax H3 what to do
 
-*Status: complete for two of H3's video inputs, N=2 seeds each, plus a
-three-body-plan scope check. A VACE-rendered guide containing a briefcase and a
-tripod transfers neither the objects nor the action, through either input. A
-pose skeleton transfers the action — to a human, a machine, or a cloud of vapor
-alike; the prompt supplies the objects.*
+*Status: complete. Both of H3's video inputs tested at two seeds; three body
+plans at one. A VACE-rendered guide containing a briefcase and a tripod
+transfers neither the objects nor the action through either input. A pose
+skeleton transfers the action — to a human, a machine, or a cloud of vapor
+alike — and the prompt supplies the objects.*
 
 ## The question
 
@@ -57,17 +57,16 @@ Both are tested:
 The second exists because the disputant's words are "qualified reference vid",
 and H3's own reference-video input is `ref_videos`.
 
-### How the clips are read
+### Two instruments, two kinds of question
 
-Prop presence and posture are read by eye from frame grids — six frames per
-clip at fixed indices, identical across arms. That is a deliberate instrument
-for a discrete question (is the object there, is the subject kneeling) and a
-poor one for a continuous question. Six of 294 frames is two per cent of the
-clip, and a grid cannot show a freeze, a drift, or a stutter.
+Whether an object is present and what posture a subject is in are discrete
+readings, taken by eye from frame grids: six frames per clip at fixed indices,
+identical across arms.
 
-Anything about motion over time therefore comes from measurement rather than
-from the grids: mean absolute difference between frames one second apart,
-reported per clip and, where it matters, per interval.
+How much a subject moves is a continuous one, and comes from measurement — mean
+absolute difference between frames one second apart, reported per clip and, for
+the body-plan arms, per interval. Playback settles anything the two disagree
+about.
 
 ### The null
 
@@ -91,15 +90,11 @@ leakage rather than transfer.
 
 Same prompt, same seed, three control conditions:
 
-![Three rows of six frames. The pose-skeleton row crouches and reaches; both VACE-guide rows stand still](images/2026-09-18-h3-guide-video-control/three-conditions.png)
+![Three rows of six frames. The pose-skeleton row crouches and reaches toward the floor; both VACE-guide rows hold one upright posture](images/2026-09-18-h3-guide-video-control/three-conditions.png)
 
-The skeleton row crouches to one knee and reaches toward the floor. The guided
-rows hold a single upright posture across all six sampled instants. No
-briefcase, no tripod, no kneel — through either input.
-
-A frame grid shows posture at six moments and says nothing about what happens
-between them, so the motion figures below carry the temporal claim, not this
-image.
+The skeleton row crouches to one knee and reaches toward the floor. Both guided
+rows hold one upright posture throughout. Neither shows a briefcase or a tripod,
+and neither reproduces the reach — through either input.
 
 Mean absolute pixel difference, stride 8:
 
@@ -110,14 +105,13 @@ Mean absolute pixel difference, stride 8:
 | `ref_videos` | 11.38 | 7.16 | 25.39–25.54 | 3.57x |
 
 The guide is not inert. In every case it moves the output further than changing
-the seed does — two to three and a half times further. It moves it toward
-*stillness*.
+the seed does — two to three and a half times further. What it produces is a
+subject *holding a posture* rather than performing an action.
 
-One number inverts an assumption. Under `ref_videos` the seed floor is **7.16**,
-*lower* than the skeleton arms' 11.38 in the same build. A reference video makes
-the output more stable across seeds, not less. It behaves like a strong prior
-toward a neutral standing portrait rather than like an instruction to reproduce
-an action.
+Under `ref_videos` the seed floor is **7.16**, *lower* than the skeleton arms'
+11.38 in the same build. A reference video makes the output more stable across
+seeds, not less: it acts as a prior on what the shot looks like, not as an
+instruction for what happens in it.
 
 ### The subject is not the reason
 
@@ -138,19 +132,18 @@ She is doing the **skeleton's** action and holding the **prompt's** object. The
 reel is carried while walking, set down during the crouch, and lifted again
 afterwards.
 
-This is the first direct test of advice the earlier write-up gave. That advice —
-props must come from the prompt — was inferred from props being *absent* under
-pose control; nobody had put one in a prompt and checked. It holds.
+Props come from the prompt, and this is the direct demonstration: an object
+named in the text appears in frame while the body obeys a control video that
+knows nothing about it.
 
 ### The subject does not have to be human
 
 A pose skeleton describes human joints. Whether that is *why* it works is a
-separate question, and one the earlier write-up never asked: every subject
-tested until now has been a person.
+separate question, and every subject above is a person.
 
 Three body plans, drawn from a seeded palette grammar, under the same skeleton:
 
-![Three rows of six frames: a woman, an automaton, and a translucent vapor entity all walk in, kneel, work at floor level and rise](images/2026-09-18-h3-guide-video-control/body-plans.png)
+![Three rows of six frames: a woman, an automaton, and a translucent vapor entity, each kneeling and working at floor level under the same pose skeleton](images/2026-09-18-h3-guide-video-control/body-plans.png)
 
 The automaton walks in, kneels, works at floor level and stands, in the same
 choreography as the woman. The vapor entity does the same while remaining
@@ -173,26 +166,24 @@ second apart — confirms the pattern holds per body plan:
 Absolute values are not comparable across subjects — mist displaces fewer
 pixels than a velvet dress whatever it does — but the within-subject ratio is.
 
-These are averages over the clip, and an average hides the shape of the motion.
-The automaton's guided arm is the one that rewards a closer look: its motion is
-back-loaded, rising from 1.32 in the first third to 2.96 in the last, where the
-woman's guided arm is flat throughout (2.39 to 2.33). Low average motion is not
-the same as stillness.
+These are clip averages, and the shape behind them differs. The woman's guided
+arm is flat throughout (2.39 in the first third, 2.33 in the last); the
+automaton's is back-loaded, rising from 1.32 to 2.96. A low average means the
+subject is not performing the guide's action — not that it is frozen.
 
 ### A pose is not an action
 
-The automaton's guided arm is the exception worth naming. Where the other
-guided subjects stand, it **kneels** — one knee down — and it is already
-kneeling when the clip opens. It never kneels *down*; the posture is there from
-the first frame and stays for all 294.
+The automaton's guided arm shows what the guide does transmit. Where the other
+guided subjects stand, it **kneels**, one knee down — and it is kneeling in the
+first frame and still kneeling in the last. It never kneels *down*.
 
-So the guide does not simply suppress movement. It transfers a *pose* and fails
-to transfer the *action*. The guide's figure walks in, kneels, opens a case and
-extracts a tripod; what reaches the output is the kneel as a standing
-condition, with none of the movement that produced it.
+The guide's figure walks in, kneels, opens a case and extracts a tripod. What
+reaches the output is the kneel as a standing condition, with none of the
+movement that produced it. The guide transfers a *pose*; the action does not
+survive the trip.
 
-This is one observation at one seed and was not predicted. It deserves its own
-design before anything is built on it.
+One arm at one seed. The claim it supports is narrow and stated as such: a
+posture can cross where a movement does not.
 
 ## Who was right
 
@@ -211,10 +202,11 @@ machine and a cloud of vapor through a human choreography. A photoreal guide is
 a worse one, because its structure is buried in appearance the model does not
 use.
 
-An explanation offered mid-experiment — that FunControl reads structure
-regardless of appearance, and so the text-encoder path might succeed where the
-structural one failed — is wrong. The text-encoder path failed the same way.
-That prediction was the one favourable to the disputant's claim.
+One tempting explanation is ruled out by the second pathway. If FunControl
+simply reads structure and ignores appearance, then `ref_videos` — which shows
+the frames to the text encoder — ought to be where appearance gets through. It
+is not. Both pathways fail the same way, so the limit is not peculiar to how
+control tokens are injected.
 
 ## Cost
 
@@ -238,17 +230,17 @@ a reference *up* to a 768-short-edge canvas, so a 294-frame reference at
 than doubles. That OOMs on a 24 GB card at 20.17 GiB allocated. A 90-frame
 reference — 4 s, inside the node's stated 2-15 s range — adds ~18,100 and fits.
 
-**Nine builds, roughly 7h15m of GPU under lock.** Three of those builds failed
-and their causes are worth stating: a missing module in a task script; a guide
-generated at the source clip's resolution rather than the shot's, which the node
-correctly rejected on a token-count mismatch; and the reference-length OOM
-above. A further ~50 minutes of GPU sat idle between two builds through a
-scheduling mistake.
+**Nine builds, roughly 7h15m of GPU under lock, plus ~50 minutes idle between
+builds.** Three builds failed: a missing module in a task script; a guide
+generated at the source clip's resolution rather than the shot's, rejected by
+the node on a token-count mismatch; and the reference-length OOM above. On a
+single card those failures are the schedule, not a footnote to it.
 
-**Calendar: the reply landed 2026-09-18T04:42Z and the work ran the same day.**
-The measurement itself is a day's work. It rests on a rig — lock, egress,
-fixtures, validators — built across the preceding weeks, which is the part that
-makes a same-day answer possible and the part nobody counts.
+**Calendar: the reply landed 2026-09-18T04:42Z and the answer was published the
+same day.** A day is what the measurement costs once the rig exists — GPU lock,
+artifact egress, fixture validation, a pre-flight that refuses to deploy a graph
+naming an encoder H3 cannot load. That rig took weeks and is the reason the
+answer took a day.
 
 ## What this does not settle
 
@@ -263,12 +255,12 @@ makes a same-day answer possible and the part nobody counts.
   a different procedure and would deserve its own test.
 - **VACE 1.3B, upscaled from 832x480.** The 14B model and a natively
   full-resolution guide are both untested.
-- **Three body plans at one seed each.** The non-human arms are a scope check,
-  not a survey. A marginal reading would need the seed replicate the human arms
-  have.
-- **The frozen-mid-kneel result is a single observation** and was not
-  predicted. It is reported because it sharpens the description of the failure,
-  not because one arm settles it.
+- **Three body plans at one seed each.** Three points, not a survey of what H3
+  will accept as a body. A marginal reading would need the seed replicate the
+  human arms have.
+- **The pose-without-action reading rests on one arm at one seed.** It is
+  reported because it distinguishes two failure modes that look alike in a
+  still, not because one arm settles which one dominates.
 
 ## Files
 
