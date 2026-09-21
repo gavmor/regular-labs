@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
+- [Single-pass text-to-image charref sheets fail full-body framing and scale consistency](2026-09-21-qwen-charref-composite-t2i.html)
 - [Pose landmarks and face detection cannot classify charref view angles from stylized renders](2026-09-20-charref-view-classification-ceiling.html)
 - [A reference video keeps a character across seeds](2026-09-19-h3-reference-video-consistency.html)
 

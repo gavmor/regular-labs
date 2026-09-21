@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-09-21
+
+- [Single-pass text-to-image charref sheets fail full-body framing and scale consistency](2026-09-21-qwen-charref-composite-t2i.html) — 4-view character reference sheets render across 44 alters in 45s each via Qwen Image 2.1 DiT, but prompt-only T2I suffers camera distance drift, dwarfism, and edge cropping.
+
 ## 2026-09-19
 
 - [A reference video keeps a character across seeds](2026-09-19-h3-reference-video-consistency.html) — supplying a prior H3 render as `ref_videos` cuts seed-to-seed variation 82% and holds the reference's own character.
