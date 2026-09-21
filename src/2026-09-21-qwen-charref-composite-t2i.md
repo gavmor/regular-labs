@@ -57,7 +57,11 @@ However, framing and scale consistency fails human eyeball review across three d
 
 ## What the renders show
 
-Qwen Image 2.1 resolves the multi-view quadrant layout reliably in a single 45-second forward pass without reference images, solving the view-angle classification and clip-stitching bottlenecks that burdened the H3 pipeline.
+![Bar chart comparing view classification and placement accuracy between Qwen Image 2.1 direct layout (100% across all views) and H3 turnaround extraction via MediaPipe pose (52% rear ceiling) and face detection (87% close-up, 16% front).](images/2026-09-21-qwen-charref-composite-t2i/view-reliability-comparison.png)
+
+Qwen Image 2.1 resolves the multi-view quadrant layout reliably in a single 45-second forward pass without reference images, solving the view-angle classification and clip-stitching bottlenecks that burdened the H3 pipeline. In exp-018, post-hoc computer vision signals failed to classify H3 turnaround frames reliably: MediaPipe pose geometry hit a 52% accuracy ceiling on rear views (front and rear silhouettes are geometrically indistinguishable in stylized renders) and 0% on close-ups (landmarks are invariant to crop). In contrast, direct prompt quadrant layout achieves 100% view compliance across all 44 alters without any downstream classification step.
+
+![Bar chart comparing the three pre-registered exit criteria between Qwen Image 2.1 and the H3 turnaround pipeline. Qwen passes view placement (100%) and costume coherence (100%), but fails framing and scale consistency (93.2% alter pass rate, 3 defect classes). H3 passes framing consistency (100%) and costume coherence (100%), but fails view separation (56.5%). Both pipelines fail the overall exit criteria.](images/2026-09-21-qwen-charref-composite-t2i/exit-review-tradeoff.png)
 
 However, text prompting alone provides no bounding-box or camera-distance guarantees. When the diffusion model reconciles full-body framing within a single quadrant, camera distance wanders between panels, resulting in scale mismatches, shin truncation, or vertically compressed anatomy. Out of the box, prompt-only composite T2I is not reliable enough to replace multi-clip turnarounds.
 
@@ -71,8 +75,10 @@ It does not test step counts beyond 40 or alternative canvas resolutions.
 
 ## Cost
 
-- **Compute:** 44 renders in 34m 17s = ~46.7s per composite image on an NVIDIA RTX 3090 under Concourse `gpu-lock`. Total GPU execution across smoke test, seed sweep, and batch is 39m 34s.
-- **Peak VRAM:** ~14.0 GiB (58% of 24 GB capacity, 10 GB headroom).
+![Two bar charts: single-pass Qwen Image 2.1 renders in 46.7 seconds against 105.0 seconds for H3 video turnaround and extraction (55% latency reduction); peak VRAM is 14.0 GiB on Qwen against 22.4 GiB on H3 (8.4 GiB headroom freed on RTX 3090).](images/2026-09-21-qwen-charref-composite-t2i/performance-cost-comparison.png)
+
+- **Compute:** 44 renders in 34m 17s = ~46.7s per composite image on an NVIDIA RTX 3090 under Concourse `gpu-lock`. By comparison, the H3 video turnaround pipeline averages ~105s per character sheet (~88.5s for the 107-frame T2VA clip plus ~16.5s for cut detection, still extraction, and ImageMagick montage assembly). Single-pass T2I cuts latency by 55% (2.25× speedup).
+- **Peak VRAM:** ~14.0 GiB (58% of 24 GB capacity, 10.0 GiB headroom). In contrast, H3 video diffusion peaks at ~22.4 GiB (93% of capacity, a tight 1.6 GiB margin).
 - **Calendar time from the original ask:** 1 day (ask: 2026-09-20, result: 2026-09-21).
 - **Active build span:** Approximately 5 hours across two sessions.
 - **Wasted builds:** Build #7 prompt included halftone/litho styling tokens that burned diffusion capacity on paper grain artifacts instead of photographic wardrobe detail, requiring prompt refinement.
