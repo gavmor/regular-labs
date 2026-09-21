@@ -108,8 +108,10 @@ Failed and wasted builds belong here with their causes.
 
 ## Files
 
-Workflows, data, scripts. If the graphs are API-format or name local
-checkpoints, say so plainly rather than implying drag-and-drop.
+Workflows, data, scripts. Every generative or pipeline experiment must include
+a direct download link to the workflow file(s) in `files/YYYY-MM-DD-slug/`.
+If the graphs are API-format or name local checkpoints, say so plainly rather
+than implying drag-and-drop.
 ```
 
 ---
@@ -118,6 +120,8 @@ checkpoints, say so plainly rather than implying drag-and-drop.
 
 - [ ] Every claim in the prose matches the figure it sits next to — counts,
       labels, axis units. Count *arms* and *variants* separately and say which.
+- [ ] Workflow download link included under `## Files` (staged in `src/files/<slug>/`)
+      for any generative/pipeline experiment
 - [ ] `pnpm run build` clean; internal links and assets resolve; entry appears
       in `feed.xml`
 - [ ] Listed under `## Reports` in `src/index.md` (journal entries go under

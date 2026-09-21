@@ -1,0 +1,68 @@
+{
+  "1": {
+    "_meta": { "title": "Load Diffusion Model" },
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "qwen_image_2.1_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "_meta": { "title": "Load CLIP (Text Encoder)" },
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_8b_int8_convrot.safetensors",
+      "type": "qwen_image",
+      "device": "default"
+    }
+  },
+  "3": {
+    "_meta": { "title": "Load VAE" },
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_2.1_vae_bf16.safetensors"
+    }
+  },
+  "4": {
+    "_meta": { "title": "Text Encode Qwen Image 2.1" },
+    "class_type": "TextEncodeQwenImage21",
+    "inputs": {
+      "clip": ["2", 0],
+      "prompt": "Character reference sheet, four panels arranged in a single composite image: close-up portrait (top left), front view full body (top right), rear view full body (bottom left), side profile full body (bottom right). Character: Hull — a decadent chrome automaton, filigree-inlaid plate carapace, art nouveau joint covers, brass and verdigris accent trim, elongated elegant proportions. Dunmanifestin setting. Halftone printing register, litho ink, period adventurer publication.",
+      "negative_prompt": "",
+      "resolution": 1024
+    }
+  },
+  "7": {
+    "_meta": { "title": "KSampler" },
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "steps": 40,
+      "cfg": 5.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": ["1", 0],
+      "positive": ["4", 0],
+      "negative": ["4", 1],
+      "latent_image": ["4", 2]
+    }
+  },
+  "8": {
+    "_meta": { "title": "VAE Decode" },
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["7", 0],
+      "vae": ["3", 0]
+    }
+  },
+  "9": {
+    "_meta": { "title": "Save Image" },
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "exp019/hull_decadent_charref_t2i",
+      "images": ["8", 0]
+    }
+  }
+}

@@ -79,8 +79,11 @@ It does not test step counts beyond 40 or alternative canvas resolutions.
 
 ## Files
 
+- [`qwen-charref-t2i.api.json`](files/2026-09-21-qwen-charref-composite-t2i/qwen-charref-t2i.api.json) — the ComfyUI API-format generation graph.
+- [`build_qwen_charref_manifest.py`](files/2026-09-21-qwen-charref-composite-t2i/build_qwen_charref_manifest.py) — Dunmanifestin palette manifest generator for the 44 core alters.
 - Pre-registration doc: `docs/experiments/qwen-image-21-charref-composite-t2i.md` in `gavmor/comfyui-workflows`.
 - Experiment metadata: `EXPERIMENT-019.yml` in `gavmor/comfyui-workflows`.
 - Concourse pipeline: `concourse/exp-019-qwen-charref-t2i.yml`.
-- Manifest generator: `projects/blades68/scripts/build_qwen_charref_manifest.py`.
 - Egress assets: Immich album `exp-019 Qwen Image 2.1 charref T2I` (48 assets total).
+
+Workflows are API-format and name local checkpoints (`qwen_image_2.1_int8_convrot.safetensors`, `qwen3vl_8b_int8_convrot.safetensors`, `qwen_image_2.1_vae_bf16.safetensors`); they are a starting point, not drag-and-drop.

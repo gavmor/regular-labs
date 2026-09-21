@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 SRC = "/home/user/code/regular-labs"
-SLUG = "2026-09-19-h3-reference-video-consistency"
+SLUG = sys.argv[1] if len(sys.argv) > 1 else "2026-09-19-h3-reference-video-consistency"
 MD = f"{SRC}/src/{SLUG}.md"
 HTML = f"{SRC}/site/{SLUG}.html"
 
@@ -32,7 +32,7 @@ for pat in BANNED:
 
 # --- required sections ----------------------------------------------------
 for heading in ["## The question", "## Method", "## Results", "## Cost",
-                "## What this does not settle"]:
+                "## What this does not settle", "## Files"]:
     if heading not in text:
         fails.append(f"missing section: {heading}")
 
@@ -46,8 +46,15 @@ lim = text.split("## What this does not settle", 1)[-1].split("##", 1)[0]
 if len(lim.strip()) < 200:
     warns.append("limitations section is very short")
 
+# --- generative/pipeline reports must link to a downloadable workflow -----
+if re.search(r"\b(?:comfyui|diffusion|t2i|turnaround)\b", text, re.I) and "## Files" in text:
+    files_sec = text.split("## Files", 1)[-1]
+    if not re.search(rf"files/{SLUG}/[^\s)]+\.(?:json|api\.json|py)", files_sec):
+        fails.append("generative report missing downloadable workflow/script link in ## Files")
+
 # --- build, then resolve every asset and internal link -------------------
-subprocess.run(["pnpm", "run", "build"], cwd=SRC, capture_output=True, check=True)
+env = dict(os.environ, PATH=f"/home/user/.local/share/pnpm:/home/user/.local/share/mise/shims:{os.environ.get('PATH', '')}")
+subprocess.run(["pnpm", "run", "build"], cwd=SRC, capture_output=True, check=True, env=env)
 if not os.path.exists(HTML):
     fails.append(f"built page missing: {HTML}")
 else:
@@ -74,18 +81,19 @@ if SLUG not in feed:
     fails.append("not present in feed.xml")
 
 # --- numbers in prose must appear in the committed data ------------------
-data = ""
-for f in os.listdir(f"{SRC}/src/files/{SLUG}"):
-    if f.endswith(".json"):
-        data += open(f"{SRC}/src/files/{SLUG}/{f}").read()
-for n in ["33.02","6.01","0.50","2.32","26.53","8.91","4.91","81.8","364",
-          "3.81","7.27","21.41","42.68","0.34","0.66","1.45","3.79",
-          "23.9","30.4","14.2","19.4","7.16","82041",
-          "3.85","3.99","17.81","12.58","24.58","7.91","67.8","29.4","3.6",
-          "1.81","2.56","2.61","22.44","22.82","23.22","56.7","79.0","79.3",
-          "14.95","21.67","23.5","23.7","4.15","4.80","14.10","18.20","0.2"]:
-    if n not in data:
-        fails.append(f"prose number {n} not found in committed data files")
+if SLUG == "2026-09-19-h3-reference-video-consistency" and os.path.exists(f"{SRC}/src/files/{SLUG}"):
+    data = ""
+    for f in os.listdir(f"{SRC}/src/files/{SLUG}"):
+        if f.endswith(".json"):
+            data += open(f"{SRC}/src/files/{SLUG}/{f}").read()
+    for n in ["33.02","6.01","0.50","2.32","26.53","8.91","4.91","81.8","364",
+              "3.81","7.27","21.41","42.68","0.34","0.66","1.45","3.79",
+              "23.9","30.4","14.2","19.4","7.16","82041",
+              "3.85","3.99","17.81","12.58","24.58","7.91","67.8","29.4","3.6",
+              "1.81","2.56","2.61","22.44","22.82","23.22","56.7","79.0","79.3",
+              "14.95","21.67","23.5","23.7","4.15","4.80","14.10","18.20","0.2"]:
+        if n not in data:
+            fails.append(f"prose number {n} not found in committed data files")
 
 for w in warns:
     print("WARN ", w)
