@@ -39,11 +39,21 @@ Execution proceeds in three stages: an N=1 smoke test (seed 42, Build #6), an N=
 
 View compliance and costume coherence hold across the entire roster: all 44 sheets position the closeup portrait top-left, front full-body top-right, rear full-body bottom-left, and side profile bottom-right. Automaton brass filigree, bespoke garments, and non-human silhouettes translate reliably across all four perspectives within each image.
 
+![Four-panel character reference sheet for the Hull alter (decadent tone). Top-left close-up portrait, top-right front full-body, bottom-left rear full-body, bottom-right side profile. Polished chrome plating, brass filigree, and amber optic sensors remain coherent across all views with consistent camera distance and full-body clearance.](images/2026-09-21-qwen-charref-composite-t2i/playbook02_hull_male_decadent.png)
+
 However, framing and scale consistency fails human eyeball review across three distinct defects:
 
 1. **Dwarfism:** `playbook05_paranormalist_male_scrappy.png` renders full-body figures with compressed, dwarfish anatomical proportions rather than natural human proportions.
+
+![Four-panel character sheet for the Paranormalist alter (scrappy tone). All three full-body panels render the subject with compressed, dwarfish proportions — an oversized head on a squat torso with shortened legs.](images/2026-09-21-qwen-charref-composite-t2i/playbook05_paranormalist_male_scrappy.png)
+
 2. **Inter-panel camera distance mismatch:** `playbook03_intellectual_male_decadent.png` frames the fourth panel (side profile) from a closer camera distance than the adjacent front and rear panels, vertically compressing the figure into dwarfish proportions to fit the panel bounds.
-3. **Edge cropping:** `playbook01_hound_male_scrappy.png` fails full-body framing bounds, cropping the character at the shins.
+
+![Four-panel character sheet for the Intellectual alter (decadent tone). The front and rear full-body panels maintain consistent distance and clearance, but the bottom-right side profile camera zooms in closer, compressing the figure vertically to fit the panel bounds.](images/2026-09-21-qwen-charref-composite-t2i/playbook03_intellectual_male_decadent.png)
+
+3. **Edge cropping:** `playbook01_hound_male_scrappy.png` fails full-body framing bounds, cropping the character at the shins and thighs.
+
+![Four-panel character sheet for the Hound alter (scrappy tone). The top-right front view is complete down to the shoes, but the bottom-left rear view crops at the shins, and the bottom-right side profile crops at mid-thigh.](images/2026-09-21-qwen-charref-composite-t2i/playbook01_hound_male_scrappy.png)
 
 ## What the renders show
 
