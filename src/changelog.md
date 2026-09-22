@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-09-22
+
+- [Vertical panel aspect ratios solve boundary cropping but leave prompt-only character anatomy compressed](2026-09-22-qwen-charref-aspect-ratio.html) — 2:3 vertical panels eliminate boundary edge-clipping and inter-panel zoom drift in Qwen Image 2.1 character reference sheets, but prompt-only T2I leaves skeletal proportions compressed (~27% leg-to-height ratio).
+
 ## 2026-09-21
 
 - [Single-pass text-to-image charref sheets fail full-body framing and scale consistency](2026-09-21-qwen-charref-composite-t2i.html) — 4-view character reference sheets render across 44 alters in 45s each via Qwen Image 2.1 DiT, but prompt-only T2I suffers camera distance drift, dwarfism, and edge cropping.
