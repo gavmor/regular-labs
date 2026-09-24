@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-09-24
+
+- [INT8 quantization moves YuE2's output about as much as changing the seed](2026-09-24-yue2-bf16-vs-convrot.html) — YuE2 3B at INT8 ConvRot differs from BF16 by 13.45 dB log-spectral L1, against 12.29 dB for merely changing the seed on the same model: a 1.09× ratio, not a distinguishable quality effect at N=1.
+
 ## 2026-09-22
 
 - [Vertical panel aspect ratios solve boundary cropping but leave prompt-only character anatomy compressed](2026-09-22-qwen-charref-aspect-ratio.html) — 2:3 vertical panels eliminate boundary edge-clipping and inter-panel zoom drift in Qwen Image 2.1 character reference sheets, but prompt-only T2I leaves skeletal proportions compressed (~27% leg-to-height ratio).

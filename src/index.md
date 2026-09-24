@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
+- [INT8 quantization moves YuE2's output about as much as changing the seed](2026-09-24-yue2-bf16-vs-convrot.html)
 - [Vertical panel aspect ratios solve boundary cropping but leave prompt-only character anatomy compressed](2026-09-22-qwen-charref-aspect-ratio.html)
 - [Single-pass text-to-image charref sheets fail full-body framing and scale consistency](2026-09-21-qwen-charref-composite-t2i.html)
 - [Pose landmarks and face detection cannot classify charref view angles from stylized renders](2026-09-20-charref-view-classification-ceiling.html)
