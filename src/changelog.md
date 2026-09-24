@@ -15,6 +15,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-24
 
+- [A reference video moves the subject; it does not replace them](2026-09-24-h3-reference-video-2x2.html) — crossing reference subject against reference engine over 20 renders: every arm rendered the prompt's character regardless of who was in the reference, native H3 references damp seed variation about twice as hard as Wan ones, and one arm's motion tracked its reference at r=0.95. One cell is void — its fixture depicted the wrong character.
 - [INT8 quantization moves YuE2's output about as much as changing the seed](2026-09-24-yue2-bf16-vs-convrot.html) — YuE2 3B at INT8 ConvRot differs from BF16 by 13.45 dB log-spectral L1, against 12.29 dB for merely changing the seed on the same model: a 1.09× ratio, not a distinguishable quality effect at N=1.
 
 ## 2026-09-22

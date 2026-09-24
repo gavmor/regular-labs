@@ -1,0 +1,307 @@
+{
+  "arms": {
+    "A_same_h3_s43": {
+      "file": "A_same_h3_s43_00001_.mp4",
+      "frames": 124,
+      "bytes": 261412
+    },
+    "A_same_h3_s44": {
+      "file": "A_same_h3_s44_00001_.mp4",
+      "frames": 124,
+      "bytes": 272916
+    },
+    "A_same_h3_s45": {
+      "file": "A_same_h3_s45_00001_.mp4",
+      "frames": 124,
+      "bytes": 304721
+    },
+    "A_same_h3_s46": {
+      "file": "A_same_h3_s46_00001_.mp4",
+      "frames": 124,
+      "bytes": 338694
+    },
+    "B_diff_h3_s43": {
+      "file": "B_diff_h3_s43_00001_.mp4",
+      "frames": 124,
+      "bytes": 369055
+    },
+    "B_diff_h3_s44": {
+      "file": "B_diff_h3_s44_00001_.mp4",
+      "frames": 124,
+      "bytes": 368782
+    },
+    "B_diff_h3_s45": {
+      "file": "B_diff_h3_s45_00001_.mp4",
+      "frames": 124,
+      "bytes": 361752
+    },
+    "B_diff_h3_s46": {
+      "file": "B_diff_h3_s46_00001_.mp4",
+      "frames": 124,
+      "bytes": 370729
+    },
+    "C_same_wan_s43": {
+      "file": "C_same_wan_s43_00001_.mp4",
+      "frames": 124,
+      "bytes": 259925
+    },
+    "C_same_wan_s44": {
+      "file": "C_same_wan_s44_00001_.mp4",
+      "frames": 124,
+      "bytes": 259589
+    },
+    "C_same_wan_s45": {
+      "file": "C_same_wan_s45_00001_.mp4",
+      "frames": 124,
+      "bytes": 248557
+    },
+    "C_same_wan_s46": {
+      "file": "C_same_wan_s46_00001_.mp4",
+      "frames": 124,
+      "bytes": 243352
+    },
+    "D_diff_wan_s43": {
+      "file": "D_diff_wan_s43_00001_.mp4",
+      "frames": 124,
+      "bytes": 245770
+    },
+    "D_diff_wan_s44": {
+      "file": "D_diff_wan_s44_00001_.mp4",
+      "frames": 124,
+      "bytes": 247711
+    },
+    "D_diff_wan_s45": {
+      "file": "D_diff_wan_s45_00001_.mp4",
+      "frames": 124,
+      "bytes": 241951
+    },
+    "D_diff_wan_s46": {
+      "file": "D_diff_wan_s46_00001_.mp4",
+      "frames": 124,
+      "bytes": 418214
+    },
+    "null_noref_s43": {
+      "file": "null_noref_s43_00001_.mp4",
+      "frames": 124,
+      "bytes": 219944
+    },
+    "null_noref_s44": {
+      "file": "null_noref_s44_00001_.mp4",
+      "frames": 124,
+      "bytes": 234906
+    },
+    "null_noref_s45": {
+      "file": "null_noref_s45_00001_.mp4",
+      "frames": 124,
+      "bytes": 223875
+    },
+    "null_noref_s46": {
+      "file": "null_noref_s46_00001_.mp4",
+      "frames": 124,
+      "bytes": 187516
+    }
+  },
+  "conditions": {
+    "A_same_h3": {
+      "seed_variation": 6.24,
+      "seed_pairwise": [
+        3.87,
+        5.18,
+        5.27,
+        7.68,
+        7.72,
+        7.72
+      ],
+      "motion": 1.5,
+      "motion_per_seed": [
+        0.89,
+        0.85,
+        1.14,
+        3.12
+      ],
+      "dist_to_ref": 9.42,
+      "ref_motion": 3.33,
+      "ref_file": "char_ref_90.mp4",
+      "motion_corr_to_ref": 0.413
+    },
+    "B_diff_h3": {
+      "seed_variation": 5.15,
+      "seed_pairwise": [
+        4.08,
+        4.32,
+        4.68,
+        5.47,
+        6.13,
+        6.2
+      ],
+      "motion": 3.43,
+      "motion_per_seed": [
+        3.41,
+        3.46,
+        3.45,
+        3.4
+      ],
+      "dist_to_ref": 10.17,
+      "ref_motion": 2.0,
+      "ref_file": "h3_diff_subject_90.mp4",
+      "motion_corr_to_ref": 0.95
+    },
+    "C_same_wan": {
+      "seed_variation": 9.82,
+      "seed_pairwise": [
+        6.92,
+        9.33,
+        9.65,
+        10.22,
+        10.31,
+        12.51
+      ],
+      "motion": 0.49,
+      "motion_per_seed": [
+        0.48,
+        0.58,
+        0.46,
+        0.45
+      ],
+      "dist_to_ref": 24.3,
+      "ref_motion": 6.18,
+      "ref_file": "wan_same_subject_90.mp4",
+      "motion_corr_to_ref": 0.129
+    },
+    "D_diff_wan": {
+      "seed_variation": 11.43,
+      "seed_pairwise": [
+        7.43,
+        8.32,
+        10.53,
+        13.25,
+        13.99,
+        15.07
+      ],
+      "motion": 1.14,
+      "motion_per_seed": [
+        0.43,
+        0.43,
+        0.39,
+        3.32
+      ],
+      "dist_to_ref": 19.67,
+      "ref_motion": 4.26,
+      "ref_file": "vace_guide_90.mp4",
+      "motion_corr_to_ref": 0.392
+    },
+    "null_noref": {
+      "seed_variation": 33.23,
+      "seed_pairwise": [
+        21.59,
+        29.1,
+        33.94,
+        34.74,
+        37.07,
+        42.92
+      ],
+      "motion": 0.34,
+      "motion_per_seed": [
+        0.3,
+        0.45,
+        0.39,
+        0.22
+      ]
+    }
+  },
+  "grids": {
+    "A_same_h3": "score-out/grids/A_same_h3.png",
+    "B_diff_h3": "score-out/grids/B_diff_h3.png",
+    "C_same_wan": "score-out/grids/C_same_wan.png",
+    "D_diff_wan": "score-out/grids/D_diff_wan.png",
+    "null_noref": "score-out/grids/null_noref.png"
+  },
+  "null": {
+    "seed_variation": 33.23,
+    "motion": 0.34
+  },
+  "vs_null": {
+    "A_same_h3": {
+      "motion_vs_null_pct": 341.2,
+      "seedvar_vs_null_pct": -81.2
+    },
+    "B_diff_h3": {
+      "motion_vs_null_pct": 908.8,
+      "seedvar_vs_null_pct": -84.5
+    },
+    "C_same_wan": {
+      "motion_vs_null_pct": 44.1,
+      "seedvar_vs_null_pct": -70.4
+    },
+    "D_diff_wan": {
+      "motion_vs_null_pct": 235.3,
+      "seedvar_vs_null_pct": -65.6
+    }
+  },
+  "factor_effects": {
+    "subject_effect_under_h3": {
+      "arms": [
+        "A_same_h3",
+        "B_diff_h3"
+      ],
+      "seedvar": [
+        6.24,
+        5.15
+      ],
+      "seedvar_delta": -1.09,
+      "motion": [
+        1.5,
+        3.43
+      ],
+      "motion_delta": 1.93
+    },
+    "subject_effect_under_wan": {
+      "arms": [
+        "C_same_wan",
+        "D_diff_wan"
+      ],
+      "seedvar": [
+        9.82,
+        11.43
+      ],
+      "seedvar_delta": 1.61,
+      "motion": [
+        0.49,
+        1.14
+      ],
+      "motion_delta": 0.65
+    },
+    "engine_effect_same_subject": {
+      "arms": [
+        "A_same_h3",
+        "C_same_wan"
+      ],
+      "seedvar": [
+        6.24,
+        9.82
+      ],
+      "seedvar_delta": 3.58,
+      "motion": [
+        1.5,
+        0.49
+      ],
+      "motion_delta": -1.01
+    },
+    "engine_effect_diff_subject": {
+      "arms": [
+        "B_diff_h3",
+        "D_diff_wan"
+      ],
+      "seedvar": [
+        5.15,
+        11.43
+      ],
+      "seedvar_delta": 6.28,
+      "motion": [
+        3.43,
+        1.14
+      ],
+      "motion_delta": -2.29
+    }
+  }
+}
