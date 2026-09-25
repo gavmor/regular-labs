@@ -15,6 +15,7 @@ Updates to labs write-ups, in reverse chronological order.
 
 ## 2026-09-25
 
+- [Rendering the guide at full resolution changes nothing, because H3 is not reading the guide's detail](2026-09-25-h3-guide-resolution-appearance-prior.html) — a VACE 1.3B guide rendered natively at 1312×736 costs 5.2× the GPU time of one rendered at 832×480 and upscaled (3.79h vs 43.7m), and moves the output 0.11 on a scale where changing the seed moves 15.85. The one prop that crosses over — a thin rod at t=2s — is not the guide's tripod (t=8s) or its briefcase, and does not reproduce on the other seed: an appearance prior, not an instruction. The 14B half is scoped out.
 - [A longer reference video buys consistency by copying the reference](2026-09-25-h3-reference-duration-scaling.html) — five reference durations (0/22/56/90/124f) × four seeds. Seed variation falls 31.50 → 1.37 and distance to the reference clip falls 23.97 → 5.09 together, because the reference is a performance: it starts standing and crouches, and each arm's render adopts the pose its trim has reached. Below ~56 frames nothing engages at all. The design confounds duration with choreography, so the scaling question stays open.
 
 ## 2026-09-24
