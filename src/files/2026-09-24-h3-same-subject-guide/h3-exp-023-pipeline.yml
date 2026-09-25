@@ -1,0 +1,162 @@
+# h3-exp-023: does a SAME-SUBJECT guide video transfer props and choreography?
+#
+# h3-exp-010 (guide -> H3FunControlApply.control_video) and h3-exp-012 (guide ->
+# MiniMaxH3ReferenceToVideo.ref_videos) both found the Wan2.1 VACE guide
+# transferred neither the briefcase/tripod nor the kneel, while an OpenPose
+# skeleton over the same choreography transferred the action cleanly. Both used
+# a guide showing a suited businessman while prompting for a woman in a 1968
+# mini dress -- so the null result is confounded with a subject mismatch. This
+# pipeline settles that objection by rendering a guide of the PROMPT'S subject
+# performing the same action and running both pathways against it.
+#
+# Six conditions x four seeds = 24 renders, sequential on the single 3090.
+#
+# ONE JOB, NOT TWO
+# ----------------
+# The fixtures task RENDERS the novel same-subject guide on Wan2.1 VACE -- real
+# GPU work -- and the arms consume its output from comfyui-local's input/ dir.
+# Splitting them into separate jobs would let another pipeline's build slip
+# between the guide and the arms that depend on it, and would take the lock
+# twice. Same shape as h3-exp-010's render-and-review job, for the same reason.
+#
+# LOCK DISCIPLINE
+# ---------------
+# Both GPU tasks live under ONE do:, so the ensure: covers the whole locked
+# section: a fixtures failure must still release the lock, and the lock is
+# taken before either task runs. The ensure: uses do:, NEVER in_parallel: --
+# in_parallel fails the whole block the moment any child errors (including
+# during a child's image check), which is how build #3 on 2026-09-13 stranded
+# gpu-lock. Release FIRST; everything after it is best-effort cleanup in try:.
+
+resource_types:
+  # Same put-only Immich resource, same pinned version, as every other egress
+  # job in this repo. See concourse/vars.default.yml for why 1.0.0.
+  - name: immich-api
+    type: registry-image
+    source:
+      repository: ghcr.io/gavmor/immich-concourse-resource
+      tag: ((immich_resource_version))
+
+resources:
+  - name: workflow-repo
+    type: git
+    icon: source-repository
+    source:
+      uri: git@github.com:gavmor/comfyui-workflows.git
+      branch: ((branch))
+      private_key: ((workflow_repo_private_key))
+
+  # The shared mutex for the single physical 3090. A `pool` resource, so jobs
+  # QUEUE at the acquire step rather than failing -- serialization across every
+  # pipeline on this deployment, not just within this one (ADR 0002).
+  - name: gpu-lock
+    type: pool
+    icon: lock
+    source:
+      uri: git@github.com:gavmor/concourse-locks.git
+      branch: main
+      pool: gpu
+      private_key: ((gpu_lock_repo_private_key))
+
+  - name: local-immich-gallery
+    type: immich-api
+    icon: image-multiple
+    source:
+      host: ((immich_url))
+      api_key: ((immich_api_key))
+
+jobs:
+  - name: render-exp023
+    serial_groups: [gpu]
+    plan:
+      - get: workflow-repo
+        # trigger: false deliberately. A write-up commit to this branch must not
+        # start a 24-render GPU job; on 2026-09-17 exactly that auto-triggered
+        # h3-exp-010's render job twice in one day. Renders start when a human
+        # asks for them.
+        trigger: false
+
+      - put: gpu-lock
+        params: { acquire: true }
+
+      - do:
+          # Builds and installs all six video fixtures, including the novel
+          # same-subject guide it renders here on Wan2.1 VACE. Fails the build
+          # if the same-subject and different-subject guides decode identically
+          # -- that would mean Factor 1 does not vary and the whole comparison
+          # is void, and it is far cheaper to learn it here than after 24 runs.
+          - task: build-fixtures
+            file: workflow-repo/concourse/tasks/build-exp023-fixtures.yml
+            params:
+              COMFYUI_LOCAL_URL: ((comfyui_local_url))
+              GUIDE_GRAPH: ((guide_graph))
+            timeout: 1h
+
+          # 24 arms at 832x480x124. exp-014 measured this geometry at roughly
+          # 90-150s per arm, so ~1h of render plus model loading; 4h bounds a
+          # wedged comfyui-local without killing a healthy long run the way
+          # h3-exp-010's first 45m budget did.
+          - task: render-arms
+            file: workflow-repo/concourse/tasks/render-smoketest-arms.yml
+            params:
+              COMFYUI_LOCAL_URL: ((comfyui_local_url))
+              ARMS_DIR: ((arms_dir))
+            timeout: 4h
+        ensure:
+          # do:, NOT in_parallel: -- see the header note. The mutex release is
+          # not best-effort and must not be cancelled by a sibling's failure.
+          do:
+            - put: gpu-lock
+              params: { release: gpu-lock }
+            - try:
+                task: flush-vram
+                config:
+                  platform: linux
+                  image_resource:
+                    type: registry-image
+                    source:
+                      repository: alpine
+                      # PINNED deliberately: an unpinned image inside ensure:
+                      # is a lock-stranding hazard. Build #3 (2026-09-13)
+                      # rendered fine, then ensure: could not reach
+                      # index.docker.io, the image check failed, and the
+                      # sibling gpu-lock release died with it -- leaving the
+                      # lock CLAIMED until it was released by hand.
+                      tag: "3.20"
+                  params:
+                    COMFYUI_LOCAL_URL: ((comfyui_local_url))
+                  run:
+                    path: sh
+                    args:
+                      - -c
+                      - |
+                        apk add --no-cache curl >/dev/null
+                        curl -sf -X POST "$COMFYUI_LOCAL_URL/free" \
+                          -H 'Content-Type: application/json' \
+                          --data '{"unload_models": true, "free_memory": true}' \
+                          || echo "WARNING: flush-vram POST /free failed -- VRAM may not be freed"
+                        exit 0
+
+      # Egress AFTER the lock is released: uploading is not GPU work and must
+      # not hold the 3090 hostage while it transfers.
+      #
+      # One album, all 24 clips, so the six conditions sit side by side. Each
+      # .mp4 is burned with its condition label (burn_label.py) because a
+      # filename is invisible during playback, and carries a .description.txt
+      # sidecar with its full prompt.
+      #
+      # VERIFY AFTER THE PUSH -- a put reports success for the batch, not per
+      # asset. If several arms resolve to ONE asset id, Immich deduped
+      # byte-identical uploads, which means the arms did not actually differ
+      # and the comparison is void. check_arms_distinct.py in the render task
+      # is the upstream guard; the post-build API check is the backstop.
+      - put: local-immich-gallery
+        no_get: true
+        params:
+          glob: "render-assets/*.mp4"
+          visibility: "timeline"
+          album: ((immich_album))
+          tags:
+            - "Blades68"
+            - "Concourse Render"
+            - ((experiment_tag))

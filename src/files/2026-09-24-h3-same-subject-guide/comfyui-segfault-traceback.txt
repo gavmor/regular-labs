@@ -1,0 +1,16 @@
+Fatal Python error: Segmentation fault
+
+Stack (most recent call first):
+  File "/usr/local/lib/python3.10/dist-packages/comfy_aimdo/malloc_graph.py", line 14 in _call
+  File "/usr/local/lib/python3.10/dist-packages/comfy_aimdo/malloc_graph.py", line 25 in pop
+  File "/opt/ComfyUI/comfy/model_prefetch.py", line 88 in malloc_graph_end
+  File "/opt/ComfyUI/comfy/ldm/minimax/model.py", line 587 in forward
+  File "/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py", line 1789 in _call_impl
+  File "/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py", line 1778 in _wrapped_call_impl
+  File "/opt/ComfyUI/comfy/model_base.py", line 254 in _apply_model
+  File "/opt/ComfyUI/comfy/patcher_extension.py", line 113 in execute
+  File "/opt/ComfyUI/comfy/model_base.py", line 210 in apply_model
+  File "/opt/ComfyUI/comfy/samplers.py", line 335 in _calc_cond_batch
+  File "/opt/ComfyUI/comfy/patcher_extension.py", line 113 in execute
+  File "/opt/ComfyUI/comfy/samplers.py", line 219 in _calc_cond_batch_outer
+--
