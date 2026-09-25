@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-09-25
+
+- [A longer reference video buys consistency by copying the reference](2026-09-25-h3-reference-duration-scaling.html) — five reference durations (0/22/56/90/124f) × four seeds. Seed variation falls 31.50 → 1.37 and distance to the reference clip falls 23.97 → 5.09 together, because the reference is a performance: it starts standing and crouches, and each arm's render adopts the pose its trim has reached. Below ~56 frames nothing engages at all. The design confounds duration with choreography, so the scaling question stays open.
+
 ## 2026-09-24
 
 - [The prompts were not vanishing, the server was dying](2026-09-24-h3-comfyui-segfault.html) — h3-exp-024's 48 arms never rendered: ComfyUI segfaults in `comfy_aimdo`'s allocator under the MiniMax H3 forward pass, 16 identical faults, killing the process and wiping the in-memory queue. Two wrong diagnoses first — lock starvation, then container churn — both from inferring around indirect signals instead of reading the failing process's own log.

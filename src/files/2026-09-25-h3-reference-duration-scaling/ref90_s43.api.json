@@ -1,0 +1,231 @@
+{
+  "1": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "_meta": {
+      "model_checksum": "sha256:7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522",
+      "checksum": "sha256:7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522"
+    }
+  },
+  "2": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "_meta": {
+      "model_checksum": "sha256:8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "checksum": "sha256:8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48"
+    }
+  },
+  "3": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "_meta": {
+      "model_checksum": "sha256:35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "checksum": "sha256:35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6"
+    }
+  },
+  "4": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "MinimaxH3/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "model_checksum": "sha256:9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779",
+      "checksum": "sha256:9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779"
+    }
+  },
+  "5": {
+    "class_type": "PathchSageAttentionKJ",
+    "inputs": {
+      "model": [
+        "4",
+        0
+      ],
+      "sage_attention": "auto",
+      "allow_compile": false
+    }
+  },
+  "6": {
+    "class_type": "MiniMaxH3TurboLoRA",
+    "inputs": {
+      "model": [
+        "5",
+        0
+      ],
+      "lora_name": "minimax_h3_turbo_v4_step600_ema.safetensors",
+      "strength": 1.0,
+      "low_vram": true
+    },
+    "_meta": {
+      "model_checksum": "sha256:5f3a626cd72c93a8b9318d6760c510bc5092d2ab13aaba1f932c5bab07a416d3",
+      "checksum": "sha256:5f3a626cd72c93a8b9318d6760c510bc5092d2ab13aaba1f932c5bab07a416d3"
+    }
+  },
+  "7": {
+    "class_type": "MiniMaxH3TurboSampler",
+    "inputs": {}
+  },
+  "8": {
+    "class_type": "BasicScheduler",
+    "inputs": {
+      "model": [
+        "6",
+        0
+      ],
+      "scheduler": "simple",
+      "steps": 8,
+      "denoise": 1.0
+    }
+  },
+  "9": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 43
+    }
+  },
+  "11": {
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "inputs": {
+      "clip": [
+        "3",
+        0
+      ],
+      "vae": [
+        "1",
+        0
+      ],
+      "audio_vae": [
+        "2",
+        0
+      ],
+      "prompt": "Live-action, photorealistic cinematic film footage, not animation, not CGI-stylized. FULL BODY SHOT: the entire figure is visible head to feet in every single frame, never cropped. Camera at standing eye level, far back from the subject, locked off and completely static, no camera movement, no zoom, no pan, no tilt. Wide framing with empty space above the head and the floor visible across the bottom of the frame. The whole body stays inside the frame at all times. A young woman with a blonde bob, wearing a sleeveless late-1960s colour-blocked A-line mini dress in red, white and blue, and low white heels. Plain concrete floor, neutral grey wall, soft even lighting. Shot on 35mm film, period-accurate 1968.",
+      "width": 832,
+      "height": 480,
+      "length": 124,
+      "ref_image_size": "match",
+      "ref_videos.ref_video_0": [
+        "61",
+        0
+      ]
+    }
+  },
+  "12": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "6",
+        0
+      ],
+      "conditioning": [
+        "11",
+        0
+      ]
+    }
+  },
+  "15": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "9",
+        0
+      ],
+      "guider": [
+        "12",
+        0
+      ],
+      "sampler": [
+        "7",
+        0
+      ],
+      "sigmas": [
+        "8",
+        0
+      ],
+      "latent_image": [
+        "11",
+        1
+      ]
+    }
+  },
+  "16": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "vae": [
+        "1",
+        0
+      ]
+    }
+  },
+  "17": {
+    "class_type": "VAEDecodeAudio",
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "vae": [
+        "2",
+        0
+      ]
+    }
+  },
+  "18": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": [
+        "16",
+        0
+      ],
+      "audio": [
+        "17",
+        0
+      ],
+      "fps": 24.0
+    }
+  },
+  "19": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": [
+        "18",
+        0
+      ],
+      "filename_prefix": "H3/exp026/ref90_s43",
+      "format": "auto",
+      "codec": "auto"
+    }
+  },
+  "60": {
+    "class_type": "LoadVideo",
+    "inputs": {
+      "file": "char_ref_90.mp4"
+    },
+    "_meta": {
+      "title": "Load pose control video"
+    }
+  },
+  "61": {
+    "class_type": "GetVideoComponents",
+    "inputs": {
+      "video": [
+        "60",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Video -> IMAGE batch"
+    }
+  }
+}
