@@ -1,0 +1,162 @@
+# h3-exp-021 -- GGUF Q4_K_M text-encoder quantisation vs loader implementation.
+#
+# Design: docs/experiments/h3-exp-021-gguf-quant-loader.md
+#
+# h3-exp-008 measured four H3 text-encoder quants and deliberately left GGUF
+# out, recording why as an explicit scope limit: GGUF needs a third-party
+# loader node, and adding an untested loader would confound the quantisation
+# question with a loader-implementation question. This pipeline answers the
+# question exp-008 declined, by making the loader a declared factor:
+#
+#   Factor 1  weight format   bf16 / int8_convrot / nvfp4_awq / int4_convrot / Q4_K_M
+#   Factor 2  loader node     stock CLIPLoader  vs  molbal/ComfyUI-GGUF CLIPLoaderGGUF
+#
+# The arm that makes the whole thing work is the LOADER CONTROL: unquantised
+# weights through the third-party loader. Its distance from the bf16 reference
+# is the loader's own offset. Without it, every GGUF number carries an unknown
+# loader term and none of them can be attributed to quantisation.
+#
+# ONE JOB for phase 1. Unlike a render matrix there is no per-cell timeout risk
+# worth splitting for: the whole sweep is encodes, not samples, and every arm
+# must be measured against the SAME reference encode within the same process to
+# be comparable at all. Splitting it across jobs would mean re-encoding the
+# reference under a different lock acquisition, which is exactly the kind of
+# drift the self-check exists to detect.
+#
+# Deploy:
+#   fly -t lab set-pipeline -p h3-exp-021 \
+#     -c concourse/h3-exp-021-pipeline.yml \
+#     -l concourse/vars.default.yml -l concourse/.secrets/vars.yml \
+#     -v workflow_repo_branch=feature/h3-exp-021-gguf-quant-loader-run
+#   fly -t lab unpause-pipeline -p h3-exp-021
+#   fly -t lab trigger-job -j h3-exp-021/exp021-fidelity -w
+
+resource_types:
+  - name: immich-api
+    type: registry-image
+    source:
+      repository: ghcr.io/gavmor/immich-concourse-resource
+      tag: ((immich_resource_version))
+
+resources:
+  - name: workflow-repo
+    type: git
+    icon: source-repository
+    source:
+      uri: git@github.com:gavmor/comfyui-workflows.git
+      branch: ((workflow_repo_branch))
+      private_key: ((workflow_repo_private_key))
+
+  # The one physical 3090. Pool resource, pool `gpu`, gavmor/concourse-locks
+  # (ADR 0002) -- jobs QUEUE at the acquire step, they do not fail. Loading a
+  # 51 GB encoder is real GPU work and collides with any render exactly like a
+  # sampler would, so this measurement takes the lock like everything else.
+  - name: gpu-lock
+    type: pool
+    icon: lock
+    source:
+      uri: git@github.com:gavmor/concourse-locks.git
+      branch: main
+      pool: gpu
+      private_key: ((gpu_lock_repo_private_key))
+
+  # Its own album. Immich content-hash-dedupes identical uploads into ONE asset
+  # id, which is how h3-exp-001's comparison was voided -- distinct "arms"
+  # collapsed into a single asset attached to several albums, discovered only
+  # after the GPU time was spent. Verify with POST /api/search/metadata +
+  # albumIds; GET /api/albums/{id} omits assets and reads as a false empty.
+  - name: immich-exp021
+    type: immich-api
+    icon: image-multiple
+    source: { host: ((immich_url)), api_key: ((immich_api_key)) }
+
+# Sequential lock release. NEVER in_parallel: inside ensure: -- a parallel
+# release races the VRAM flush and can drop the lock while the card is still
+# occupied, which is how the next job starts against a full GPU.
+release_gpu: &release_gpu
+  ensure:
+    do:
+      - put: gpu-lock
+        params: { release: gpu-lock }
+      - try:
+          task: flush-vram
+          config:
+            platform: linux
+            image_resource:
+              type: registry-image
+              source: { repository: alpine, tag: "3.20" }
+            params: { COMFYUI_LOCAL_URL: ((comfyui_local_url)) }
+            run:
+              path: sh
+              args:
+                - -c
+                - |
+                  apk add --no-cache curl >/dev/null
+                  curl -sf -X POST "$COMFYUI_LOCAL_URL/free" \
+                    -H 'Content-Type: application/json' \
+                    --data '{"unload_models": true, "free_memory": true}' \
+                    || echo "WARNING: flush-vram POST /free failed"
+                  exit 0
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Phase 1: deterministic conditioning fidelity. No sampling, no seed, no
+  # taste -- same prompt + same encoder = same tensor, which is what makes
+  # this the half of the r/StableDiffusion argument that can actually be
+  # settled by measurement rather than by eyeballing.
+  # ---------------------------------------------------------------------
+  - name: exp021-fidelity
+    serial_groups: [gpu]
+    plan:
+      - get: workflow-repo
+      - put: gpu-lock
+        params: { acquire: true }
+      - do:
+          - task: measure-fidelity
+            timeout: 4h
+            file: workflow-repo/concourse/tasks/measure-fidelity-gguf.yml
+            params:
+              COMFYUI_LOCAL_URL: ((comfyui_local_url))
+              # name=file@loader. The reference is the unquantised bf16
+              # safetensors through the STOCK loader: the same ground truth
+              # exp-008 used, so exp-021's numbers land on the same axis.
+              REFERENCE_ARM: >-
+                bf16=qwen3vl_32b_minimax_h3_bf16.safetensors@CLIPLoader
+              # Arms 1-3 reproduce exp-008's quants (they are the sanity check
+              # that nothing drifted since). Arm 4 is the LOADER CONTROL and
+              # arm 5 is the candidate under dispute.
+              #
+              # The loader control here is PARTIAL and the report must say so.
+              # Every BF16 H3 GGUF published on the Hub is vision-PRUNED: 551
+              # tensors against our reference's 902 (551 text + 351 `visual.*`),
+              # verified by ranged header reads on five repos. Converting our
+              # own bf16.safetensors was tried and failed honestly --
+              # molbal's tools/convert.py detects the H3 encoder as plain
+              # `qwen3`, drops all 351 visual tensors, and writes no
+              # general.architecture key, producing a 50 GB file the loader
+              # refuses. So `gguf_bf16_PRUNED_CONTROL` isolates the loader
+              # only for the arms that share its pruned namespace: its delta
+              # against `gguf_q4_k_s_PRUNED` is a clean within-GGUF quant
+              # effect (same repo, same pruning, same loader, quantisation the
+              # only difference). Its distance from the bf16 reference is
+              # loader AND pruning confounded together, and is reported as
+              # such rather than as a loader number.
+              CANDIDATE_ARMS: >-
+                int8_convrot=qwen3vl_32b_minimax_h3_int8_convrot.safetensors@CLIPLoader
+                nvfp4_awq=qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors@CLIPLoader
+                int4_convrot=qwen3vl_32b_minimax_h3-int4_convrot.safetensors@CLIPLoader
+                gguf_bf16_PRUNED_CONTROL=_gguf_dl/BF16/Qwen3VL-32b-MiniMaxH3-bf16.gguf@CLIPLoaderGGUF
+                gguf_q4_k_s_PRUNED=_gguf_dl/Qwen3VL-32b-MiniMaxH3-Q4_K_S.gguf@CLIPLoaderGGUF
+                gguf_q4_k_m=qwen3vl_32b_minimax_h3-Q4_K_M.gguf@CLIPLoaderGGUF
+        <<: *release_gpu
+      # Charting happens after the lock is released: it is CPU work and must
+      # never hold the card.
+      - task: chart-fidelity
+        file: workflow-repo/concourse/tasks/chart-fidelity-gguf.yml
+      - put: immich-exp021
+        no_get: true
+        params:
+          glob: "chart/*.png"
+          visibility: "timeline"
+          album: "h3-exp-021 GGUF quant vs loader"
+          tags: ["H3", "exp-021", "Conditioning Fidelity"]

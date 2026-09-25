@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
+- [The GGUF loader is transparent; Q4_K_M is not](2026-09-24-h3-gguf-quant-loader.html)
 - [A reference video moves the subject; it does not replace them](2026-09-24-h3-reference-video-2x2.html)
 - [INT8 quantization moves YuE2's output about as much as changing the seed](2026-09-24-yue2-bf16-vs-convrot.html)
 - [Vertical panel aspect ratios solve boundary cropping but leave prompt-only character anatomy compressed](2026-09-22-qwen-charref-aspect-ratio.html)
