@@ -144,6 +144,61 @@ down the `comfy_aimdo` segfault — it is costing every H3 experiment on this
 host, silently, and it has been misread as queue flakiness and container
 churn more than once.
 
+## Follow-up: what triggers it
+
+The crash is not random. Classifying all 26 H3 sampling prompts in one
+container log (12 crashed, 14 clean) turns up a discriminator that separates
+them perfectly:
+
+    VideoVAE loaded IMMEDIATELY before MiniMaxH3  ->  12 crash, 0 clean
+    any other model load order                   ->   0 crash, 14 clean
+
+The confounders die in the same table. UNet, text encoder and LoRA are
+byte-identical across both groups, and so are the staged sizes — TE 14956MB,
+VideoVAE 4965MB, H3 19995MB, every single run. Latent size does not separate
+them either: crashes at 1020480 and 7907296, clean runs at that same 7907296
+and at 1398528. The only thing that moves is the order the models are asked
+for.
+
+The second signal is when it dies. Crashed runs always reach forward call#2 and
+never call#3; clean runs sail to call#6. Nothing dies on call#1. That is the
+signature of a recording pass that succeeds and a *replay* that does not — the
+first forward records the allocation graph, the second replays it against a
+layout that no longer holds, and `pop` dereferences stale bookkeeping. It
+matches the captured stack above frame for frame.
+
+Reading `comfy/ldm/minimax/model.py`, the whole record/replay path is behind
+one gate:
+
+    compile_allocations = comfy.model_prefetch.malloc_graph_enabled(x[0].device)
+
+and `malloc_graph_enabled` is `not args.disable_comfy_compiler and
+aimdo_enabled and is_device_cuda`. So the narrowest lever that removes the
+crashing code path while keeping weight streaming is
+`--disable-comfy-compiler`. `--disable-cuda-graphs` is the wrong knob — it does
+not gate this function. Disabling DynamicVRAM outright is the wrong trade: it
+would give up weight streaming, and upstream reporters say it makes H3
+unusably slow.
+
+This is upstream, not local. Comfy-Org/ComfyUI#15269 collects the same
+allocator failing on the second pass across Qwen, Flux 2 and MiniMax H3, on
+3090s, 4070s and 16GB cards alike. Ours segfaults where theirs raises `Fault
+failed: 2`, but it is the same subsystem failing at the same moment: the second
+time through.
+
+Versions at diagnosis: ComfyUI 1d61dcc, comfy-aimdo 0.5.5, comfy-kitchen
+0.2.35, torch 2.13.0+cu130, driver 595.91.07, RTX 3090.
+
+The flag is committed to `entrypoint.sh` on
+`fix/h3-segfault-disable-comfy-compiler` in `gavmor/comfyui-local`. It is **not
+yet verified on hardware** — the file is bind-mounted, so it applies on the next
+container restart, and the GPU was mid-render, so I did not force one. Until an
+H3 run completes with the flag live, the load-order finding is a strong
+correlation with a mechanism behind it, not a demonstrated fix. What would
+settle it is the adversarial run, not the confirming one: submit the exact
+VideoVAE-then-H3 order that crashed 12 times out of 12 and watch it survive
+past call#2.
+
 ## Method note
 
 Two of my three diagnoses here were wrong, and both wrong ones were arrived at
