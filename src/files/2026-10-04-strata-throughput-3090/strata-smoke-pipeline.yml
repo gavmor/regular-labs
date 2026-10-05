@@ -1,0 +1,560 @@
+# Strata smoke-test pipeline (task t_d899033c)
+#
+# Builds the Strata engine (Qwen3.8-Flash-Next GGML MoE) from pinned upstream
+# source, prepares the Q2_0 weights, and -- holding gpu-lock -- starts the real
+# engine, proves its OpenAI-compatible API, and measures generation throughput
+# against the claim under test.
+#
+# Spec: docs/experiments/strata-smoke-test.md (branch spec/strata-smoke-test).
+# Arms: experiments/strata-smoke/arms.json.
+#
+# Set with:
+#   fly -t lab set-pipeline -p strata-smoke \
+#     -c concourse/strata-smoke-pipeline.yml \
+#     -l concourse/vars.default.yml -l concourse/.secrets/vars.yml
+#
+# ---------------------------------------------------------------------------
+# What this pipeline is a test OF
+# ---------------------------------------------------------------------------
+# A claim, not a product: ~100-140 generation tok/s for Q2_0 at 32K context on
+# an RTX 3090. It is a SMOKE TEST, N=1. It is not a controlled comparison and
+# nothing here is matched against a baseline arm. The reference numbers in
+# arms.json come from a Ryzen 5 7600 (AVX-512) + RTX 5070; tower is Zen 2 +
+# DDR4 with no AVX-512, so a below-band result here is confounded by CPU and
+# memory bandwidth and does NOT by itself refute the claim.
+#
+# ---------------------------------------------------------------------------
+# Reuse over invention: upstream's own Dockerfile is the build
+# ---------------------------------------------------------------------------
+# Strata ships a Dockerfile that compiles the engine into the image exactly the
+# way setup.py would. Writing our own would mean re-implementing its cmake
+# invocation and its BUILD.json handshake (the file setup.py reads to decide an
+# engine is current and must not be recompiled at container start), and then
+# owning that duplication forever. So the build context IS the upstream
+# checkout, and the only things this pipeline contributes are two build args:
+#
+#   CUDA_ARCHITECTURES=86   this lab has exactly one card, an RTX 3090 (sm_86).
+#                           Upstream's default is a fat binary over five archs
+#                           (75;80;86;89;120) -- four of which no machine here
+#                           can run, each costing a full nvcc pass.
+#   BUILD_VISION=0          arms.json declares images:false. The image encoder
+#                           is a second CUDA build for a capability under test
+#                           by nothing.
+#
+# Reproducibility comes from `tag_filter` on the git resource, not from a
+# floating branch: ((strata_tag)) is an immutable upstream tag, and the
+# verify-pin task below re-asserts the resolved commit against
+# ((strata_commit)) and fails the build on any mismatch. A retagged upstream
+# release is then a loud red build, not a silently different engine.
+#
+# ---------------------------------------------------------------------------
+# gpu-lock: where the boundary is, and why it is there and not elsewhere
+# ---------------------------------------------------------------------------
+# The lock is acquired immediately before `serve-and-measure` and released by a
+# single sequential `put` in that task's `ensure:`. NOT `in_parallel:` -- a
+# parallel branch in an `ensure:` is how a lock gets stranded when a build is
+# aborted, deadlocking every GPU job in every pipeline on this box.
+#
+# Everything expensive happens outside the lock, in this order:
+#   build            20-40 min of nvcc. No GPU work.
+#   prepare-weights  ~66 GB download + the prepared expert pack. No GPU work.
+#   preflight-ram    the RAM gate, deliberately the LAST step before the
+#                    acquire so it rejects on the freshest possible reading.
+# Holding the single 3090 through a 66 GB download would be indefensible.
+#
+# The contention itself is in scope. This job takes the same lock ComfyUI
+# renders take, so it cannot co-reside with a render, and a queued render waits
+# on it. That is the designed behaviour, not a limitation to engineer around.
+#
+# ---------------------------------------------------------------------------
+# privileged: true on serve-and-measure -- a measured constraint, not caution
+# ---------------------------------------------------------------------------
+# Probed on this deployment with `fly execute` before this YAML was written
+# (2026-10-04):
+#
+#   unprivileged task : max locked memory (-l) 8192 KB soft AND hard;
+#                       `ulimit -l unlimited` -> "Operation not permitted".
+#   privileged task   : same 8192 KB defaults, but CapEff 0x3fffffffff
+#                       includes CAP_SYS_RESOURCE, so `ulimit -l unlimited`
+#                       succeeds.
+#   both              : /dev/nvidia0, nvidiactl, nvidia-uvm present via the
+#                       worker's OCI nvidia hooks given NVIDIA_VISIBLE_DEVICES.
+#   outputs/inputs    : Concourse honours an absolute `path:` and mounts the
+#                       volume there, which is what makes the /data handoff
+#                       below possible.
+#
+# Strata page-locks expert tensors -- tens of GB. An 8 MB memlock ceiling fails
+# that, and it fails as a confusing engine-side error, not as "your ulimit is
+# wrong". Concourse has no per-task `ulimit` knob, so the only route to a
+# usable limit is CAP_SYS_RESOURCE and raising it in the task's own shell,
+# which is what the task does on its first line. The other steps stay
+# unprivileged: only this one needs it.
+#
+# ---------------------------------------------------------------------------
+# The 66 GB, and what this pipeline does NOT do about it
+# ---------------------------------------------------------------------------
+# `prepare-weights` writes the model, the prepared pack and the install config
+# into a Concourse output volume mounted at /data, which `serve-and-measure`
+# takes as an input at the SAME absolute path -- setup.py bakes absolute paths
+# into the install config, so the mount point has to be stable across the two
+# tasks. Within one job on one worker that handoff is a local volume, not a
+# copy, so it is cheap -- but it is also NOT cached across builds: every run of
+# this pipeline re-downloads ~66 GB from Hugging Face.
+#
+# That is a deliberate choice over the two alternatives. A Concourse task
+# `cache:` is keyed per step, so the download step's cache is not visible to
+# the serve step; and routing 66 GB through MinIO to cross a job boundary is
+# the same bytes twice, locally. The pipeline therefore has NO automatic
+# trigger: it is run on purpose, by a human or by the execution card, and the
+# download is paid once per deliberate run. Revisit if this pipeline ever runs
+# often enough for that to matter -- it is a smoke test, so it should not.
+
+resources:
+  # Upstream Strata, pinned to an immutable tag. trigger: false -- a new
+  # upstream release must not silently re-run a 66 GB experiment.
+  - name: strata-src
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/Niko1221/Strata.git
+      tag_filter: ((strata_tag))
+
+  - name: workflow-repo
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:gavmor/comfyui-workflows.git
+      branch: ((strata_smoke_branch))
+      private_key: ((workflow_repo_private_key))
+
+  # gpu-lock: the same cross-pipeline pool every GPU job on this box uses
+  # (github.com:gavmor/concourse-locks, pool `gpu`, one lock). One physical
+  # 3090, so exclusivity is global -- docs/adr/0002-cross-pipeline-gpu-lock.md.
+  - name: gpu-lock
+    type: pool
+    icon: lock
+    source:
+      uri: git@github.com:gavmor/concourse-locks.git
+      branch: main
+      pool: gpu
+      private_key: ((gpu_lock_repo_private_key))
+
+  # Egress is S3/MinIO, not Immich: this experiment produces a results JSON and
+  # an engine log, not an image or a video. Immich would be the wrong store for
+  # both and would make neither reviewable.
+  - name: strata-results-s3
+    type: s3
+    icon: archive-outline
+    source:
+      endpoint: ((minio_endpoint))
+      bucket: ((strata_smoke_bucket))
+      regexp: ((strata_smoke_key_prefix))/strata-smoke-(.*)\.tar\.gz
+      access_key_id: ((minio_access_key))
+      secret_access_key: ((minio_secret_key))
+      region_name: us-east-1
+      disable_ssl: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # One job, not two.
+  # -------------------------------------------------------------------------
+  # The tempting split is `build-engine` and `smoke` as separate jobs, so a
+  # toolchain regression is its own red build. It was rejected: Concourse does
+  # not carry an unpacked rootfs across a job boundary, so the second job would
+  # have to rebuild the image -- 20-40 minutes of nvcc, twice, on every run,
+  # to buy a signal that a single job already gives in step order. The build
+  # runs first here, so a broken build still fails before anything downloads
+  # 66 GB or touches the lock.
+  - name: smoke
+    serial: true
+    # serial_groups [gpu]: pipeline-local defence in depth on top of gpu-lock,
+    # matching the other GPU jobs on this box.
+    serial_groups: [gpu]
+    plan:
+      - in_parallel:
+          - get: strata-src
+          - get: workflow-repo
+
+      - task: verify-pin
+        tags: [cpu]
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          params:
+            EXPECT: ((strata_commit))
+            TAG: ((strata_tag))
+          inputs:
+            - name: strata-src
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                # The git resource checks out DETACHED at the version it
+                # resolved, so .git/HEAD holds the raw 40-char sha.
+                #
+                # .git/ref is NOT the sha here and using it is a trap: for a
+                # tag_filter resource the resource's "version" is the tag
+                # NAME, so .git/ref reads "v0.1.39". This check failed on its
+                # first real run for exactly that reason, which is the
+                # argument for the check existing at all.
+                #
+                # An upstream tag is mutable by whoever owns the repo, so
+                # "we pinned a tag" is not by itself reproducibility: this is
+                # what turns a moved tag into a red build instead of a quietly
+                # different engine.
+                GOT="$(cat strata-src/.git/HEAD)"
+                case "$GOT" in
+                  ref:*)
+                    echo "FAIL: expected a detached checkout; .git/HEAD is '$GOT'"
+                    exit 1 ;;
+                esac
+                echo "tag      : ${TAG}"
+                echo "expected : ${EXPECT}"
+                echo "resolved : ${GOT}"
+                echo "ref file : $(cat strata-src/.git/ref)"
+                if [ "$GOT" != "$EXPECT" ]; then
+                  echo
+                  echo "FAIL: ${TAG} no longer resolves to the pinned commit."
+                  echo "The upstream tag moved. Review the diff, then update"
+                  echo "strata_commit in concourse/vars.default.yml -- do not"
+                  echo "relax this check."
+                  exit 1
+                fi
+                echo "OK: pinned engine source is unchanged."
+
+      # privileged: required by buildkit itself, not by anything this build is
+      # doing on purpose. UNPACK_ROOTFS is what lets later tasks use `image:
+      # image` and so run AS the built artifact rather than beside it.
+      - task: build
+        privileged: true
+        timeout: 2h
+        input_mapping: { context: strata-src }
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: concourse/oci-build-task
+              tag: 0.11.1
+          params:
+            CONTEXT: context
+            UNPACK_ROOTFS: "true"
+            BUILD_ARG_CUDA_ARCHITECTURES: ((strata_cuda_arch))
+            BUILD_ARG_BUILD_VISION: "0"
+          inputs:
+            - name: context
+          outputs:
+            - name: image
+          run:
+            path: build
+
+      # Prove the compiled engine exists and runs its own version check before
+      # anything downloads 66 GB. Runs AS the built image.
+      - task: verify-engine
+        image: image
+        timeout: 15m
+        params:
+          NVIDIA_VISIBLE_DEVICES: all
+          NVIDIA_DRIVER_CAPABILITIES: all
+        config:
+          platform: linux
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                cd /opt/strata
+                echo "--- built engine ---"
+                ls -l engine/
+                cat engine/BUILD.json
+                echo
+                echo "--- the archs this binary actually carries ---"
+                # cuobjdump is the authority on which cubins are in the fat
+                # binary. If the build arg did not take, it says so here rather
+                # than at model load on the 3090 with the lock held.
+                cuobjdump --list-elf engine/strata 2>/dev/null | head -20 \
+                  || echo "(cuobjdump unavailable; BUILD.json archs above)"
+                echo
+                echo "--- nvidia-smi from inside the built image ---"
+                nvidia-smi --query-gpu=name,memory.total,driver_version \
+                  --format=csv,noheader
+                echo
+                echo "--- setup.py sees this machine ---"
+                .venv/bin/python setup.py --check 2>&1 | tail -40
+
+      # ---------------------------------------------------------------------
+      # prepare-weights -- OUTSIDE the lock. ~66 GB, no GPU work.
+      # ---------------------------------------------------------------------
+      # setup.py probes the GPU to write the install config, which is why this
+      # task still asks for the nvidia devices. Probing is not using: it reads
+      # the card's name and VRAM and writes a JSON file. No model is loaded and
+      # no kernel is launched, so this does not need -- and must not take --
+      # the lock.
+      - task: prepare-weights
+        image: image
+        timeout: 6h
+        params:
+          NVIDIA_VISIBLE_DEVICES: all
+          NVIDIA_DRIVER_CAPABILITIES: all
+          MODEL: ((strata_model))
+          FAMILY: ((strata_family))
+          CONTEXT: ((strata_context))
+          LOW_RAM: ((strata_low_ram))
+        config:
+          platform: linux
+          outputs:
+            # path: /data -- a STABLE ABSOLUTE mount point, and the single
+            # most load-bearing line in this file.
+            #
+            # setup.py records ABSOLUTE paths in the install config it writes:
+            # --pack, --native, --ple-gguf, --mtp and tokenizer all point at
+            # wherever the data dir was when setup ran. Concourse gives every
+            # task its own build directory (/tmp/build/<id>), so left to the
+            # default this config is written against the prepare task's
+            # directory and is dead the moment the serve task reads it. That
+            # is exactly how build #2 failed: "strata-q2_0.json refers to
+            # missing files: /tmp/build/0c030993/...".
+            #
+            # Mounting the volume at /data in BOTH tasks makes the recorded
+            # paths true in both. Verified with `fly execute` that Concourse
+            # honours an absolute output path (2026-10-04). It also matches
+            # upstream's own /data volume convention, so the layout here is
+            # the layout their docs describe.
+            - name: strata-data
+              path: /data
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                DATA=/data
+                mkdir -p "$DATA"
+                cd /opt/strata
+
+                echo "--- disk before ---"
+                df -h "$DATA" /
+                echo "--- memory ---"
+                head -3 /proc/meminfo
+
+                # --yes alone is not consent to a risk; an explicit flag is.
+                # --model is the explicit consent to the size, and --low-ram
+                # off is the explicit consent to keeping the experts resident
+                # in RAM. Without both, setup stops and waits for a human --
+                # which in a Concourse task means it hangs until the timeout.
+                #
+                # --no-start: this task installs, it does not serve. Serving
+                # happens in the next task, under the lock.
+                .venv/bin/python setup.py --setup --yes \
+                  --family "$FAMILY" \
+                  --model "$MODEL" \
+                  --context "$CONTEXT" \
+                  --vision no \
+                  --low-ram "$LOW_RAM" \
+                  --data-dir "$DATA" \
+                  --host 127.0.0.1 \
+                  --port 8080 \
+                  --no-browser \
+                  --no-start
+
+                # setup.py writes the install config next to setup.py, i.e.
+                # into the image's own filesystem, which does not survive this
+                # task. Copy it onto the data volume -- the same handoff
+                # upstream's docker-entrypoint.sh makes to its /data volume.
+                case "$FAMILY" in qwen) prefix="" ;; *) prefix="${FAMILY}-" ;; esac
+                tag="${prefix}$(printf '%s' "$MODEL" | tr 'A-Z' 'a-z')"
+                mkdir -p "$DATA/config"
+                cp -f "/opt/strata/strata-${tag}.json" "$DATA/config/strata-${tag}.json"
+
+                echo "--- install config ---"
+                cat "$DATA/config/strata-${tag}.json"
+
+                # Guard the handoff rather than discover it broken under the
+                # lock. Every recorded path must live under /data, or the
+                # serve task will look for files that are not there.
+                if grep -q '/tmp/build/' "$DATA/config/strata-${tag}.json"; then
+                  echo
+                  echo "FAIL: the install config records build-directory paths."
+                  echo "The data volume must be mounted at /data in BOTH this"
+                  echo "task and serve-and-measure for the recorded absolute"
+                  echo "paths to resolve."
+                  exit 1
+                fi
+
+                echo "--- what was staged ---"
+                du -sh "$DATA"/* 2>/dev/null || true
+                df -h "$DATA" /
+
+      # ---------------------------------------------------------------------
+      # preflight-ram -- the LAST step before the acquire, on purpose.
+      # ---------------------------------------------------------------------
+      # Q2_0 needs ~40 GB resident. tower has 62 GiB total with ~17 GiB already
+      # held by the desktop, Steam, Hermes, Concourse and Postgres. If the box
+      # is not clear, the honest outcome is a red build here -- NOT an OOM kill
+      # part-way through a load while holding the single 3090, which strands
+      # the GPU for however long the kill takes and tells us nothing.
+      #
+      # Reading it here rather than inside the locked task is the whole point:
+      # a failure costs nothing and blocks nobody.
+      - task: preflight-ram
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          params:
+            MIN_GIB: ((strata_min_mem_available_gib))
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                # /proc/meminfo in a Concourse task is the HOST's, which is
+                # what we want: the question is whether this machine can hold
+                # the model, not whether a cgroup can.
+                AVAIL_KB="$(awk '/^MemAvailable:/ {print $2}' /proc/meminfo)"
+                AVAIL_GIB=$(( AVAIL_KB / 1048576 ))
+                echo "MemAvailable: ${AVAIL_GIB} GiB (need >= ${MIN_GIB} GiB)"
+                head -3 /proc/meminfo
+                if [ "$AVAIL_GIB" -lt "$MIN_GIB" ]; then
+                  echo
+                  echo "FAIL: not enough free RAM to load the model."
+                  echo "Free some on tower and re-run. Refusing to take"
+                  echo "gpu-lock and then be OOM-killed holding it."
+                  exit 1
+                fi
+                echo "OK."
+
+      # ---------------------------------------------------------------------
+      # GPU section. Lock acquired here, released in serve-and-measure's
+      # ensure, as a single sequential put.
+      # ---------------------------------------------------------------------
+      - put: gpu-lock
+        params: { acquire: true }
+
+      - task: serve-and-measure
+        image: image
+        # privileged: for CAP_SYS_RESOURCE only -- see the memlock note in the
+        # header. Probed, not assumed.
+        privileged: true
+        timeout: 3h
+        input_mapping: { repo: workflow-repo, docs: strata-src }
+        params:
+          NVIDIA_VISIBLE_DEVICES: all
+          NVIDIA_DRIVER_CAPABILITIES: all
+          MODEL: ((strata_model))
+          FAMILY: ((strata_family))
+          CONTEXT: ((strata_context))
+          PROMPT_TOKENS: ((strata_prompt_tokens))
+          MIN_COMPLETION_TOKENS: ((strata_min_completion_tokens))
+          MAX_TOKENS: ((strata_max_tokens))
+          REASONING_BUDGET_TOKENS: ((strata_reasoning_budget_tokens))
+          PASS_THRESHOLD: ((strata_pass_threshold_tok_s))
+          # The engine's no-progress watchdog. A 32K prefill on this Zen 2 CPU
+          # can legitimately exceed the 120 s default, and a watchdog firing on
+          # a slow-but-working prefill looks exactly like a hang. Raised
+          # deliberately and recorded, rather than debugged as a false stall.
+          STRATA_WATCHDOG_S: ((strata_watchdog_s))
+        config:
+          platform: linux
+          inputs:
+            - name: repo
+            - name: docs
+            # Mounted at the SAME absolute path the prepare task used, so the
+            # absolute paths baked into the install config resolve here. See
+            # the long note on that task's output.
+            - name: strata-data
+              path: /data
+          outputs:
+            - name: results
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                # The engine page-locks experts. Concourse gives a task 8 MB of
+                # memlock, soft and hard; CAP_SYS_RESOURCE (privileged: true)
+                # is what lets us raise it. Do it FIRST and prove it, so a
+                # pinning failure later is never ambiguous.
+                echo "memlock before: $(ulimit -l)"
+                ulimit -l unlimited
+                echo "memlock after : $(ulimit -l)"
+                if [ "$(ulimit -l)" != "unlimited" ]; then
+                  echo "FAIL: could not raise the memlock limit. The task must"
+                  echo "run privileged: true for CAP_SYS_RESOURCE."
+                  exit 1
+                fi
+
+                # Open files: the engine maps many shards plus the pack.
+                ulimit -n 65536 || echo "note: could not raise nofile"
+
+                # Not `exec`: the engine writes its own log next to setup.py
+                # (config "log": /opt/strata/strata-<tag>.log), inside the
+                # image's filesystem, which does not survive this task. Run
+                # the script, keep its exit code, then copy that log into the
+                # egressed results -- a failed run is exactly when its log
+                # matters most, so this must happen on failure too.
+                set +e
+                python3 repo/concourse/scripts/strata_smoke.py \
+                  --data-dir  /data \
+                  --doc-dir   docs/docs \
+                  --results-dir results \
+                  --model     "$MODEL" \
+                  --family    "$FAMILY" \
+                  --context   "$CONTEXT" \
+                  --prompt-tokens "$PROMPT_TOKENS" \
+                  --min-completion-tokens "$MIN_COMPLETION_TOKENS" \
+                  --max-tokens "$MAX_TOKENS" \
+                  --reasoning-budget-tokens "$REASONING_BUDGET_TOKENS" \
+                  --pass-threshold "$PASS_THRESHOLD" \
+                  --calibrate
+                RC=$?
+                set -e
+                cp -f /opt/strata/strata-*.log results/ 2>/dev/null || true
+                ls -l results/
+                echo "smoke script exit code: $RC"
+                exit "$RC"
+        ensure:
+          # ONE sequential put. Never in_parallel inside ensure: a cancelled
+          # sibling branch leaves the lock held by a build that no longer
+          # exists, which deadlocks every GPU job on this box.
+          put: gpu-lock
+          params: { release: gpu-lock }
+
+      # ---------------------------------------------------------------------
+      # Egress, after the lock is released. Nothing here needs the GPU, and a
+      # slow upload must not hold the 3090.
+      # ---------------------------------------------------------------------
+      - task: package-results
+        tags: [cpu]
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          inputs:
+            - name: results
+            - name: strata-src
+          outputs:
+            - name: package
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                # The stamp carries the engine commit, so an uploaded result is
+                # attributable to a specific build without opening the JSON.
+                # .git/HEAD, not .git/ref: under tag_filter the resource's
+                # version is the tag name, not the sha (see verify-pin).
+                SHA="$(cut -c1-7 strata-src/.git/HEAD)"
+                STAMP="$(date -u +%Y%m%dT%H%M%SZ)-${SHA}"
+                ls -l results/
+                tar -czf "package/strata-smoke-${STAMP}.tar.gz" -C results .
+                echo "packaged: strata-smoke-${STAMP}.tar.gz"
+                ls -l package/
+
+      - put: strata-results-s3
+        params:
+          file: package/strata-smoke-*.tar.gz

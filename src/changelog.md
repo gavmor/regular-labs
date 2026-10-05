@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-10-04
+
+- [A 24 GB 3090 serves a 125B MoE at 111 tok/s, and the engine's own calibrator overstates that by 17%](2026-10-04-strata-throughput-3090.html) — Strata 0.1.39 serving Qwen3.8-Flash-Next `Q2_0` at a 32,768-token context sustains 111.28 tok/s over a 1,916-token answer to a 30,341-token prompt, inside the README's claimed 100–140 tok/s band for this card and near its floor, at 98% of the 24 GB card with 13,465 experts cached. Three builds agree to within 0.7%. The non-obvious result is the engine's own `--calibrate`, which predicts 130.1 tok/s for the settings it picks and is 17% optimistic against the real long-context request nineteen minutes later. Smoke test, N=1; time-to-first-token is a warm-cache hit, so nothing here measures prefill.
+
 ## 2026-09-25
 
 - [RETRACTED: the guide resolution comparison was never run — all three cells were handed the same file](2026-09-25-h3-guide-resolution-appearance-prior.html) — retracted the day it was published. `render_vace_guide.py` scanned ComfyUI's history first-match-wins, and ComfyUI reports `LoadVideo`'s own source alongside `SaveVideo`'s render, with the loader node sorting first. So all three cells fetched the experiment's input, `vace_src_props.mp4`, instead of the VACE render each had just spent 44m–3.8h producing. The delivered "guides" are 0.04 apart with the burn-in cropped; the real renders, recovered from the box, are 2.78–3.70 apart. The 144-to-1 margin, the resolution finding, and the scope cut of cell 4 are all void. Fixed, with a regression test checked against the old implementation.
