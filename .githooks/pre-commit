@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Regular Labs: enforce TEMPLATE-lab-report.md on STAGED reports only.
+#
+# Mirrors the check-reports job in .github/workflows/deploy.yml, so a
+# non-conforming report is caught locally before it ever reaches CI. Only
+# staged src/*.md reports are checked -- the legacy corpus is grandfathered
+# permanently and is never re-validated.
+#
+# Enable in a fresh clone with:
+#     git config core.hooksPath .githooks
+#
+# Bypass (rarely justified) with: git commit --no-verify
+set -uo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+cd "$root" || exit 1
+
+# Staged, still-present files directly under src/ with a .md extension.
+# src/journal/* is excluded by the single-segment glob; index/changelog by name.
+staged="$(git diff --cached --name-only --diff-filter=ACMR -- 'src/*.md' || true)"
+
+rc=0
+found=0
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  case "$f" in src/*/*) continue ;; esac
+  base="$(basename "$f" .md)"
+  case "$base" in index|changelog) continue ;; esac
+  found=1
+  echo "check_report: $base"
+  if ! python3 scripts/check_report.py "$base"; then
+    rc=1
+  fi
+done <<< "$staged"
+
+if [ "$found" = 0 ]; then
+  exit 0
+fi
+
+if [ "$rc" != 0 ]; then
+  echo
+  echo "pre-commit: a staged report does not match TEMPLATE-lab-report.md."
+  echo "Start from a copy of TEMPLATE-lab-report.md; do not imitate a recent post."
+  echo "Fix the problems above, or commit with --no-verify if you truly must."
+fi
+exit $rc

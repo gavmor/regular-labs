@@ -1,5 +1,30 @@
 # TEMPLATE — Lab Report
 
+## Start here: copy this file
+
+**Start a new report by copying THIS file to `src/<slug>.md`. Do NOT open a
+recent post as a model.** The published corpus has drifted — most of it predates
+this template and is grandfathered permanently, so imitating the latest post
+reproduces whatever that post happened to do. The six fixed sections below, and
+their order, are enforced by `scripts/check_report.py` in CI and in the
+`.githooks/pre-commit` hook; a non-conforming new report blocks the deploy.
+
+The six fixed sections, in this exact order and with this exact wording:
+
+1. `## The question`
+2. `## Method`
+3. `## Results`
+4. *one free interpretation section — any title you like*
+5. `## What this does not settle`
+6. `## Cost`
+7. `## Files`
+
+Six are fixed; slot 4 is the single free one, and it sits between Results and
+"What this does not settle". A `*Status:` line directly under the title is also
+required. Run `python3 scripts/check_report.py <slug>` before committing.
+
+---
+
 Copy this to `src/YYYY-MM-DD-slug.md` and fill it in. Not for journal entries,
 which live in `src/journal/` and follow no template — a journal entry may
 narrate freely, in past tense, with dead ends and dates.

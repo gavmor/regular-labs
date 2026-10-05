@@ -1,7 +1,10 @@
 name: Deploy
 
-# Push to main → build and deploy to GitHub Pages.
+# Push to main → check changed reports, build, deploy to GitHub Pages.
 # site/ is never committed; this workflow is the only path to production.
+# check-reports gates the deploy: a new report that does not match
+# TEMPLATE-lab-report.md blocks the build. Only reports *changed in the push*
+# are checked, so the grandfathered legacy corpus is never re-validated.
 
 on:
   push:
@@ -17,7 +20,48 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check changed reports against the template
+        run: |
+          set -euo pipefail
+          before="${{ github.event.before }}"
+          if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
+            before="${{ github.sha }}^"
+          fi
+          changed="$(git diff --name-only "$before" "${{ github.sha }}" -- 'src/*.md' || true)"
+          rc=0; found=0
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            # git's '*' matches '/', so the pathspec also catches src/journal/*.md.
+            # Journal entries follow no template; skip anything below src/.
+            case "$f" in src/*/*) continue ;; esac
+            base="$(basename "$f" .md)"
+            case "$base" in index|changelog) continue ;; esac
+            found=1
+            echo "::group::check_report $base"
+            if ! python3 scripts/check_report.py "$base"; then rc=1; fi
+            echo "::endgroup::"
+          done <<< "$changed"
+          [ "$found" = 0 ] && echo "No report .md changed; nothing to gate."
+          exit $rc
+
   build:
+    needs: check-reports
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
