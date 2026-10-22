@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-10-22
+
+- [The best tool-error rate in the run belongs to the two models that finished nothing](2026-10-22-pi-ollama-bakeoff.html) — four tool-capable local Ollama models drive the `pi` coding agent (0.73.1) through the same three-task battery, decoding pinned identically across arms by derived `bakeoff-*` tags. `flint` passes 3/3 and `nemotron-lightning` 3/3; the incumbent baseline `qwen3-coder-ud-q4kxl` passes 0/3. On the pre-registered rule the hypothesis is supported, but the interesting result is how the losers lose: they emit prose promising the next action and end the turn with no tool call, terminating the agent loop one call short. The tool error rate pre-registered as the tiebreak is anti-correlated with success — the arms that complete nothing score a perfect 0%, because a call never made is never malformed — and between the two arms it was meant to separate it ranks the denominator, since both made exactly three malformed calls. N=3 tasks per arm; flint vs nemotron is a tie, not a win.
+
 ## 2026-10-04
 
 - [A 24 GB 3090 serves a 125B MoE at 111 tok/s, and the engine's own calibrator overstates that by 17%](2026-10-04-strata-throughput-3090.html) — Strata 0.1.39 serving Qwen3.8-Flash-Next `Q2_0` at a 32,768-token context sustains 111.28 tok/s over a 1,916-token answer to a 30,341-token prompt, inside the README's claimed 100–140 tok/s band for this card and near its floor, at 98% of the 24 GB card with 13,465 experts cached. Three builds agree to within 0.7%. The non-obvious result is the engine's own `--calibrate`, which predicts 130.1 tok/s for the settings it picks and is 17% optimistic against the real long-context request nineteen minutes later. Smoke test, N=1; time-to-first-token is a warm-cache hit, so nothing here measures prefill.

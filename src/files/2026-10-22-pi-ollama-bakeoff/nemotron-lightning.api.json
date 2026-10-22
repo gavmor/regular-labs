@@ -1,0 +1,21 @@
+{
+  "_note": "NOT a ComfyUI graph -- see flint.api.json's _note for why an Ollama arm spec carries the .api.json extension in this repo.",
+  "_experiment": "pi-ollama-bakeoff",
+  "arm": "nemotron-lightning",
+  "role": "contender -- different vendor and architecture family, also tools+thinking",
+  "ollama_model": "hf.co/bartowski/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF:Q4_K_S",
+  "controlled_tag": "bakeoff-nemotron-lightning:latest",
+  "advertised_capabilities": ["completion", "tools", "thinking"],
+  "params_b": 30,
+  "quantization": "Q4_K_S",
+  "on_disk_gb": 23,
+  "context_window": 16384,
+  "decoding": {
+    "temperature": 0,
+    "top_p": 1.0,
+    "top_k": 1,
+    "seed": 42,
+    "num_ctx": 16384,
+    "repeat_penalty": 1.1
+  }
+}

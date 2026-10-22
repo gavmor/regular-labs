@@ -1,0 +1,21 @@
+{
+  "_note": "NOT a ComfyUI graph. This experiment's arms are Ollama models driving the `pi` coding agent, not diffusion workflows. The repo's arm-readiness check (concourse/scripts/list-experiment-arms.py) requires each arm's spec to live at a path ending .api.json, be valid non-empty JSON, and not be the stamped skeleton -- all of which this file satisfies. The extension is the tooling's contract, not a claim about the contents. See experiments/pi-ollama-bakeoff/README.md.",
+  "_experiment": "pi-ollama-bakeoff",
+  "arm": "flint",
+  "role": "subject -- the model the hypothesis is about",
+  "ollama_model": "flint:latest",
+  "controlled_tag": "bakeoff-flint:latest",
+  "advertised_capabilities": ["completion", "tools", "thinking"],
+  "params_b": 39.8,
+  "quantization": "NVFP4",
+  "on_disk_gb": 22,
+  "context_window": 16384,
+  "decoding": {
+    "temperature": 0,
+    "top_p": 1.0,
+    "top_k": 1,
+    "seed": 42,
+    "num_ctx": 16384,
+    "repeat_penalty": 1.1
+  }
+}

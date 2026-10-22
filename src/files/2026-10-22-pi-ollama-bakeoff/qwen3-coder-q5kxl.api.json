@@ -1,0 +1,21 @@
+{
+  "_note": "NOT a ComfyUI graph -- see flint.api.json's _note for why an Ollama arm spec carries the .api.json extension in this repo.",
+  "_experiment": "pi-ollama-bakeoff",
+  "arm": "qwen3-coder-q5kxl",
+  "role": "contender -- same base model as the baseline at a heavier quant, which isolates quantization from architecture",
+  "ollama_model": "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q5_K_XL",
+  "controlled_tag": "bakeoff-qwen3-coder-q5kxl:latest",
+  "advertised_capabilities": ["completion", "tools"],
+  "params_b": 30,
+  "quantization": "UD-Q5_K_XL",
+  "on_disk_gb": 21,
+  "context_window": 16384,
+  "decoding": {
+    "temperature": 0,
+    "top_p": 1.0,
+    "top_k": 1,
+    "seed": 42,
+    "num_ctx": 16384,
+    "repeat_penalty": 1.1
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "_note": "NOT a ComfyUI graph -- see flint.api.json's _note for why an Ollama arm spec carries the .api.json extension in this repo.",
+  "_experiment": "pi-ollama-bakeoff",
+  "arm": "qwen3-coder-q4kxl",
+  "role": "baseline -- the tool-capable coder model already used to drive pi locally",
+  "ollama_model": "qwen3-coder-ud-q4kxl:latest",
+  "controlled_tag": "bakeoff-qwen3-coder-q4kxl:latest",
+  "advertised_capabilities": ["completion", "tools"],
+  "params_b": 30,
+  "quantization": "UD-Q4_K_XL",
+  "on_disk_gb": 17,
+  "context_window": 16384,
+  "decoding": {
+    "temperature": 0,
+    "top_p": 1.0,
+    "top_k": 1,
+    "seed": 42,
+    "num_ctx": 16384,
+    "repeat_penalty": 1.1
+  }
+}

@@ -1,0 +1,122 @@
+# Pre-registration for experiment 'pi-ollama-bakeoff'.
+#
+# Which local Ollama model drives the `pi` coding agent best?
+#
+# Committed BEFORE the run. The hypothesis under test is that flint:latest
+# (39.8B, NVFP4, tools+thinking) drives pi more effectively than the other
+# tool-capable local models. "More effectively" is defined here, in advance,
+# as a higher task completion rate against objective oracles -- not as a
+# reading of the transcripts after the fact.
+#
+# The judgment calls the gate deliberately does NOT check -- is reusing this
+# prompt hash intentional, is this baseline genuinely comparable, is N honest --
+# are answered in CHECKLIST-pi-ollama-bakeoff.md next to this file.
+
+# Must match the directory name.
+experiment: pi-ollama-bakeoff
+
+# Four arms, a named baseline, and everything not under test pinned. A
+# decision rides on this (which model the lab points pi at by default), so it
+# is not an N=1 smoke.
+design: matched-control
+
+# sha256 over the battery's task prompts, in task-id order.
+#
+# In a diffusion experiment this hashes the render prompt; here the equivalent
+# stimulus is the task battery's prompts -- the exact text every arm is driven
+# with. Hashing them pins the battery: edit a prompt and the hash moves.
+#
+# Reproduce:  python3 experiments/pi-ollama-bakeoff/harness/prompt_hash.py
+# Verify:     python3 experiments/pi-ollama-bakeoff/harness/prompt_hash.py \
+#                 --check experiments/pi-ollama-bakeoff/protocol.yml
+#
+# The pipeline runs that --check before gpu-lock, so a battery reworded after
+# pre-registration fails the build instead of quietly changing the stimulus.
+prompt_hash: sha256:a33099f07706e863a76f513c73c52c6691a0b009941afd910d1f3fe6da220b61
+
+# Pinned into every arm's derived Ollama model as `PARAMETER seed 42`.
+# Greedy decoding (temperature 0, top_k 1) makes the seed close to moot, which
+# is the point: it is recorded so a later run can be compared against this one.
+seed: 42
+
+axes:
+  # The ONLY thing that varies between arms.
+  under_test:
+    - ollama_model
+
+  # Pinned identically across all four arms. The derived `bakeoff-*` tags
+  # exist precisely so decoding is held constant rather than inherited from
+  # each base model's own Modelfile defaults -- comparing the models as
+  # shipped would have varied decoding along with the model, which is the
+  # control this experiment claims to have.
+  held_constant:
+    - pi_version                  # one pinned version, recorded per arm
+    - pi_system_prompt            # pi's default coding prompt, unmodified
+    - pi_tool_set                 # built-in tools only; skills, extensions,
+                                  # context files, prompt templates and themes
+                                  # are all disabled, so no machine-local
+                                  # state rides along unrecorded
+    - task_battery                # identical 3 tasks, pinned by prompt_hash
+    - fixture_state               # every arm gets a fresh copy of every
+                                  # fixture; no arm sees another's edits
+    - temperature                 # 0
+    - top_p                       # 1.0
+    - top_k                       # 1
+    - seed                        # 42
+    - num_ctx                     # 16384 for every arm, including flint, whose
+                                  # 262k window is deliberately NOT used -- a
+                                  # larger window is a different advantage than
+                                  # driving an agent well
+    - repeat_penalty              # 1.1
+    - task_timeout_s              # 1800 per task
+    - gpu_residency               # one model resident at a time, serially,
+                                  # under gpu-lock on the single 3090
+
+# One entry per arm. Each `workflow` is this experiment's ARM SPEC, not a
+# ComfyUI graph -- see the `_note` at the top of each file.
+arms:
+  - name: flint
+    workflow: experiments/pi-ollama-bakeoff/workflows/flint.api.json
+  - name: qwen3-coder-q4kxl
+    workflow: experiments/pi-ollama-bakeoff/workflows/qwen3-coder-q4kxl.api.json
+  - name: qwen3-coder-q5kxl
+    workflow: experiments/pi-ollama-bakeoff/workflows/qwen3-coder-q5kxl.api.json
+  - name: nemotron-lightning
+    workflow: experiments/pi-ollama-bakeoff/workflows/nemotron-lightning.api.json
+
+# The incumbent: the tool-capable coder model the lab already points pi at.
+# The hypothesis is that flint beats THIS, so this is what flint is scored
+# against -- not whichever arm happens to score worst.
+baseline: qwen3-coder-q4kxl
+
+# ---------------------------------------------------------------------------
+# Not gate-checked, but pre-registered anyway, because deciding these after
+# seeing the numbers is how a smoke test becomes a "comparison".
+# ---------------------------------------------------------------------------
+
+metrics:
+  primary: completion_rate        # oracle passes / 3, per arm
+  secondary:
+    - tool_error_rate             # tool_execution_end with isError / all calls
+    - protocol_errors             # assistant messages ending stopReason=error
+    - total_turns
+    - total_wall_clock_s
+    - mean_tokens_per_s
+
+# Stated in advance so the write-up cannot move the goalposts.
+decision_rule: >-
+  The hypothesis is SUPPORTED only if flint's completion_rate is strictly
+  greater than the baseline's. Equal completion rates are a NULL result for
+  the hypothesis regardless of how the efficiency metrics fall; in that case
+  the recommendation is decided on tool_error_rate first and wall clock
+  second, and the write-up must say the primary metric did not separate them.
+
+# N is small and deliberately so. Saying it here is what stops the write-up
+# from implying otherwise.
+power: >-
+  N=3 tasks x 1 attempt per arm. This can distinguish "drives an agent at all"
+  from "does not", and can expose gross tool-call breakage. It CANNOT resolve
+  small differences in completion rate: one task's worth of difference is 33
+  percentage points. A 3/3 vs 2/3 split is a reason to look harder, not a
+  measured ranking. Greedy decoding reduces run-to-run variance but does not
+  turn N=3 into a confidence interval.
