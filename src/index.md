@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
+- [Five probes confirm NCM is structurally unfit for GraphRAG extraction](2026-10-30-ncm-graphrag-null.html)
 - [The best tool-error rate in the run belongs to the two models that finished nothing](2026-10-22-pi-ollama-bakeoff.html)
 - [A 24 GB 3090 serves a 125B MoE at 111 tok/s, and the engine's own calibrator overstates that by 17%](2026-10-04-strata-throughput-3090.html)
 - [RETRACTED: the guide resolution comparison was never run — all three cells were handed the same file](2026-09-25-h3-guide-resolution-appearance-prior.html)

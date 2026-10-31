@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-10-30
+
+- [Five probes confirm NCM is structurally unfit for GraphRAG extraction](2026-10-30-ncm-graphrag-null.html) — Neural Cellular Machine tested as a GraphRAG primitive across five probe designs (REBEL entity extraction, Multi-News community reporting, TACRED relation classification, HotpotQA relevance scoring, and XSum zero-shot faithfulness) returns null or negative results in every case. Entity F1 hits 0.53% against AR 9.50% at paper scale, relation classification trails a unigram linear model (25.75 vs 44.7), and zero-shot summaries condition identically on relevant versus wrong-chunk context. NCM's discrete-latent generation lacks a span-copy mechanism, leaving it structurally unable to extract open-vocabulary entities at benchmark scale.
+
 ## 2026-10-22
 
 - [The best tool-error rate in the run belongs to the two models that finished nothing](2026-10-22-pi-ollama-bakeoff.html) — four tool-capable local Ollama models drive the `pi` coding agent (0.73.1) through the same three-task battery, decoding pinned identically across arms by derived `bakeoff-*` tags. `flint` passes 3/3 and `nemotron-lightning` 3/3; the incumbent baseline `qwen3-coder-ud-q4kxl` passes 0/3. On the pre-registered rule the hypothesis is supported, but the interesting result is how the losers lose: they emit prose promising the next action and end the turn with no tool call, terminating the agent loop one call short. The tool error rate pre-registered as the tiebreak is anti-correlated with success — the arms that complete nothing score a perfect 0%, because a call never made is never malformed — and between the two arms it was meant to separate it ranks the denominator, since both made exactly three malformed calls. N=3 tasks per arm; flint vs nemotron is a tie, not a win.
