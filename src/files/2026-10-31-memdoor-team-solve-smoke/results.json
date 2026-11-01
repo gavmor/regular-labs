@@ -1,0 +1,41 @@
+{
+  "experiment": "memdoor-team-solve",
+  "design": "smoke",
+  "n": 1,
+  "outcome": "completed-pass",
+  "harness_failure": "",
+
+  "public_sample_verdict": "PUBLIC_PASS",
+  "public_sample_exit_code": "0",
+  "independent_oracle_verdict": "ORACLE_PASS",
+  "independent_oracle_exit_code": "0",
+
+  "workflow_run_exit_code": "0",
+  "workflow_run_id": "",
+  "workflow_wall_clock_seconds": "85",
+  "team_solve_step_dirs_observed": "8",
+  "other_workflows_executed": "0",
+
+  "ledger_fidelity": {
+    "comment": "The engine's own 8/8 report is not evidence that each fresh role wrote the artifact its prompt demanded. Measured here, and NOT folded into either verdict.",
+    "documented_artifacts_present": ["notes.md", "solution.py", "test-output.log", "test-status.txt", "final-test-output.log"],
+    "documented_artifacts_missing": ["plan.md", "review.md"],
+    "notes_md_lines": "76",
+    "notes_md_lines_required_by_plan_prompt": "50",
+    "proposal_a_markers": "1",
+    "proposal_b_markers": "1",
+    "markers_required_each": "1"
+  },
+
+  "upstream_commit": "ce126a8dec855c99c73da58e230460a3c57e5140",
+  "model": "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL",
+  "backend": "ollama, keyless local OpenAI-compatible endpoint",
+  "inference": "local, on one RTX 3090, under the Concourse gpu-lock",
+  "cost_usd": 0,
+  "oracle_seed": "20261031",
+  "attempts": 1,
+  "model_retries": 0,
+
+  "NOT_A_BENCHMARK": "N=1 smoke test on the upstream sample problem with one repair round. This is not the upstream bench/ parity loop, carries no comparison to upstream's reported scores, and must not be read as one.",
+  "green_build_means": "the experiment ran and was measured, NOT that the model solved the problem; read outcome and the two verdicts."
+}

@@ -10,6 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
+- [Memdoor's eight-role DAG solves the sample problem on a local 30B MoE while skipping two contracted handoffs](2026-10-31-memdoor-team-solve-smoke.html)
 - [Five probes confirm NCM is structurally unfit for GraphRAG extraction](2026-10-30-ncm-graphrag-null.html)
 - [The best tool-error rate in the run belongs to the two models that finished nothing](2026-10-22-pi-ollama-bakeoff.html)
 - [A 24 GB 3090 serves a 125B MoE at 111 tok/s, and the engine's own calibrator overstates that by 17%](2026-10-04-strata-throughput-3090.html)

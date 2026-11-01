@@ -1,0 +1,162 @@
+# Experiment: memdoor-team-solve
+#
+# A SMOKE TEST (N=1). It is not a controlled comparison, it has no baseline
+# arm, and it cannot confirm or refute any upstream benchmark number.
+#
+# Task: kanban t_77af9edd.
+
+id: memdoor-team-solve
+title: Reproduce the upstream Memdoor team-solve sample in Concourse
+design: smoke
+n: 1
+
+# ---------------------------------------------------------------------------
+# What is under test
+# ---------------------------------------------------------------------------
+# Exactly one claim, and it is a mechanical one:
+#
+#   "The upstream team-solve workflow, run at its pinned revision against its
+#    own sample problem, drives eight file-coordinated steps to completion and
+#    its own final checker exits 0."
+#
+# The verdict is the upstream `verify` step: `check-samples.sh` run by the
+# workflow itself. A model's self-report is not the verdict and is not read as
+# one anywhere in this experiment.
+claim: >-
+  The upstream team-solve workflow at revision
+  ce126a8dec855c99c73da58e230460a3c57e5140, run on its own sample problem
+  against a locally served tool-capable model, completes its eight steps and
+  its own final sample checker exits 0.
+
+# ---------------------------------------------------------------------------
+# What is explicitly NOT under test
+# ---------------------------------------------------------------------------
+# Upstream reports a mean of 9.8/10 over five passes on the first ten
+# LiveCodeBench Hard problems, on Qwen3.8-27B served by OpenRouter, graded on
+# hidden tests, via a SEPARATE benchmark loop (bench/) that runs up to 10
+# rounds. This experiment runs the eight-step SAMPLE with at most ONE repair
+# round, on a different host, a different quantization and one problem.
+#
+# A result here therefore cannot be reported as, compared against, or scaled
+# to that number. One sample problem solved or unsolved is not a score.
+not_under_test:
+  - upstream's 9.8/10 five-pass parity result
+  - the separate bench/ parity loop (up to 10 rounds)
+  - equivalence to upstream's Qwen3.8-27B on OpenRouter in FP8
+  - any model-vs-model comparison
+  - LiveCodeBench Hard performance
+  - hidden-test performance (no hidden tests exist for the sample problem)
+
+# ---------------------------------------------------------------------------
+# Deliberate divergences from upstream's published run
+# ---------------------------------------------------------------------------
+# Each is a confound, named here before the run rather than explained after.
+divergences:
+  - what: model
+    upstream: Qwen3.8-27B, FP8, OpenRouter (Modal/CoreWeave/Parasail/Wafer)
+    here: Qwen3-Coder-30B-A3B-Instruct, GGUF UD-Q4_K_XL, Ollama on one RTX 3090
+    why: >-
+      No approved cloud inference for this card, and the lab's standing rule
+      puts all generative work inside Concourse under the GPU lock. This is a
+      different model at a far lower precision, so output quality is not
+      comparable to upstream's.
+  - what: problem
+    upstream: first ten LiveCodeBench Hard problems
+    here: the repository's own sample problem (count balanced substrings)
+    why: the sample is what the eight-step workflow ships to be run on.
+  - what: rounds
+    upstream_bench: up to 10 rounds
+    here: the sample's one repair round
+    why: the sample workflow defines exactly one conditional repair.
+  - what: grading
+    upstream: public and hidden tests, authors' corrected grader
+    here: the 5 public samples (upstream's checker) plus an independent oracle
+    why: no hidden tests exist for the sample problem.
+  - what: build
+    upstream: official installer binary from memdoor.ai/dl
+    here: built from the pinned source revision, with web/dist stubbed
+    why: >-
+      Building from the pinned revision ties the run to an auditable commit.
+      web/dist is untracked and needs a vite build; the CLI workflow engine
+      does not serve the web UI, so a placeholder satisfies the //go:embed.
+
+# ---------------------------------------------------------------------------
+# Measurement
+# ---------------------------------------------------------------------------
+# Two verdicts, reported SEPARATELY and never merged into one number.
+measures:
+  - name: public_sample_verdict
+    source: upstream check-samples.sh, run by the workflow's own verify step
+    type: exit_code
+    note: this is the workflow's own definition of success.
+  - name: independent_oracle_verdict
+    source: concourse/scripts/memdoor_oracle.py
+    type: exit_code
+    note: >-
+      Deterministic brute force over strings the generated solution.py is fed,
+      seeded fixed. Catches a solution that fits the five public samples and is
+      still wrong. A public PASS with an oracle FAIL is a real and reportable
+      outcome, not a contradiction to be smoothed over.
+  - name: step_outcomes
+    source: memdoor workflow status and the on-disk ledger
+    type: per-step state and exit codes
+  - name: wall_clock
+    source: task log timestamps
+  - name: cost
+    value: 0
+    note: local inference, no provider billing. Cost is GPU-lock time, recorded.
+
+# ---------------------------------------------------------------------------
+# Budgets. A run that exceeds one is stopped and reported as stopped.
+# ---------------------------------------------------------------------------
+budgets:
+  workflow_timeout: 90m
+  locked_task_timeout: 2h
+  attempts: 1          # ONE sample attempt
+  infra_retries: 2     # infrastructure only (image pull, model pull, network)
+  model_retries: 0     # a model failure is a result, never retried away
+
+# ---------------------------------------------------------------------------
+# Pre-registered outcomes. All four are publishable; none is a failure of the
+# experiment.
+# ---------------------------------------------------------------------------
+outcomes:
+  - id: completed-pass
+    when: eight steps ran and the final checker exited 0
+    means: the harness reproduces mechanically on this host and model.
+  - id: completed-fail
+    when: eight steps ran and the final checker exited non-zero
+    means: >-
+      the harness reproduces mechanically; this model did not solve this
+      problem within one repair round. A real null result.
+  - id: incomplete
+    when: a step errored, timed out, or the engine could not be driven
+    means: report the step, the exit code and the log. Not retried into a pass.
+  - id: blocked
+    when: the run could not start for an evidenced infrastructure reason
+    means: report the blocker. Never fabricate a run.
+
+# ---------------------------------------------------------------------------
+# Safety: upstream is untrusted code
+# ---------------------------------------------------------------------------
+safety:
+  - >-
+    The pinned revision's team-solve assets are hash-asserted before
+    execution (audit-upstream task). Changed upstream content is a red build,
+    not a silent different experiment.
+  - >-
+    The workflow and the model-authored solution.py execute only inside the
+    Concourse task container.
+  - >-
+    The locked task is passed NO secrets. No Immich key, no MinIO key, no
+    repo deploy key, no provider API key. Egress credentials live only in the
+    separate put step, after the container is gone.
+  - >-
+    Inference is keyless and local. Nothing leaves the box.
+
+provenance:
+  upstream_repo: https://github.com/guregodevo/memdoor
+  upstream_commit: ce126a8dec855c99c73da58e230460a3c57e5140
+  upstream_path: examples/workflows/team-solve
+  pipeline: concourse/memdoor-team-solve-pipeline.yml
+  egress: s3/minio, bucket blades68-3d, prefix memdoor-team-solve

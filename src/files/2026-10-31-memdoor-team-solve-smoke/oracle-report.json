@@ -1,0 +1,12 @@
+{
+  "cases_failed": 0,
+  "cases_total": 1451,
+  "crashes": 0,
+  "failures_sample": [],
+  "mismatches": 0,
+  "note": "Independent of the five public samples. This verdict is reported separately and is NOT a benchmark score.",
+  "seed": 20261031,
+  "solution": "/tmp/build/1903c69f/results/raw/solution.py",
+  "timeouts": 0,
+  "verdict": "ORACLE_PASS"
+}

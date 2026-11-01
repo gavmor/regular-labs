@@ -1,0 +1,462 @@
+# =============================================================================
+# memdoor-team-solve: a Concourse-native smoke test of the upstream Memdoor
+# team-solve sample.
+# =============================================================================
+#
+# Card: kanban t_77af9edd. Protocol: experiments/memdoor-team-solve/protocol.yml
+#
+# WHAT THIS MEASURES
+# ------------------
+# One question, mechanical: does the upstream eight-step team-solve workflow,
+# at its pinned revision, drive its own sample problem to a passing run of its
+# own checker, on a locally served tool-capable model?
+#
+# N=1. It is a smoke test. It is NOT the upstream bench/ parity loop, carries
+# no comparison to upstream's published scores, and a result here cannot be
+# read as one. The protocol names every divergence from upstream's published
+# run before the fact.
+#
+# GREEN DOES NOT MEAN SOLVED
+# --------------------------
+# The locked task exits 0 whenever the experiment RAN and was MEASURED.
+# `completed-fail` -- eight steps ran, the checker exited non-zero -- is a
+# pre-registered valid outcome and still egresses its artifacts. The build
+# goes red only when the harness failed. The result lives in results.json,
+# not in the build's colour. Conflating the two is how a null result gets
+# reported as a pass.
+#
+# TWO VERDICTS, NEVER MERGED
+# --------------------------
+# * public_sample_verdict      -- upstream's five-sample check-samples.sh
+# * independent_oracle_verdict -- a brute-force oracle over 1125+ cases
+# Five samples is a weak oracle, and upstream's own write-up documents a
+# solution that passed the samples while still being wrong. A PUBLIC_PASS with
+# an ORACLE_FAIL is a real, reportable finding, so the two are recorded on
+# separate lines and never averaged.
+#
+# STEP ORDER IS THE SAFETY ARGUMENT
+# ---------------------------------
+#   verify-pin    -> the resource is the reviewed commit, or red
+#   audit-upstream-> the nine executed files are byte-identical, or red
+#   build-memdoor -> a broken build fails before anything downloads 17 GB
+#   pull-model    -> the big download happens OFF the lock
+#   preflight     -> disk and model checked immediately before acquiring
+#   put gpu-lock  -> acquired as late as possible
+#   run           -> the only task that needs the 3090
+#   ensure        -> ONE sequential put releasing the lock
+#   package/put   -> egress after the lock is free
+#
+# Everything that does not need the GPU runs `tags: [cpu]` on the CPU worker,
+# so the 3090 box is not occupied compiling Go or pulling a model.
+#
+# THE BENCH CONFLATION GUARD
+# --------------------------
+# Measured, not theoretical. A probe that staged the whole upstream
+# `team-solve/` directory into the memdoor workflow library had the engine
+# discover `bench/single-lcb/steps/` and `bench/team-llm-lcb/steps/` as
+# workflows of their own: one `workflow run team-solve` became 23 tasks across
+# three workflows and died in a bench step. The run script therefore stages an
+# allowlist of exactly nine files and asserts both the count and that only one
+# steps/ directory exists in the staged tree.
+#
+# SECRETS
+# -------
+# The locked task is passed none: no Immich key, no MinIO key, no repo deploy
+# key, no provider API key. Upstream code and a model-authored solution.py
+# execute in it. Egress credentials live only in the `put:` step, after that
+# container is gone. Inference is keyless and local.
+#
+# NO TRIGGERS
+# -----------
+# Every resource is trigger: false. This is run on purpose. A new upstream
+# commit must not silently re-run it and overwrite a recorded result.
+
+resources:
+  # Upstream memdoor. Pinned by assertion, not by tag: upstream publishes no
+  # tag at this revision, so verify-pin compares .git/ref to the var and the
+  # audit task hashes the nine files it will execute. If main has moved, the
+  # build goes red rather than quietly measuring a different commit.
+  - name: memdoor-src
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/guregodevo/memdoor.git
+      branch: main
+
+  - name: workflow-repo
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:gavmor/comfyui-workflows.git
+      branch: ((memdoor_smoke_branch))
+      private_key: ((workflow_repo_private_key))
+
+  # The same cross-pipeline pool every GPU job on this box uses. One physical
+  # 3090, so exclusivity is global -- docs/adr/0002-cross-pipeline-gpu-lock.md.
+  - name: gpu-lock
+    type: pool
+    icon: lock
+    source:
+      uri: git@github.com:gavmor/concourse-locks.git
+      branch: main
+      pool: gpu
+      private_key: ((gpu_lock_repo_private_key))
+
+  # S3/MinIO, not Immich: the artifacts are prompts, a ledger, generated
+  # Python and logs. Immich is a photo library and would make none of it
+  # reviewable.
+  - name: memdoor-results-s3
+    type: s3
+    icon: archive-outline
+    source:
+      endpoint: ((minio_endpoint))
+      bucket: ((memdoor_smoke_bucket))
+      regexp: ((memdoor_smoke_key_prefix))/memdoor-team-solve-(.*)\.tar\.gz
+      access_key_id: ((minio_access_key))
+      secret_access_key: ((minio_secret_key))
+      region_name: us-east-1
+      disable_ssl: true
+
+jobs:
+  - name: smoke
+    serial: true
+    # Pipeline-local defence in depth on top of gpu-lock, matching the other
+    # GPU jobs on this box.
+    serial_groups: [gpu]
+    plan:
+      - in_parallel:
+          - get: memdoor-src
+            trigger: false
+          - get: workflow-repo
+            trigger: false
+
+      # ---------------------------------------------------------------------
+      # Gate 1: the resource is the commit that was reviewed.
+      # ---------------------------------------------------------------------
+      - task: verify-pin
+        tags: [cpu]
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          inputs:
+            - name: memdoor-src
+          params:
+            EXPECTED: ((memdoor_commit))
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                # Under `branch:` the git resource's version is the sha, in
+                # .git/ref. Compared rather than trusted: a moved main would
+                # otherwise silently change the experiment.
+                GOT="$(cat memdoor-src/.git/ref)"
+                echo "resource ref : $GOT"
+                echo "protocol pin : $EXPECTED"
+                if [ "$GOT" != "$EXPECTED" ]; then
+                  echo
+                  echo "FAIL: upstream main has moved off the reviewed revision."
+                  echo "Either re-review at the new sha and update memdoor_commit,"
+                  echo "or pin the resource:"
+                  echo "  fly -t lab pin-resource -r memdoor-team-solve/memdoor-src -v ref:$EXPECTED"
+                  exit 1
+                fi
+                echo "OK: pinned revision confirmed."
+
+      # ---------------------------------------------------------------------
+      # Gate 2: upstream is untrusted code. Audit before anything executes it.
+      # ---------------------------------------------------------------------
+      - task: audit-upstream
+        tags: [cpu]
+        input_mapping: { repo: workflow-repo }
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: python, tag: "3.12-slim" }
+          inputs:
+            - name: memdoor-src
+            - name: repo
+          outputs:
+            - name: audit
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                python3 repo/concourse/scripts/memdoor_audit_upstream.py \
+                  memdoor-src/examples/workflows/team-solve \
+                  audit/audit.json
+
+      # ---------------------------------------------------------------------
+      # Build the CLI from the pinned source. CPU worker, and before any
+      # large download, so a toolchain break costs nothing.
+      # ---------------------------------------------------------------------
+      - task: build-memdoor
+        tags: [cpu]
+        timeout: 45m
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: golang, tag: "1.26-bookworm" }
+          inputs:
+            - name: memdoor-src
+          outputs:
+            - name: memdoor-bin
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                cd memdoor-src
+                # web/embed.go carries `//go:embed all:dist` and web/dist is
+                # untracked -- upstream's build runs vite first. The CLI's
+                # workflow engine does not serve the web UI, so a placeholder
+                # satisfies the embed directive and keeps a Node toolchain out
+                # of this pipeline. Recorded as an adaptation in the protocol.
+                mkdir -p web/dist
+                printf 'not built: this pipeline runs the CLI workflow engine only\n' \
+                  > web/dist/index.html
+                cd cmd/cli
+                CGO_CFLAGS="-DSQLITE_ENABLE_FTS5" \
+                  go build -o ../../../memdoor-bin/memdoor main.go
+                cd ../../..
+                chmod +x memdoor-bin/memdoor
+                ./memdoor-bin/memdoor --version
+                ls -l memdoor-bin/
+
+      # ---------------------------------------------------------------------
+      # Pull the model OFF the lock. This is the big download and it needs no
+      # GPU, so it must not happen while the 3090 is held.
+      # ---------------------------------------------------------------------
+      - task: pull-model
+        tags: [cpu]
+        timeout: 90m
+        params:
+          MEMDOOR_MODEL: ((memdoor_model))
+          MIN_DISK_GIB: ((memdoor_min_disk_gib))
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: ollama/ollama, tag: ((ollama_tag)) }
+          outputs:
+            # Carried into the locked task so it starts with the weights
+            # already local.
+            - name: ollama-models
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                echo "--- disk before the download ---"
+                df -h . | tail -1
+                AVAIL_GIB="$(df -BG --output=avail . | tail -1 | tr -dc '0-9')"
+                echo "available: ${AVAIL_GIB} GiB; required: ${MIN_DISK_GIB} GiB"
+                if [ "$AVAIL_GIB" -lt "$MIN_DISK_GIB" ]; then
+                  echo "FAIL: not enough disk for the model. Refusing to"
+                  echo "half-download it and fail later holding the lock."
+                  exit 1
+                fi
+
+                export OLLAMA_MODELS="$(pwd)/ollama-models"
+                mkdir -p "$OLLAMA_MODELS"
+                # Serving on CPU here: this step only writes blobs to disk.
+                ollama serve > /tmp/serve.log 2>&1 &
+                for _ in $(seq 1 90); do
+                  ollama list >/dev/null 2>&1 && break
+                  sleep 2
+                done
+                ollama list >/dev/null 2>&1 || { tail -40 /tmp/serve.log; exit 1; }
+
+                echo "--- pulling ${MEMDOOR_MODEL} ---"
+                ollama pull "$MEMDOOR_MODEL"
+                ollama list
+                echo "--- model store ---"
+                du -sh "$OLLAMA_MODELS"
+                df -h . | tail -1
+
+      # ---------------------------------------------------------------------
+      # Last gate before the lock: everything the locked task needs is here.
+      # ---------------------------------------------------------------------
+      - task: preflight
+        tags: [cpu]
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          inputs:
+            - name: ollama-models
+            - name: memdoor-bin
+            - name: audit
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                echo "--- audit verdict ---"
+                grep -o '"verdict": "[A-Z_]*"' audit/audit.json
+                grep -q '"verdict": "AUDIT_CLEAN"' audit/audit.json \
+                  || { echo "FAIL: upstream audit not clean"; exit 1; }
+                echo "--- memdoor binary ---"
+                ls -l memdoor-bin/memdoor
+                test -x memdoor-bin/memdoor || { echo "FAIL: no binary"; exit 1; }
+                echo "--- model store ---"
+                du -sh ollama-models
+                test -d ollama-models/manifests \
+                  || { echo "FAIL: model store looks empty"; exit 1; }
+                echo "OK: ready to acquire the lock."
+
+      # ---------------------------------------------------------------------
+      # GPU section. Acquired here, released in the task's ensure as a single
+      # sequential put.
+      # ---------------------------------------------------------------------
+      - put: gpu-lock
+        params: { acquire: true }
+
+      - task: run-team-solve
+        # Untagged on purpose: this is the only task that needs the 3090, and
+        # the GPU worker is the untagged one.
+        timeout: 3h
+        input_mapping: { repo: workflow-repo }
+        params:
+          NVIDIA_VISIBLE_DEVICES: all
+          NVIDIA_DRIVER_CAPABILITIES: all
+          MEMDOOR_MODEL: ((memdoor_model))
+          MEMDOOR_COMMIT: ((memdoor_commit))
+          MEMDOOR_WORKFLOW_TIMEOUT: ((memdoor_workflow_timeout))
+          MEMDOOR_ORACLE_SEED: ((memdoor_oracle_seed))
+          OLLAMA_KEEP_ALIVE: 2h
+          # No credential of any kind is passed here. See the header.
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: ollama/ollama, tag: ((ollama_tag)) }
+          inputs:
+            - name: repo
+            - name: memdoor-src
+            - name: memdoor-bin
+            - name: audit
+            - name: ollama-models
+              path: /models/ollama
+          outputs:
+            - name: results
+          run:
+            path: bash
+            args:
+              - -ec
+              - |
+                # DEBIAN_FRONTEND=noninteractive is not optional here, it is a
+                # fix for a measured failure: build 1 hung for 15 minutes on
+                # tzdata's debconf prompt WHILE HOLDING THE GPU LOCK, because
+                # a prompt on a closed stdin waits forever. Any apt call in a
+                # lock-held task must be non-interactive by construction.
+                export DEBIAN_FRONTEND=noninteractive
+                export TZ=UTC
+                # Not silenced: a failed install inside the lock must be
+                # visible in the log, not inferred from a later error.
+                apt-get update -qq
+                apt-get install -y -qq --no-install-recommends \
+                  python3 git ca-certificates curl
+                python3 --version
+                mkdir -p /work
+                bash repo/concourse/scripts/memdoor_team_solve.sh
+        ensure:
+          # ONE sequential put. Never in_parallel inside ensure: a cancelled
+          # sibling branch leaves the lock held by a build that no longer
+          # exists, which deadlocks every GPU job on this box.
+          put: gpu-lock
+          params: { release: gpu-lock }
+
+      # ---------------------------------------------------------------------
+      # Egress, after the lock is released. Nothing here needs the GPU and a
+      # slow upload must not hold the 3090.
+      # ---------------------------------------------------------------------
+      - task: package-results
+        tags: [cpu]
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          inputs:
+            - name: results
+            - name: memdoor-src
+          outputs:
+            - name: package
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                # The stamp carries the upstream sha and the outcome, so an
+                # object in the bucket is attributable and its result legible
+                # without unpacking it.
+                SHA="$(cut -c1-7 memdoor-src/.git/ref)"
+                OUTCOME="$(grep -o '"outcome": "[a-z-]*"' results/results.json \
+                           | cut -d'"' -f4)"
+                OUTCOME="${OUTCOME:-unknown}"
+                STAMP="$(date -u +%Y%m%dT%H%M%SZ)-${SHA}-${OUTCOME}"
+                echo "--- results tree ---"
+                find results -maxdepth 2 | head -40
+                du -sh results
+                tar -czf "package/memdoor-team-solve-${STAMP}.tar.gz" -C results .
+                echo "packaged: memdoor-team-solve-${STAMP}.tar.gz"
+                ls -l package/
+
+      - put: memdoor-results-s3
+        params:
+          file: package/memdoor-team-solve-*.tar.gz
+
+      # ---------------------------------------------------------------------
+      # The build's colour, decided AFTER the artifacts are safely in the
+      # bucket.
+      # ---------------------------------------------------------------------
+      # run-team-solve deliberately exits 0 on any measured outcome so that
+      # nothing blocks egress -- an `incomplete` run's prompts and ledger are
+      # exactly what a reader needs. Build 6219766 proved the cost of getting
+      # this backwards: the task went red on `incomplete` and its evidence
+      # never left the container.
+      #
+      # So redness lives here instead. A red build still means "the
+      # experiment did not run", and its evidence is in the bucket regardless.
+      - task: verdict-gate
+        tags: [cpu]
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: "1.36" }
+          inputs:
+            - name: results
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                OUTCOME="$(grep -o '"outcome": "[a-z-]*"' results/results.json \
+                           | cut -d'"' -f4)"
+                echo "--- recorded verdicts ---"
+                grep -E '"(outcome|public_sample_verdict|independent_oracle_verdict|harness_failure|team_solve_step_dirs_observed|other_workflows_executed)"' \
+                  results/results.json
+                echo
+                case "$OUTCOME" in
+                  completed-pass|completed-fail)
+                    # completed-fail is a pre-registered valid outcome: the
+                    # harness reproduced and the model did not solve it.
+                    echo "GREEN: the experiment ran and was measured ($OUTCOME)."
+                    echo "This is NOT a statement that the model solved the"
+                    echo "problem -- read the two verdicts above."
+                    ;;
+                  *)
+                    echo "RED: the experiment did not run to a gradable result"
+                    echo "($OUTCOME). The artifacts are already in the bucket;"
+                    echo "read the prompts and ledger there."
+                    exit 1
+                    ;;
+                esac

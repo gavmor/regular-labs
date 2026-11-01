@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-10-31
+
+- [Memdoor's eight-role DAG solves the sample problem on a local 30B MoE while skipping two contracted handoffs](2026-10-31-memdoor-team-solve-smoke.html) — the upstream Memdoor team-solve workflow at pinned revision ce126a8 produces an optimal O(N) solution to its sample problem on a locally served Qwen3-Coder-30B-A3B quant under the Concourse GPU lock, passing all 5 public samples and 1,451 independent brute-force oracle cases in 85 seconds. The engine reports 8/8 tasks completed, but inspection of the artifact ledger reveals that the planner and reviewer roles omitted their contracted plan.md and review.md deliverables. N=1 smoke test.
+
 ## 2026-10-30
 
 - [Five probes confirm NCM is structurally unfit for GraphRAG extraction](2026-10-30-ncm-graphrag-null.html) — Neural Cellular Machine tested as a GraphRAG primitive across five probe designs (REBEL entity extraction, Multi-News community reporting, TACRED relation classification, HotpotQA relevance scoring, and XSum zero-shot faithfulness) returns null or negative results in every case. Entity F1 hits 0.53% against AR 9.50% at paper scale, relation classification trails a unigram linear model (25.75 vs 44.7), and zero-shot summaries condition identically on relevant versus wrong-chunk context. NCM's discrete-latent generation lacks a span-copy mechanism, leaving it structurally unable to extract open-vocabulary entities at benchmark scale.
