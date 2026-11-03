@@ -1,0 +1,6 @@
+{
+  "embedding": "hf.co/tex8/Octen-Embedding-8B-GGUF:Q4_K_M",
+  "embed_query_prefix": "query: ",
+  "embed_doc_prefix": "passage: ",
+  "generator": "bakeoff-qwen3-coder-q5kxl:latest"
+}

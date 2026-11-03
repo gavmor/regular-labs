@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-11-02
+
+- [Pinned decoding parameters separate the 30B coder from the pack, while reasoning models burn their token budget on thoughts Antfly never reads](2026-11-02-antfly-local-model-bakeoff.html) — an empirical 26-run evaluation of 22 local Ollama models across dense retrieval and agentic execution on an RTX 3090. `bakeoff-qwen3-coder-q5kxl` scores 0.9403 generator quality with 0.89s/call latency and 100% deterministic reproducibility under pinned Modelfile decoding parameters. `Octen-Embedding-8B` with lowercase asymmetric prefixes (`query: ` / `passage: `) leads retrieval at 0.9583 MRR@10, while `nomic-embed-text` with `search_*` prefixes provides an 11x faster Pareto alternative (166.7 docs/s). Reasoning models (Nemotron, Qwen3.8) fail inside Antfly because Antfly's default 256-token cap is exhausted by reasoning before content can generate.
+
 ## 2026-10-31
 
 - [Memdoor's eight-role DAG solves the sample problem on a local 30B MoE while skipping two contracted handoffs](2026-10-31-memdoor-team-solve-smoke.html) — the upstream Memdoor team-solve workflow at pinned revision ce126a8 produces an optimal O(N) solution to its sample problem on a locally served Qwen3-Coder-30B-A3B quant under the Concourse GPU lock, passing all 5 public samples and 1,451 independent brute-force oracle cases in 85 seconds. The engine reports 8/8 tasks completed, but inspection of the artifact ledger reveals that the planner and reviewer roles omitted their contracted plan.md and review.md deliverables. N=1 smoke test.
