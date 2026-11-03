@@ -109,7 +109,7 @@ These parameters lower decoding latency from 1.99s to 0.89s per call and produce
 
 Dropping from Q5 (`bakeoff-qwen3-coder-q5kxl`) to Q4 (`bakeoff-qwen3-coder-q4kxl`) saves 4 GB of VRAM but collapses tool schema validation from 0.9750 to 0.3750. The Q4 model fails type constraints (emitting strings like `"5"` instead of integer `5`) and omits optional filters. For agent tool calling, 5-bit quantization is a hard requirement.
 
-### Why reasoning models fail inside Antfly
+### Why reasoning models fail inside Antfly, and how 4096 tokens restores them
 
 Network proxy captures between Antfly and Ollama expose the mechanism:
 
@@ -118,8 +118,12 @@ Network proxy captures between Antfly and Ollama expose the mechanism:
 3. Models such as `Nemotron` and `Qwen3.8-27B` generate 256 tokens of reasoning, hit `finish_reason: "length"`, and return `content: ""`.
 4. Antfly's OpenAI client treats the empty string as a successful response, yielding blank generation and broken query plans.
 5. Attempting to suppress reasoning via Modelfile (`PARAMETER stop <think>` in `bakeoff-nemotron-lightning`) halts generation at token 0, producing an Antfly score of 0.0000.
-6. Supplying `"max_tokens": 4096` explicitly in the generator JSON allows reasoning models to complete their thinking trace and populate `content`.
+6. **The Configuration Fix:** Supplying `"max_tokens": 4096` in the generator JSON allows reasoning models to complete their thinking trace and populate `content`:
+   - **Nemotron-3.5-Lightning-30B**: `antfly_rag_acc` jumps from 0.00 to **0.88**, and `antfly_qb_score` jumps from 0.38 to **0.88** (overall Antfly score 0.19 $\rightarrow$ **0.88**).
+   - **Swift-Qwen3.8-27B**: `antfly_rag_acc` reaches **0.88**, and `antfly_qb_score` jumps from 0.33 to **0.83** (overall Antfly score 0.60 $\rightarrow$ **0.85**).
+7. **Do not disable thinking:** Turning off reasoning via `reasoning_effort: "none"` causes query-builder planning to collapse (Nemotron QB drops to 0.00, Swift QB drops to 0.17). Both models depend on their reasoning trace to interpret database schemas and formulate structured Bleve queries.
 
+With `"max_tokens": 4096`, Nemotron 3.5 Lightning 30B matches `bakeoff-qwen3-coder-q5kxl` in Antfly agent performance (0.88 vs 0.85), trading sub-second latency (0.89s) for deeper reasoning capability (6.6s).
 ### Tokenizer case sensitivity in dense embeddings
 
 `Octen-Embedding-8B` exhibits sharp sensitivity to prefix formatting:
@@ -138,7 +142,7 @@ The fixture tests 382 chunks from Roman historical texts; domain transfer to cod
 
 Furthermore, this test does not evaluate multi-user concurrent throughput. All benchmarks execute serially under single-tenant GPU residence. Concurrent request queuing under Ollama may alter latency profiles.
 
-Finally, while `"max_tokens": 4096` restores content generation for reasoning models, this bake-off does not benchmark whether reasoning models with thinking enabled outperform non-thinking 30B coders on retrieval synthesis when given sufficient tokens. That comparison requires an expanded latency budget.
+While `"max_tokens": 4096` restores content generation and query planning for reasoning models, this bake-off does not benchmark long-horizon agent trajectories where reasoning token accumulation might stress multi-turn context windows.
 
 ## Cost
 
