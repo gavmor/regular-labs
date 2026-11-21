@@ -135,4 +135,5 @@ The evidence files are the contents of the task's egress archive, `s3://blades68
 - [`ollama-arm.json`](files/2026-11-21-inkling2-mini-3090-smoke/ollama-arm.json) — the daemon's answer, verbatim, and proof the model unloaded again
 - [`inkling2-toolchain.json`](files/2026-11-21-inkling2-mini-3090-smoke/inkling2-toolchain.json) — pinned model and runtime identity plus the vendor `BUILD_INFO`
 - [`gpu-samples.txt`](files/2026-11-21-inkling2-mini-3090-smoke/gpu-samples.txt) — the raw 0.5 s VRAM and utilization samples behind the figure
+- [`vram_utilization_chart.py`](files/2026-11-21-inkling2-mini-3090-smoke/vram_utilization_chart.py) — the script that turns those samples into the figure, unplotting nothing and smoothing nothing; it reproduces the published SVG byte for byte
 - [`prepare.log`](files/2026-11-21-inkling2-mini-3090-smoke/prepare.log) — the lock-free preparation log, including the digest checks
