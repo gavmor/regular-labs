@@ -1,0 +1,12 @@
+{
+  "elapsed_s": 3.3,
+  "endpoint": "http://192.168.16.1:11434",
+  "error": "{\"error\":\"llama-server process has terminated: exit status 1: error: Failed to load CLIP model from /usr/share/ollama/.ollama/models/blobs/sha256-2c165c78790e78a3f45a2d1e9e931083e52ee69d45ff2a0dc9c281fdf1a666e7\\nerror loading model: unknown model architecture: 'inkling2'\\nerror loading model: unknown model architecture: 'inkling2'\"}",
+  "http_status": 500,
+  "model": "hf.co/unsloth/Inkling-2-Mini-GGUF:UD-Q4_K_XL",
+  "model_unloaded_before_next_arm": true,
+  "outcome": "error",
+  "version": {
+    "version": "0.40.16"
+  }
+}

@@ -1,0 +1,57 @@
+# Instance vars for concourse/gpu-workload-template.yml -- Inkling 2 Mini smoke
+# (task t_c6bcc3aa).
+#
+# Deploy with:
+#   fly -t lab set-pipeline -p inkling2-mini-smoke \
+#     -c concourse/gpu-workload-template.yml \
+#     -l concourse/vars.default.yml \
+#     -l concourse/vars/inkling2-mini-smoke.yml \
+#     -l concourse/.secrets/vars.yml
+#
+# `artifact_resource_source` is NOT defined here: it carries the MinIO
+# credentials and therefore lives in concourse/.secrets/vars.yml, alongside
+# minio_access_key / minio_secret_key.
+
+workload_repo_uri: git@github.com:gavmor/genops-pipeline.git
+# The branch the smoke scripts are read from. Pin to the branch that carries
+# concourse/scripts/inkling2_smoke.py and concourse/scripts/inkling2_fetch.sh.
+workload_branch: wt/t_c6bcc3aa
+
+# --- image: pinned by digest, not by tag -----------------------------------
+# pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime. The template's contract needs
+# bash, Python, pip, PyTorch, tar, GNU time; the CUDA 12.8 libs it ships
+# (libcudart.so.12, libcublas.so.12) are also what the vendored llama.cpp
+# cuda12-portable bundle links against.
+cuda_workload_image_repo: pytorch/pytorch
+cuda_workload_image_digest: sha256:7b324d212a4450795b49edba9949b7cdc72429148a64e974334bfe5774d51385
+cuda_workload_image_insecure: false
+
+# No AOT CUDA extension to import: the CUDA code under test ships prebuilt.
+aot_import_check: ""
+
+# --- pre-lock preparation --------------------------------------------------
+# The pinned runtime image ships torch but not curl. Installed in the lock-free
+# prepare phase (apt state does not survive into the GPU task, so nothing here
+# is relied on later -- the template records peak RSS as unavailable instead).
+prepare_apt_packages: curl ca-certificates
+# 16.4 GiB of weights plus the pinned llama.cpp bundle, hash-verified, inside
+# the lock-free prepare phase. Never under gpu-lock.
+prepare_cmd: bash repo/concourse/scripts/inkling2_fetch.sh
+
+# --- the workload ----------------------------------------------------------
+# cwd is prepared-workspace/repo, so the staged toolchain is ../models, ../llamacpp.
+# OLLAMA_URL points at the fleet daemon over the docker bridge gateway; the
+# script probes it first (keep_alive=0) and records the outcome without letting
+# a failure there mask the llama.cpp measurement.
+workload_cmd: >-
+  export MODEL_PATH=../models/inkling-2-mini/Inkling-2-Mini-UD-Q4_K_XL.gguf;
+  export LLAMACPP_DIR=../llamacpp/llama-b12588-mix-c0c3de8;
+  export LD_LIBRARY_PATH=../llamacpp/llama-b12588-mix-c0c3de8:${LD_LIBRARY_PATH:-};
+  export OLLAMA_URL=http://192.168.16.1:11434;
+  python concourse/scripts/inkling2_smoke.py
+
+# Load (16.4 GiB offload) + one 192-token generation + the bounded Ollama probe.
+gpu_task_timeout: 30m
+
+# --- artifact egress -------------------------------------------------------
+artifact_resource_type: s3

@@ -1,0 +1,292 @@
+{
+  "claim_under_test": "Inkling 2 Mini UD-Q4_K_XL generates coherent text on one RTX 3090 (24 GiB, sm_86) through the vendor llama.cpp build.",
+  "config": {
+    "ctx": 4096,
+    "llamacpp_dir": "../llamacpp/llama-b12588-mix-c0c3de8",
+    "max_tokens": 320,
+    "model": "../models/inkling-2-mini/Inkling-2-Mini-UD-Q4_K_XL.gguf",
+    "n_gpu_layers": "999",
+    "ollama_url": "http://192.168.16.1:11434",
+    "seed": 42,
+    "temperature": 0.2,
+    "threads": "8"
+  },
+  "cuda_backend": {
+    "LD_LIBRARY_PATH": "/opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib:/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:/tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8:/opt/conda/lib:../llamacpp/llama-b12588-mix-c0c3de8:/usr/local/nvidia/lib:/usr/local/nvidia/lib64",
+    "ldd_libggml_cuda": "linux-vdso.so.1 (0x00007ca6fedbd000)\n\tlibggml-base.so.1 => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libggml-base.so.1 (0x00007ca6e24f0000)\n\tlibcudart.so.12 => /opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib/libcudart.so.12 (0x00007ca6e2200000)\n\tlibcublas.so.12 => /opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib/libcublas.so.12 (0x00007ca6db000000)\n\tlibcublasLt.so.12 => /opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib/libcublasLt.so.12 (0x00007ca6a8c00000)\n\tlibcuda.so.1 => /lib/x86_64-linux-gnu/libcuda.so.1 (0x00007ca6a3400000)\n\tlibstdc++.so.6 => /opt/conda/lib/libstdc++.so.6 (0x00007ca6a3213000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ca6e2119000)\n\tlibgcc_s.so.1 => /opt/conda/lib/libgcc_s.so.1 (0x00007ca6e24cc000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ca6a2fea000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ca6fedbf000)\n\tlibgomp.so.1 => /opt/conda/lib/libgomp.so.1 (0x00007ca6dafc0000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007ca6e24c5000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007ca6e24c0000)\n\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007ca6e24bb000)",
+    "ldd_llama_server": "linux-vdso.so.1 (0x0000710df85ac000)\n\tlibllama-server-impl.so => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libllama-server-impl.so (0x0000710df7edf000)\n\tlibstdc++.so.6 => /opt/conda/lib/libstdc++.so.6 (0x0000710df7cf2000)\n\tlibgcc_s.so.1 => /opt/conda/lib/libgcc_s.so.1 (0x0000710df7cd3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000710df7aa7000)\n\tlibllama-common.so.1 => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libllama-common.so.1 (0x0000710df751f000)\n\tlibmtmd.so.1 => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libmtmd.so.1 (0x0000710df7282000)\n\tlibllama.so.1 => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libllama.so.1 (0x0000710df6dc4000)\n\tlibggml.so.1 => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libggml.so.1 (0x0000710df6db8000)\n\tlibggml-base.so.1 => /tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/libggml-base.so.1 (0x0000710df6cd7000)\n\tlibssl.so.3 => /opt/conda/lib/libssl.so.3 (0x0000710df6bd9000)\n\tlibcrypto.so.3 => /opt/conda/lib/libcrypto.so.3 (0x0000710df65cb000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000710df64e4000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000710df85ae000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x0000710df64df000)\n\tlibgomp.so.1 => /opt/conda/lib/libgomp.so.1 (0x0000710df649f000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x0000710df649a000)",
+    "libraries_found": [
+      "libcublas.so.12",
+      "libcublasLt.so.12",
+      "libcudart.so.12"
+    ],
+    "library_dirs": [
+      "/opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib",
+      "/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib"
+    ],
+    "unresolved": []
+  },
+  "design": "smoke",
+  "experiment": "inkling2-mini-smoke",
+  "finished_at_unix": 1795287798,
+  "gpu_start": {
+    "driver_version": "595.99.02",
+    "memory_total_mib": 24576,
+    "memory_used_mib": 1667,
+    "name": "NVIDIA GeForce RTX 3090",
+    "utilization_pct": 0
+  },
+  "host": "Linux 6.17.0-42-generic x86_64",
+  "llamacpp_arm": {
+    "ctx_size": 4096,
+    "distinct_word_ratio": 0.909,
+    "generation_http_status": 200,
+    "generation_wall_seconds": 6.73,
+    "gpu_after_load": {
+      "driver_version": "595.99.02",
+      "memory_total_mib": 24576,
+      "memory_used_mib": 18870,
+      "name": "NVIDIA GeForce RTX 3090",
+      "utilization_pct": 1
+    },
+    "gpu_before": {
+      "driver_version": "595.99.02",
+      "memory_total_mib": 24576,
+      "memory_used_mib": 1669,
+      "name": "NVIDIA GeForce RTX 3090",
+      "utilization_pct": 0
+    },
+    "health": {
+      "status": "ok"
+    },
+    "load_seconds": 6.5,
+    "max_tokens": 320,
+    "n_gpu_layers": "999",
+    "new_tokens": 320,
+    "peak_utilization_pct": 88,
+    "peak_vram_mib": 18952,
+    "predicted_ms": 6232.705,
+    "prompt": "In two sentences, explain why a graphics card's memory bandwidth matters more than its raw FLOPs when generating tokens from a large language model.",
+    "prompt_ms": 485.925,
+    "prompt_tokens": 44,
+    "reasoning_text": "The user asks: \"In two sentences, explain why a graphics card's memory bandwidth matters more than its raw FLOPs when generating tokens from a large language model.\"\n\nNeed answer in two sentences. Need explain: token generation is memory-bound autoregressive decoding; each token requires reading model weights/KV cache from memory, arithmetic intensity low, so FLOPs underutilized. Raw FLOPs matter for training/prefill compute-heavy phases, but decode is limited by bandwidth to fetch weights/KV. Need concise two sentences. Ensure exactly two sentences. Could mention batch size caveat? They ask why matters more. Keep two sentences.\n\nNeed final only. No extra. Ensure two sentences exactly. Sentence 1: During autoregressive decoding, each new token mostly requires streaming the model weights and KV cache from GPU memory rather than doing dense arithmetic, so arithmetic intensity is low and compute units sit idle. Sentence 2: Consequently, tokens/sec is capped by memory bandwidth (and capacity), while raw FLOPs mainly help compute-bound phases like prefill/training, not single-token generation. That's two sentences. Good.",
+    "seed": 42,
+    "server_cmd": [
+      "/tmp/build/cf593ca0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8/llama-server",
+      "--model",
+      "/tmp/build/cf593ca0/prepared-workspace/models/inkling-2-mini/Inkling-2-Mini-UD-Q4_K_XL.gguf",
+      "--ctx-size",
+      "4096",
+      "--n-gpu-layers",
+      "999",
+      "--threads",
+      "8",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "9931",
+      "--no-webui",
+      "--metrics",
+      "--parallel",
+      "1",
+      "--seed",
+      "42",
+      "--temp",
+      "0.2"
+    ],
+    "server_exited": null,
+    "shutdown": {
+      "exit_after_sigterm": 0,
+      "exit_before_kill": null,
+      "gpu_after_shutdown": {
+        "driver_version": "595.99.02",
+        "memory_total_mib": 24576,
+        "memory_used_mib": 1677,
+        "name": "NVIDIA GeForce RTX 3090",
+        "utilization_pct": 0
+      }
+    },
+    "temperature": 0.2,
+    "text": "During autoregressive decoding, each new token mostly requires streaming the model weights and KV cache from GPU memory rather than doing dense arithmetic, so arithmetic intensity is low and compute units sit idle. Consequently, tokens/sec is capped by memory bandwidth and capacity, while raw FLOPs mainly help compute-bound phases like prefill and training, not single-",
+    "text_channel": "content",
+    "text_chars": 371,
+    "text_words": 55,
+    "timings": {
+      "cache_n": 0,
+      "predicted_ms": 6232.705,
+      "predicted_n": 320,
+      "predicted_per_second": 51.18162980599916,
+      "predicted_per_token_ms": 19.538260188087776,
+      "prompt_ms": 485.925,
+      "prompt_n": 44,
+      "prompt_per_second": 90.54895302773062,
+      "prompt_per_token_ms": 11.043750000000001
+    },
+    "tok_s_runtime": 51.18,
+    "tok_s_wall": 47.55,
+    "usage": {
+      "completion_tokens": 320,
+      "prompt_tokens": 44,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 364
+    },
+    "vram_delta_mib": 17283,
+    "vram_samples": [
+      [
+        1795287780.91,
+        1669,
+        0
+      ],
+      [
+        1795287781.43,
+        1931,
+        0
+      ],
+      [
+        1795287781.96,
+        1931,
+        0
+      ],
+      [
+        1795287782.48,
+        1931,
+        0
+      ],
+      [
+        1795287783.0,
+        1932,
+        0
+      ],
+      [
+        1795287783.53,
+        18266,
+        0
+      ],
+      [
+        1795287784.06,
+        18266,
+        81
+      ],
+      [
+        1795287784.59,
+        18266,
+        78
+      ],
+      [
+        1795287785.12,
+        18267,
+        17
+      ],
+      [
+        1795287785.64,
+        18869,
+        0
+      ],
+      [
+        1795287786.16,
+        18869,
+        0
+      ],
+      [
+        1795287786.68,
+        18869,
+        0
+      ],
+      [
+        1795287787.21,
+        18870,
+        1
+      ],
+      [
+        1795287787.73,
+        18874,
+        0
+      ],
+      [
+        1795287788.25,
+        18950,
+        86
+      ],
+      [
+        1795287788.78,
+        18950,
+        86
+      ],
+      [
+        1795287789.3,
+        18950,
+        85
+      ],
+      [
+        1795287789.82,
+        18950,
+        85
+      ],
+      [
+        1795287790.35,
+        18951,
+        87
+      ],
+      [
+        1795287790.99,
+        18951,
+        86
+      ],
+      [
+        1795287791.51,
+        18951,
+        86
+      ],
+      [
+        1795287792.03,
+        18951,
+        88
+      ],
+      [
+        1795287792.56,
+        18952,
+        76
+      ],
+      [
+        1795287793.08,
+        18952,
+        87
+      ],
+      [
+        1795287793.6,
+        18952,
+        87
+      ]
+    ]
+  },
+  "ollama_arm": {
+    "elapsed_s": 3.3,
+    "endpoint": "http://192.168.16.1:11434",
+    "error": "{\"error\":\"llama-server process has terminated: exit status 1: error: Failed to load CLIP model from /usr/share/ollama/.ollama/models/blobs/sha256-2c165c78790e78a3f45a2d1e9e931083e52ee69d45ff2a0dc9c281fdf1a666e7\\nerror loading model: unknown model architecture: 'inkling2'\\nerror loading model: unknown model architecture: 'inkling2'\"}",
+    "http_status": 500,
+    "model": "hf.co/unsloth/Inkling-2-Mini-GGUF:UD-Q4_K_XL",
+    "model_unloaded_before_next_arm": true,
+    "outcome": "error",
+    "version": {
+      "version": "0.40.16"
+    }
+  },
+  "python": "3.11.14",
+  "shutdown": {
+    "exit_after_sigterm": 0,
+    "exit_before_kill": null,
+    "gpu_after_shutdown": {
+      "driver_version": "595.99.02",
+      "memory_total_mib": 24576,
+      "memory_used_mib": 1677,
+      "name": "NVIDIA GeForce RTX 3090",
+      "utilization_pct": 0
+    }
+  },
+  "started_at_unix": 1795287776,
+  "task": "t_c6bcc3aa",
+  "verdict": "pass",
+  "vram_free_before_load_mib": 22907
+}

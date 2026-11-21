@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-11-21
+
+- [Inkling 2 Mini runs at 51 tok/s on a 24 GB 3090 through Unsloth's llama.cpp, and not at all through Ollama](2026-11-21-inkling2-mini-3090-smoke.html) — a brand-new looping mixture-of-experts, tested once on the lab's single RTX 3090. A hash-pinned `UD-Q4_K_XL` GGUF loads fully offloaded into 18,952 MiB (77% of the card), decodes 320 tokens at 51.18 tok/s, and returns the card to its idle baseline afterwards; at ~184 GB/s of streamed weights the single stream is nowhere near the card's 936 GB/s ceiling. The arm that the launch announcement leads with — Ollama — answers HTTP 500 in 3.3 s on the same file: `unknown model architecture: 'inkling2'` from version 0.40.16. The visible answer is cut mid-word at the token cap because the model's reasoning channel spends the budget first.
+
 ## 2026-11-02
 
 - [Pinned decoding parameters separate the 30B coder from the pack, while reasoning models burn their token budget on thoughts Antfly never reads](2026-11-02-antfly-local-model-bakeoff.html) — an empirical 26-run evaluation of 22 local Ollama models across dense retrieval and agentic execution on an RTX 3090. `bakeoff-qwen3-coder-q5kxl` scores 0.9403 generator quality with 0.89s/call latency and 100% deterministic reproducibility under pinned Modelfile decoding parameters. `Octen-Embedding-8B` with lowercase asymmetric prefixes (`query: ` / `passage: `) leads retrieval at 0.9583 MRR@10, while `nomic-embed-text` with `search_*` prefixes provides an 11x faster Pareto alternative (166.7 docs/s). Reasoning models (Nemotron, Qwen3.8) fail inside Antfly because Antfly's default 256-token cap is exhausted by reasoning before content can generate.

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" width="860" height="520" font-family="Helvetica,Arial,sans-serif">
+<rect width="860" height="520" fill="#ffffff"/>
+<text x="20" y="28" font-size="15" font-weight="bold" fill="#1a1a1a">One RTX 3090 over 12.7 seconds: the weights land, and the card stays above 75% utilization</text>
+<text x="20" y="48" font-size="11.5" fill="#6b6b6b">nvidia-smi at 0.5 s intervals during the single 320-token generation (peak 18,952 MiB, peak utilization 88%). Dashed line is the card's 24,576 MiB capacity.</text>
+<text x="74" y="62" font-size="12" font-weight="bold" fill="#1a1a1a">VRAM used (MiB)</text>
+<line x1="74" y1="268.0" x2="830" y2="268.0" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="272.0" font-size="10.5" text-anchor="end" fill="#6b6b6b">0</text>
+<line x1="74" y1="230.9" x2="830" y2="230.9" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="234.9" font-size="10.5" text-anchor="end" fill="#6b6b6b">5,000</text>
+<line x1="74" y1="193.8" x2="830" y2="193.8" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="197.8" font-size="10.5" text-anchor="end" fill="#6b6b6b">10,000</text>
+<line x1="74" y1="156.7" x2="830" y2="156.7" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="160.7" font-size="10.5" text-anchor="end" fill="#6b6b6b">15,000</text>
+<line x1="74" y1="119.6" x2="830" y2="119.6" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="123.6" font-size="10.5" text-anchor="end" fill="#6b6b6b">20,000</text>
+<line x1="74" y1="82.5" x2="830" y2="82.5" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="86.5" font-size="10.5" text-anchor="end" fill="#6b6b6b">25,000</text>
+<line x1="74" y1="85.6" x2="830" y2="85.6" stroke="#b03a2e" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="830" y="79.6" font-size="10.5" text-anchor="end" fill="#b03a2e">card capacity 24,576 MiB</text>
+<polyline points="74.0,255.6 105.0,253.7 136.6,253.7 167.5,253.7 198.5,253.7 230.1,132.4 261.7,132.4 293.2,132.4 324.8,132.4 355.8,128.0 386.8,128.0 417.7,128.0 449.3,127.9 480.3,127.9 511.3,127.4 542.9,127.4 573.8,127.4 604.8,127.4 636.4,127.3 674.5,127.3 705.5,127.3 736.5,127.3 768.0,127.3 799.0,127.3 830.0,127.3" fill="none" stroke="#1f6f8b" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="74.0" cy="255.6" r="2.1" fill="#1f6f8b"/>
+<circle cx="105.0" cy="253.7" r="2.1" fill="#1f6f8b"/>
+<circle cx="136.6" cy="253.7" r="2.1" fill="#1f6f8b"/>
+<circle cx="167.5" cy="253.7" r="2.1" fill="#1f6f8b"/>
+<circle cx="198.5" cy="253.7" r="2.1" fill="#1f6f8b"/>
+<circle cx="230.1" cy="132.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="261.7" cy="132.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="293.2" cy="132.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="324.8" cy="132.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="355.8" cy="128.0" r="2.1" fill="#1f6f8b"/>
+<circle cx="386.8" cy="128.0" r="2.1" fill="#1f6f8b"/>
+<circle cx="417.7" cy="128.0" r="2.1" fill="#1f6f8b"/>
+<circle cx="449.3" cy="127.9" r="2.1" fill="#1f6f8b"/>
+<circle cx="480.3" cy="127.9" r="2.1" fill="#1f6f8b"/>
+<circle cx="511.3" cy="127.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="542.9" cy="127.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="573.8" cy="127.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="604.8" cy="127.4" r="2.1" fill="#1f6f8b"/>
+<circle cx="636.4" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<circle cx="674.5" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<circle cx="705.5" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<circle cx="736.5" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<circle cx="768.0" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<circle cx="799.0" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<circle cx="830.0" cy="127.3" r="2.1" fill="#1f6f8b"/>
+<text x="74" y="294" font-size="12" font-weight="bold" fill="#1a1a1a">GPU utilization (%)</text>
+<line x1="74" y1="404.0" x2="830" y2="404.0" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="408.0" font-size="10.5" text-anchor="end" fill="#6b6b6b">0</text>
+<line x1="74" y1="379.5" x2="830" y2="379.5" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="383.5" font-size="10.5" text-anchor="end" fill="#6b6b6b">25</text>
+<line x1="74" y1="355.0" x2="830" y2="355.0" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="359.0" font-size="10.5" text-anchor="end" fill="#6b6b6b">50</text>
+<line x1="74" y1="330.5" x2="830" y2="330.5" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="334.5" font-size="10.5" text-anchor="end" fill="#6b6b6b">75</text>
+<line x1="74" y1="306.0" x2="830" y2="306.0" stroke="#ececec" stroke-width="1"/>
+<text x="66" y="310.0" font-size="10.5" text-anchor="end" fill="#6b6b6b">100</text>
+<polyline points="74.0,404.0 105.0,404.0 136.6,404.0 167.5,404.0 198.5,404.0 230.1,404.0 261.7,324.6 293.2,327.6 324.8,387.3 355.8,404.0 386.8,404.0 417.7,404.0 449.3,403.0 480.3,404.0 511.3,319.7 542.9,319.7 573.8,320.7 604.8,320.7 636.4,318.7 674.5,319.7 705.5,319.7 736.5,317.8 768.0,329.5 799.0,318.7 830.0,318.7" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="74.0" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="105.0" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="136.6" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="167.5" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="198.5" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="230.1" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="261.7" cy="324.6" r="2.1" fill="#b45309"/>
+<circle cx="293.2" cy="327.6" r="2.1" fill="#b45309"/>
+<circle cx="324.8" cy="387.3" r="2.1" fill="#b45309"/>
+<circle cx="355.8" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="386.8" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="417.7" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="449.3" cy="403.0" r="2.1" fill="#b45309"/>
+<circle cx="480.3" cy="404.0" r="2.1" fill="#b45309"/>
+<circle cx="511.3" cy="319.7" r="2.1" fill="#b45309"/>
+<circle cx="542.9" cy="319.7" r="2.1" fill="#b45309"/>
+<circle cx="573.8" cy="320.7" r="2.1" fill="#b45309"/>
+<circle cx="604.8" cy="320.7" r="2.1" fill="#b45309"/>
+<circle cx="636.4" cy="318.7" r="2.1" fill="#b45309"/>
+<circle cx="674.5" cy="319.7" r="2.1" fill="#b45309"/>
+<circle cx="705.5" cy="319.7" r="2.1" fill="#b45309"/>
+<circle cx="736.5" cy="317.8" r="2.1" fill="#b45309"/>
+<circle cx="768.0" cy="329.5" r="2.1" fill="#b45309"/>
+<circle cx="799.0" cy="318.7" r="2.1" fill="#b45309"/>
+<circle cx="830.0" cy="318.7" r="2.1" fill="#b45309"/>
+<line x1="74" y1="420" x2="830" y2="420" stroke="#c9c9c9" stroke-width="1"/>
+<line x1="74.0" y1="420" x2="74.0" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="74.0" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">0</text>
+<line x1="193.1" y1="420" x2="193.1" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="193.1" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">2</text>
+<line x1="312.3" y1="420" x2="312.3" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="312.3" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">4</text>
+<line x1="431.4" y1="420" x2="431.4" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="431.4" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">6</text>
+<line x1="550.6" y1="420" x2="550.6" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="550.6" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">8</text>
+<line x1="669.7" y1="420" x2="669.7" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="669.7" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">10</text>
+<line x1="788.9" y1="420" x2="788.9" y2="424" stroke="#c9c9c9" stroke-width="1"/>
+<text x="788.9" y="437" font-size="10.5" text-anchor="middle" fill="#6b6b6b">12</text>
+<text x="452" y="454" font-size="11" text-anchor="middle" fill="#6b6b6b">seconds from the first sample</text>
+<text x="452" y="470" font-size="11" text-anchor="middle" fill="#6b6b6b">Weights are resident by t=2.6 s; utilization spikes to 81% for the load, then, from t=7.3 s to the last sample, stays between 76% and 88%.</text>
+<text x="20" y="510" font-size="10.5" fill="#8a8a8a">Source: results.json / gpu-samples.txt from build #7, pipeline inkling2-mini-smoke.</text>
+</svg>

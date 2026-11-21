@@ -1,0 +1,14 @@
+{
+  "build_info": "llama.cpp version: b12588-mix-c0c3de8\nrequested source ref: b12588-mix-c0c3de8\nresolved source ref: b12588-mix-c0c3de8\nvariant: cuda12-portable\nruntime line: cuda12\ncoverage class: portable\nbundle rank: 30\ndocker image: github-hosted ubuntu-22.04, CUDA 12.8.0 (Jimver)\nbackend: CUDA\ntoolkit version: 12.8\nsupported sms: 70,75,80,86,89,90,100,103,120\nnvcc validation: available\nmin sm: 70\nmax sm: 120\nos: linux\narch: x64\nbuild_shared_libs: ON\nggml_backend_dl: ON\nggml_cpu_all_variants: ON\nggml_cuda_nccl: OFF\nrpath: $ORIGIN\nllama_openssl: ON\nopenssl_linkage: dynamic\ncxx_runtime: dynamic\nsource commit: 883286076efe5b85fddb31d9cc7035a6b698ba9b\nsource commit short: 8832860\nbuilt at (UTC): 2026-11-20T23:05:01Z\nnotes: CUDA 12 portable bundle.\n",
+  "fetched_at_unix": 1795287762,
+  "llamacpp_dir": "/tmp/build/d6f1b3c0/prepared-workspace/llamacpp/llama-b12588-mix-c0c3de8",
+  "llamacpp_release": "b12588-mix-c0c3de8",
+  "llamacpp_tarball_sha256": "4c30d5e3b3d7242cf3f214977c09a0d06102c71a713c256749909dcafa9f5980",
+  "llamacpp_variant": "linux-x64-cuda12-portable",
+  "model_bytes": 17629759456,
+  "model_file": "Inkling-2-Mini-UD-Q4_K_XL.gguf",
+  "model_path": "/tmp/build/d6f1b3c0/prepared-workspace/models/inkling-2-mini/Inkling-2-Mini-UD-Q4_K_XL.gguf",
+  "model_repo": "unsloth/Inkling-2-Mini-GGUF",
+  "model_repo_revision": "ae9327c5fbc7333116ba32eee78bb5d2bbefae4f",
+  "model_sha256": "e62d463c135ffe283df8d94b279a96ca145ac128b52ce854478613045bf4de15"
+}

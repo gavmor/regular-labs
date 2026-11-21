@@ -1,0 +1,325 @@
+# Generic Concourse pipeline template for single-GPU (RTX 3090 / sm_86) workloads.
+#
+# Architecture & Operational Contract:
+#   1. Lock-free preparation: Dependencies, wheels, and any AOT CUDA extensions are
+#      built and installed into a portable environment under `prepared-workspace`
+#      BEFORE acquiring `gpu-lock`.
+#   2. Both tasks use the same pinned image and recreate /tmp/workload-pybase
+#      against the transferred output volume. Dependencies are installed there
+#      without editable installs or pip work under the lock.
+#   3. Lock scope & caveats: `gpu-lock` serializes participating Concourse jobs across
+#      pipelines. `ensure` provides best-effort cleanup on task completion/failure,
+#      but cannot prevent a stranded lock if the worker itself is lost mid-run.
+#   4. Concourse interpolation guard: Avoid literal double-parentheses in shell
+#      scripts or comments; Concourse evaluates them as pipeline variables pre-flight.
+# Set cuda_workload_image_insecure to false except for a trusted HTTP registry.
+# artifact_resource_source must match its resource type; artifact puts require a
+# file parameter, such as the bundled S3 resource. Use versioning or a distinct
+# resource destination per run if archives must not overwrite one another.
+# The image must provide bash, Python, pip, PyTorch, tar and the CUDA tools the
+# workload needs; PYTHONUSERBASE and its user site must be enabled. GNU time is
+# used for Peak RSS when present and recorded as unavailable when absent (no
+# package installed in prepare survives into the GPU task's fresh container).
+# Pip installs non-editably. Projects with bespoke AOT build commands must add
+# them to prepare-inputs and validate imports using aot_import_check.
+# Publication and release are best effort if the worker or backend is lost.
+
+resources:
+  - name: workload-repo
+    type: git
+    icon: source-repository
+    source:
+      uri: ((workload_repo_uri))
+      branch: ((workload_branch))
+      private_key: ((workload_repo_private_key))
+
+  - name: gpu-lock
+    type: pool
+    icon: lock
+    source:
+      uri: git@github.com:gavmor/concourse-locks.git
+      branch: main
+      pool: gpu
+      private_key: ((gpu_lock_repo_private_key))
+
+  - name: workload-artifacts
+    type: ((artifact_resource_type))
+    source: ((artifact_resource_source))
+
+jobs:
+  # ---------------------------------------------------------------------
+  - name: run-gpu-workload
+    serial_groups: [gpu]
+    plan:
+      - get: workload-repo
+        trigger: false
+
+      # --- Phase 1: Lock-free validation, dependency install & AOT build ---
+      - task: prepare-inputs
+        timeout: 45m
+        params:
+          # Sets target architecture when an explicit build step compiles CUDA C++;
+          # does not trigger compilation by itself.
+          TORCH_CUDA_ARCH_LIST: "8.6"
+          FORCE_CUDA: "1"
+          MAX_JOBS: "8"
+          AOT_IMPORT_CHECK: ((aot_import_check))
+          PIP_CACHE_DIR: pip-cache
+          # Optional repository-supplied preparation that must finish BEFORE the
+          # lock: large weight fetches, pinned runtime downloads, dataset staging.
+          # Runs with cwd = prepared-workspace, so its outputs are transferred to
+          # the GPU task and are reachable from the repo checkout as ../<dir>.
+          # Leave empty when the workload needs nothing beyond pip dependencies.
+          PREPARE_CMD: ((prepare_cmd))
+          # Packages the base image is missing but the contract or the prepare
+          # hook needs (space-separated, apt names). Installed before the
+          # contract check below. Empty means "the image already has everything".
+          PREPARE_APT_PACKAGES: ((prepare_apt_packages))
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: ((cuda_workload_image_repo))
+              insecure: ((cuda_workload_image_insecure))
+            version:
+              digest: ((cuda_workload_image_digest))
+          inputs:
+            - name: workload-repo
+          outputs:
+            - name: prepared-workspace
+            - name: prep-log
+          caches:
+            - path: pip-cache
+          run:
+            path: bash
+            args:
+              - -c
+              - |
+                set -euo pipefail
+                mkdir -p prep-log prepared-workspace
+                exec > >(tee prep-log/prepare.log) 2>&1
+
+                # Distinguish expr exit 1 (result is 0) from exit >= 2 (invalid input/syntax error)
+                elapsed() {
+                  local out rc=0
+                  out=$(expr "$2" - "$1") || rc=$?
+                  if [ "$rc" -gt 1 ]; then
+                    echo "ERROR: invalid elapsed operands '$1' '$2'" >&2
+                    return "$rc"
+                  fi
+                  printf '%s\n' "$out"
+                }
+
+                T0=$(date +%s)
+
+                echo "=== 0. Optional image gap installs ==="
+                if [ -n "${PREPARE_APT_PACKAGES:-}" ]; then
+                  export DEBIAN_FRONTEND=noninteractive
+                  apt-get update
+                  # shellcheck disable=SC2086 # deliberate word splitting
+                  apt-get install -y --no-install-recommends ${PREPARE_APT_PACKAGES}
+                else
+                  echo "no PREPARE_APT_PACKAGES set; using the image as-is"
+                fi
+
+                echo "=== 1. Verify image contract (torch; GNU time optional) ==="
+                # /usr/bin/time feeds Peak RSS telemetry. It is not a hard
+                # requirement: several pinned images (e.g. the pytorch runtime
+                # images) ship torch but no /usr/bin/time, and no package
+                # installed here survives into Phase 3's fresh container. If it
+                # is missing, say so loudly and let Phase 3 record the gap.
+                if command -v /usr/bin/time >/dev/null; then
+                  echo "GNU time: present"
+                else
+                  echo "WARNING: /usr/bin/time absent from this image; Phase 3 will record peak-rss as unavailable."
+                fi
+                python -c "import torch, sys; print('python', sys.version); print('torch', torch.__version__, 'cuda', torch.version.cuda)"
+                df -h .
+
+                echo "=== 2. Stage repository & install dependencies outside GPU lock ==="
+                cp -a workload-repo/. prepared-workspace/repo/
+
+                # Install into a fixed path backed by the output volume so paths match in Phase 3
+                mkdir -p prepared-workspace/python-user-base
+                ln -sfn "$PWD/prepared-workspace/python-user-base" /tmp/workload-pybase
+                export PYTHONUSERBASE=/tmp/workload-pybase
+                export PATH="$PYTHONUSERBASE/bin:$PATH"
+
+                if [ -f prepared-workspace/repo/requirements.txt ]; then
+                  pip install --no-input --user -r prepared-workspace/repo/requirements.txt
+                fi
+
+                # Non-editable installation avoids retaining the preparation
+                # container's transient repository path in package metadata.
+                if [ -f prepared-workspace/repo/pyproject.toml ] || [ -f prepared-workspace/repo/setup.py ]; then
+                  pip install --no-input --no-build-isolation --user prepared-workspace/repo
+                fi
+
+                pip freeze > prep-log/pip-freeze.txt
+
+                echo "=== 2b. Repository prepare hook (pre-lock) ==="
+                if [ -n "${PREPARE_CMD:-}" ]; then
+                  ( cd prepared-workspace && bash -c "$PREPARE_CMD" )
+                else
+                  echo "no PREPARE_CMD set; skipping"
+                fi
+
+                echo "=== 3. Validate compiled extensions & imports before acquiring lock ==="
+                if [ -n "${AOT_IMPORT_CHECK:-}" ]; then
+                  python -c "$AOT_IMPORT_CHECK"
+                fi
+
+                T1=$(date +%s)
+                echo "=== Preparation complete in $(elapsed "$T0" "$T1")s ==="
+
+      # --- Phase 2: Acquire cross-pipeline GPU lock ---
+      - put: gpu-lock
+        params: { acquire: true }
+
+      # --- Phase 3: Foreground execution with best-effort upload and release ---
+      - do:
+          - task: execute-gpu-task
+            timeout: ((gpu_task_timeout))
+            params:
+              NVIDIA_VISIBLE_DEVICES: all
+              NVIDIA_DRIVER_CAPABILITIES: all
+              TORCH_CUDA_ARCH_LIST: "8.6"
+              WORKLOAD_CMD: ((workload_cmd))
+            config:
+              platform: linux
+              image_resource:
+                type: registry-image
+                source:
+                  repository: ((cuda_workload_image_repo))
+                  insecure: ((cuda_workload_image_insecure))
+                version:
+                  digest: ((cuda_workload_image_digest))
+              inputs:
+                - name: prepared-workspace
+                - name: prep-log
+              outputs:
+                - name: task-out
+              run:
+                path: bash
+                args:
+                  - -c
+                  - |
+                    set -euo pipefail
+                    BUILD_DIR=$PWD
+                    export OUTPUT_DIR="$BUILD_DIR/task-out"
+                    mkdir -p "$OUTPUT_DIR"
+                    SAMPLER=
+
+                    # Stop the sampler even when the workload or setup fails.
+                    stop_sampler() {
+                      local rc=$?
+                      trap - EXIT
+                      if [ -n "$SAMPLER" ]; then
+                        kill "$SAMPLER" 2>/dev/null || true
+                        wait "$SAMPLER" 2>/dev/null || true
+                      fi
+                      exit "$rc"
+                    }
+                    trap stop_sampler EXIT
+                    cp -a prep-log/. "$OUTPUT_DIR/"
+
+                    elapsed() {
+                      local out rc=0
+                      out=$(expr "$2" - "$1") || rc=$?
+                      if [ "$rc" -gt 1 ]; then
+                        echo "ERROR: invalid elapsed operands '$1' '$2'" >&2
+                        return "$rc"
+                      fi
+                      printf '%s\n' "$out"
+                    }
+
+                    # Re-bind the identical PYTHONUSERBASE symlink path used in prepare-inputs
+                    ln -sfn "$PWD/prepared-workspace/python-user-base" /tmp/workload-pybase
+                    export PYTHONUSERBASE=/tmp/workload-pybase
+                    export PATH="$PYTHONUSERBASE/bin:$PATH"
+
+                    echo "=== 1. Verify required telemetry tools & CUDA visibility ===" | tee -a task-out/run.log
+                    TIME_BIN=""
+                    if command -v /usr/bin/time >/dev/null; then
+                      TIME_BIN=/usr/bin/time
+                    else
+                      echo "WARNING: /usr/bin/time absent; peak RSS telemetry will be recorded as unavailable." | tee -a task-out/run.log
+                      echo "unavailable: /usr/bin/time is absent from the pinned image" > task-out/peak-rss-kib.txt
+                    fi
+                    python -c "import torch; assert torch.cuda.is_available(), 'CUDA unavailable'; print('Device:', torch.cuda.get_device_name(0))" | tee -a task-out/run.log
+                    nvidia-smi --query-gpu=memory.used,memory.total --format=csv | tee -a task-out/run.log
+
+                    # Background VRAM and GPU utilization sampler (5s interval)
+                    ( while true; do
+                        echo "$(date +%s) $(nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv,noheader,nounits)"
+                        sleep 5
+                      done ) > task-out/vram-samples.txt &
+                    SAMPLER=$!
+
+                    cd prepared-workspace/repo
+
+                    echo "=== 2. Launching foreground workload: $WORKLOAD_CMD ===" | tee -a "$OUTPUT_DIR/run.log"
+                    T0=$(date +%s)
+
+                    set +e
+                    if [ -n "$TIME_BIN" ]; then
+                      "$TIME_BIN" -v -o "$OUTPUT_DIR/time-rss.txt" bash -c "$WORKLOAD_CMD" 2>&1 | tee -a "$OUTPUT_DIR/run.log"
+                    else
+                      bash -c "$WORKLOAD_CMD" 2>&1 | tee -a "$OUTPUT_DIR/run.log"
+                    fi
+                    RUN_RC=${PIPESTATUS[0]}
+                    set -e
+
+                    T1=$(date +%s)
+                    kill "$SAMPLER" 2>/dev/null || true
+                    wait "$SAMPLER" 2>/dev/null || true
+                    SAMPLER=
+
+                    cd "$BUILD_DIR"
+                    WALL_SECS=$(elapsed "$T0" "$T1")
+                    echo "$WALL_SECS" > task-out/wall-clock-seconds.txt
+                    awk '{gsub(/,/, "", $2); if ($2 ~ /^[0-9]+$/) print $2}' task-out/vram-samples.txt | sort -n | tail -1 > task-out/peak-vram-mib.txt
+                    if [ -s task-out/time-rss.txt ]; then
+                      awk -F': ' '/Maximum resident set size/ {print $2}' task-out/time-rss.txt > task-out/peak-rss-kib.txt
+                    elif [ ! -s task-out/peak-rss-kib.txt ]; then
+                      echo "unavailable: no GNU time output" > task-out/peak-rss-kib.txt
+                    fi
+
+                    echo "=== Workload finished (rc=$RUN_RC, wall=${WALL_SECS}s, peak_vram=$(cat task-out/peak-vram-mib.txt) MiB, peak_rss=$(cat task-out/peak-rss-kib.txt) KiB) ===" | tee -a task-out/run.log
+                    if [ "$RUN_RC" -ne 0 ]; then
+                      echo "FAIL: workload exited with code $RUN_RC" | tee -a task-out/run.log
+                      exit "$RUN_RC"
+                    fi
+        ensure:
+          # Release before compression or upload. If release fails, Concourse
+          # stops this sequence; inspect the lock and recover it before retrying.
+          do:
+            - put: gpu-lock
+              params: { release: gpu-lock }
+            - task: package-outputs
+              config:
+                platform: linux
+                image_resource:
+                  type: registry-image
+                  source:
+                    repository: ((cuda_workload_image_repo))
+                    insecure: ((cuda_workload_image_insecure))
+                  version:
+                    digest: ((cuda_workload_image_digest))
+                inputs:
+                  - name: task-out
+                outputs:
+                  - name: packaged-out
+                run:
+                  path: bash
+                  args:
+                    - -c
+                    - |
+                      set -euo pipefail
+                      tar -czf packaged-out/telemetry-and-logs.tar.gz -C task-out .
+            - put: workload-artifacts
+              no_get: true
+              params:
+                file: packaged-out/telemetry-and-logs.tar.gz
+
