@@ -13,6 +13,10 @@ Updates to labs write-ups, in reverse chronological order.
 
 
 
+## 2026-11-23
+
+- [pi-mem lifts every local reader to 79–93% on a LongMemEval-S pilot, and the choice of reader barely moves the score](2026-11-23-pi-memory-plugins-longmemeval-pilot.html) — three Pi memory extensions and a no-memory baseline, read by five local models on one RTX 3090: Inkling 2 Mini, three uncensored Inkling derivatives, and Qwen3.8-27B. Fourteen stratified LongMemEval-S questions each get a frozen memory snapshot per extension, written once by a fixed Gemini 3.5 Flash-Lite writer, and every answer is graded with LongMemEval's own prompts through Inspect AI. Pooled over readers, pi-mem answers 59 of 70, pi-memory 36, pi-mem0 35, and no memory 11. pi-mem leads by 4 to 6 questions with every reader, at roughly twice pi-mem0's median query time and eight times its reader input tokens. Within any memory arm the five readers differ by at most two questions. 280 graded answers, $7.15 of API spend, 2 h 43 min from ask to last grade.
+
 ## 2026-11-21
 
 - [Inkling 2 Mini runs at 51 tok/s on a 24 GB 3090 through Unsloth's llama.cpp, and not at all through Ollama](2026-11-21-inkling2-mini-3090-smoke.html) — a brand-new looping mixture-of-experts, tested once on the lab's single RTX 3090. A hash-pinned `UD-Q4_K_XL` GGUF loads fully offloaded into 18,952 MiB (77% of the card), decodes 320 tokens at 51.18 tok/s, and returns the card to its idle baseline afterwards; at ~184 GB/s of streamed weights the single stream is nowhere near the card's 936 GB/s ceiling. The arm that the launch announcement leads with — Ollama — answers HTTP 500 in 3.3 s on the same file: `unknown model architecture: 'inkling2'` from version 0.40.16. The visible answer is cut mid-word at the token cap because the model's reasoning channel spends the budget first.
