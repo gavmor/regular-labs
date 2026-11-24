@@ -5,23 +5,23 @@ Accuracy by reader x memory (n = questions per cell)
                                  n  accuracy  retrieval_rate  median_s    p95_s  reader_in  reader_out
 reader         metadata_memory                                                                        
 atomicchat     none             14     0.214             0.0     4.043    6.028    276.643     192.714
-               pi-mem           14     0.786           0.929    16.498   90.191    12541.5     278.857
+               pi-mem           14     0.643           0.929     9.012   13.572   2777.357     268.071
                pi-mem0          14     0.500             1.0     7.424  218.989   1423.692     245.308
                pi-memory        14     0.500             1.0    13.331   17.512   4877.143       314.5
 openuncensored none             14     0.071             0.0     3.294    5.513    275.786     169.143
-               pi-mem           14     0.929           0.929    18.104     67.4  11137.214     335.214
+               pi-mem           14     0.643           0.929     9.166   13.623     2725.5     281.429
                pi-mem0          14     0.500             1.0      7.58   11.649   1420.786     263.429
                pi-memory        14     0.500           0.929    13.549   23.524   5569.429     317.071
 original       none             14     0.143             0.0      3.41     7.01    275.571     165.857
-               pi-mem           14     0.786           0.929    14.445   62.159  10895.286       295.5
+               pi-mem           14     0.643           0.929     9.061    12.57   2636.214     256.357
                pi-mem0          14     0.429             1.0     6.697   11.337   1350.071     245.429
                pi-memory        14     0.429             1.0    12.809   14.785     4824.5     276.429
 qwen38         none             14     0.143             0.0     4.024     6.97    270.714     144.571
-               pi-mem           14     0.857           0.786    26.522   90.684  13178.357     685.714
+               pi-mem           14     0.714           0.714    13.945   21.566     2606.0     397.429
                pi-mem0          14     0.571             1.0    11.252   17.256   1231.214     380.286
                pi-memory        14     0.571           0.643    20.604   33.277   7411.571     488.143
 unbound        none             14     0.214             0.0     3.127    5.572      276.0     155.929
-               pi-mem           14     0.857           0.929     16.23   64.383  10356.286       355.5
+               pi-mem           14     0.643           0.929     9.555   13.272     2709.5       278.5
                pi-mem0          14     0.500             1.0     8.521   15.703   1587.286     305.929
                pi-memory        14     0.571             1.0    14.032   18.942   5231.143     319.143 
 
@@ -29,11 +29,11 @@ Accuracy matrix
 
 metadata_memory   none  pi-mem  pi-mem0  pi-memory
 reader                                            
-atomicchat       0.214   0.786    0.500      0.500
-openuncensored   0.071   0.929    0.500      0.500
-original         0.143   0.786    0.429      0.429
-qwen38           0.143   0.857    0.571      0.571
-unbound          0.214   0.857    0.500      0.571 
+atomicchat       0.214   0.643    0.500      0.500
+openuncensored   0.071   0.643    0.500      0.500
+original         0.143   0.643    0.429      0.429
+qwen38           0.143   0.714    0.571      0.571
+unbound          0.214   0.643    0.500      0.571 
 
 Accuracy by memory x category, pooled over readers
 
@@ -42,15 +42,15 @@ metadata_category
 abstention                  0.9     1.0      1.0        1.0
 knowledge-update            0.0     0.6      0.4        0.0
 multi-session               0.0     0.5      0.0        0.5
-single-session-assistant    0.2     0.8      0.6        0.5
+single-session-assistant    0.2     0.5      0.6        0.5
 single-session-preference   0.0     1.0      1.0        0.9
-single-session-user         0.0     1.0      0.0        0.6
-temporal-reasoning          0.0     1.0      0.5        0.1 
+single-session-user         0.0     0.5      0.0        0.6
+temporal-reasoning          0.0     0.5      0.5        0.1 
 
 Ingestion per snapshot (fixed writer; plugin-internal extraction calls not included)
 
            snapshots  mean_writer_in  mean_writer_out  mean_seconds  retries
 memory                                                                      
-pi-mem            14        300125.0           8955.0         290.0        2
+pi-mem            14        357348.0           9109.0         561.0        0
 pi-mem0           14        215395.0           4294.0         135.0        0
 pi-memory         14        398960.0           7541.0         143.0        0

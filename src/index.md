@@ -10,7 +10,7 @@ automation, and whatever else comes out of the generative-ops workbench.
 
 ## Reports
 
-- [pi-mem lifts every local reader to 79–93% on a LongMemEval-S pilot, and the choice of reader barely moves the score](2026-11-23-pi-memory-plugins-longmemeval-pilot.html)
+- [Every Pi memory extension lifts local readers from 16% to 50–66% on a LongMemEval-S pilot, and the choice of reader barely moves the score](2026-11-23-pi-memory-plugins-longmemeval-pilot.html)
 - [Inkling 2 Mini runs at 51 tok/s on a 24 GB 3090 through Unsloth's llama.cpp, and not at all through Ollama](2026-11-21-inkling2-mini-3090-smoke.html)
 - [Pinned decoding parameters separate the 30B coder from the pack, while reasoning models burn their token budget on thoughts Antfly never reads](2026-11-02-antfly-local-model-bakeoff.html)
 - [Memdoor's eight-role DAG solves the sample problem on a local 30B MoE while skipping two contracted handoffs](2026-10-31-memdoor-team-solve-smoke.html)
